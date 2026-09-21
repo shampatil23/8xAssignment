@@ -142,7 +142,7 @@ export default function ProductDetailPage({ params }: PageProps) {
     if (!product || isOutOfStock) return;
 
     addItem(product, selectedVariant, quantity);
-    alert('Redirecting to checkout flow! (Full checkout active in upcoming phase)');
+    router.push('/checkout');
   };
 
   // Wishlist handler

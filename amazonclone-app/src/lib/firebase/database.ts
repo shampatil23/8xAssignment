@@ -8,12 +8,22 @@ import {
   set,
   get,
   update,
+  remove,
   onValue,
   type Database,
   type DataSnapshot,
 } from 'firebase/database';
 import { firebaseApp } from './config';
-import type { User as AppUser, UserRole, Category, Product, Cart, Wishlist } from '@/types';
+import type {
+  User as AppUser,
+  UserRole,
+  Category,
+  Product,
+  Cart,
+  Wishlist,
+  Address,
+  Order,
+} from '@/types';
 import { SEED_CATEGORIES, SEED_PRODUCTS } from './seedData';
 
 let _db: Database | null = null;
@@ -283,3 +293,93 @@ export async function saveUserWishlist(uid: string, wishlist: Wishlist): Promise
   const db = getRTDB();
   await set(ref(db, `users/${uid}/wishlist`), wishlist);
 }
+
+// ============================================================================
+// User Address Operations (RTDB)
+// Stored under users/${uid}/addresses/${addressId}
+// ============================================================================
+export async function getUserAddresses(uid: string): Promise<Address[]> {
+  const db = getRTDB();
+  const snap = await get(ref(db, `users/${uid}/addresses`));
+  if (!snap.exists()) return [];
+  const raw = snap.val() as Record<string, Address>;
+  return Object.values(raw);
+}
+
+export async function saveUserAddress(uid: string, address: Address): Promise<void> {
+  const db = getRTDB();
+  // If this address is set as default, unset other defaults
+  if (address.isDefault) {
+    const addresses = await getUserAddresses(uid);
+    const updates: Record<string, any> = {};
+    addresses.forEach((addr) => {
+      if (addr.id !== address.id && addr.isDefault) {
+        updates[`users/${uid}/addresses/${addr.id}/isDefault`] = false;
+      }
+    });
+    updates[`users/${uid}/addresses/${address.id}`] = address;
+    await update(ref(db), updates);
+  } else {
+    await set(ref(db, `users/${uid}/addresses/${address.id}`), address);
+  }
+}
+
+export async function deleteUserAddress(uid: string, addressId: string): Promise<void> {
+  const db = getRTDB();
+  await remove(ref(db, `users/${uid}/addresses/${addressId}`));
+}
+
+export async function setDefaultAddress(uid: string, addressId: string): Promise<void> {
+  const db = getRTDB();
+  const addresses = await getUserAddresses(uid);
+  const updates: Record<string, any> = {};
+  addresses.forEach((addr) => {
+    updates[`users/${uid}/addresses/${addr.id}/isDefault`] = addr.id === addressId;
+  });
+  await update(ref(db), updates);
+}
+
+// ============================================================================
+// Order Operations (RTDB)
+// Stored under orders/${orderId} and indexed under users/${uid}/orders/${orderId}
+// ============================================================================
+export async function saveOrder(order: Order): Promise<void> {
+  const db = getRTDB();
+  const updates: Record<string, any> = {
+    [`orders/${order.id}`]: order,
+    [`users/${order.userId}/orders/${order.id}`]: {
+      id: order.id,
+      createdAt: order.createdAt,
+      total: order.total,
+      status: order.status,
+      itemCount: order.items.reduce((sum, i) => sum + i.quantity, 0),
+    },
+  };
+  await update(ref(db), updates);
+}
+
+export async function getOrder(orderId: string): Promise<Order | null> {
+  const db = getRTDB();
+  const snap = await get(ref(db, `orders/${orderId}`));
+  if (!snap.exists()) return null;
+  return snap.val() as Order;
+}
+
+export async function getUserOrdersFromDB(uid: string): Promise<Order[]> {
+  const db = getRTDB();
+  const snap = await get(ref(db, `users/${uid}/orders`));
+  if (!snap.exists()) return [];
+  const orderIndex = snap.val() as Record<string, any>;
+  const orderIds = Object.keys(orderIndex);
+
+  const fullOrders: Order[] = [];
+  for (const id of orderIds) {
+    const o = await getOrder(id);
+    if (o) fullOrders.push(o);
+  }
+
+  // Sort newest first
+  fullOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  return fullOrders;
+}
+

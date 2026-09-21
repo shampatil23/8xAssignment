@@ -70,7 +70,8 @@ export default function CartPage() {
       return;
     }
 
-    alert('Proceeding to checkout! (Full checkout active in upcoming phase)');
+    // Navigate to checkout
+    router.push('/checkout');
   };
 
   // ── Loading Skeleton ──

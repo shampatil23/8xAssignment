@@ -199,6 +199,18 @@ export interface PaymentMethod {
   type: 'card' | 'upi' | 'netbanking' | 'cod';
   last4?: string;
   brand?: string;
+  cardHolder?: string;
+  expMonth?: string;
+  expYear?: string;
+  upiId?: string;
+}
+
+export interface ShippingOption {
+  id: string;
+  title: string;
+  description: string;
+  estimatedDate: string;
+  price: number;
 }
 
 // --- Category Types ---
