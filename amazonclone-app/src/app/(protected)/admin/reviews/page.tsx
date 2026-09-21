@@ -116,13 +116,13 @@ export default function AdminReviewsPage() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-lg border border-[#d5d9d9] shadow-xs">
           <div>
-            <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
-              <MessageSquare className="h-6 w-6 text-purple-600" />
+            <h1 className="text-xl font-bold text-[#0f1111] flex items-center gap-2">
+              <MessageSquare className="h-6 w-6 text-amazon-orange" />
               Review Moderation Feed
             </h1>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#565959] mt-1">
               Audit customer product reviews, filter spam or inappropriate remarks, and maintain rating integrity.
             </p>
           </div>
@@ -132,23 +132,23 @@ export default function AdminReviewsPage() {
             size="sm"
             onClick={loadReviews}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 text-xs text-slate-700"
+            className="inline-flex items-center gap-1.5 text-xs text-[#0f1111] border-[#d5d9d9] hover:bg-[#f7fafa] cursor-pointer"
           >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={14} className={loading ? 'animate-spin text-amazon-orange' : 'text-[#565959]'} />
             <span>Refresh</span>
           </Button>
         </div>
 
         {/* Notifications */}
         {successMessage && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-center justify-between text-emerald-800 text-xs">
+          <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-4 flex items-center justify-between text-emerald-900 text-xs">
             <div className="flex items-center gap-2">
-              <CheckCircle size={16} className="text-emerald-600" />
+              <CheckCircle size={16} className="text-[#007600]" />
               <span>{successMessage}</span>
             </div>
             <button
               onClick={() => setSuccessMessage(null)}
-              className="text-emerald-600 hover:text-emerald-900"
+              className="text-emerald-700 hover:text-emerald-900 cursor-pointer"
             >
               <X size={16} />
             </button>
@@ -156,36 +156,36 @@ export default function AdminReviewsPage() {
         )}
 
         {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 flex items-center justify-between text-red-800 text-xs">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 flex items-center justify-between text-red-900 text-xs">
             <div className="flex items-center gap-2">
               <AlertCircle size={16} className="text-red-600" />
               <span>{error}</span>
             </div>
-            <button onClick={() => setError(null)} className="text-red-600 hover:text-red-900">
+            <button onClick={() => setError(null)} className="text-red-700 hover:text-red-900 cursor-pointer">
               <X size={16} />
             </button>
           </div>
         )}
 
         {/* Filters */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-3">
+        <div className="bg-white p-4 rounded-lg border border-[#d5d9d9] shadow-xs flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#565959]" />
             <input
               type="text"
               placeholder="Search comments, reviewer name, product ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+              className="w-full pl-9 pr-4 py-2 text-xs rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden text-[#0f1111]"
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500">Rating:</span>
+            <span className="text-xs text-[#565959]">Rating:</span>
             <select
               value={ratingFilter}
               onChange={(e) => setRatingFilter(e.target.value)}
-              className="py-1.5 px-2.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-hidden"
+              className="py-1.5 px-2.5 text-xs rounded border border-[#d5d9d9] bg-white text-[#0f1111] focus:border-[#e77600] focus:outline-hidden"
             >
               <option value="all">All Stars</option>
               <option value="5">5 Stars</option>
@@ -195,11 +195,11 @@ export default function AdminReviewsPage() {
               <option value="1">1 Star</option>
             </select>
 
-            <span className="text-xs text-slate-500 ml-2">Status:</span>
+            <span className="text-xs text-[#565959] ml-2">Status:</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="py-1.5 px-2.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-hidden"
+              className="py-1.5 px-2.5 text-xs rounded border border-[#d5d9d9] bg-white text-[#0f1111] focus:border-[#e77600] focus:outline-hidden"
             >
               <option value="all">All Statuses</option>
               <option value="approved">Approved</option>
@@ -212,11 +212,11 @@ export default function AdminReviewsPage() {
         {/* Reviews Feed */}
         <div className="space-y-3">
           {loading ? (
-            <div className="bg-white p-8 text-center text-xs text-slate-500 rounded-xl border">
+            <div className="bg-white p-8 text-center text-xs text-[#565959] rounded-lg border border-[#d5d9d9]">
               Loading reviews...
             </div>
           ) : filteredReviews.length === 0 ? (
-            <div className="bg-white p-8 text-center text-xs text-slate-400 rounded-xl border">
+            <div className="bg-white p-8 text-center text-xs text-[#565959] rounded-lg border border-[#d5d9d9]">
               No reviews found matching filters.
             </div>
           ) : (
@@ -225,25 +225,25 @@ export default function AdminReviewsPage() {
               return (
                 <div
                   key={rev.id}
-                  className={`bg-white rounded-xl border p-4 shadow-xs transition-colors ${
+                  className={`bg-white rounded-lg border p-4 shadow-xs transition-colors ${
                     status === 'hidden'
-                      ? 'border-slate-300 bg-slate-50/70 opacity-75'
+                      ? 'border-[#d5d9d9] bg-[#f7fafa] opacity-75'
                       : status === 'flagged'
-                        ? 'border-amber-200 bg-amber-50/30'
-                        : 'border-slate-200'
+                        ? 'border-amber-300 bg-amber-50/50'
+                        : 'border-[#d5d9d9]'
                   }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                     {/* Left: Content */}
                     <div className="space-y-1.5 flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <div className="flex text-amber-400">
+                        <div className="flex text-[#de7921]">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
                               key={star}
                               size={14}
                               className={
-                                star <= rev.rating ? 'fill-amber-400 text-amber-400' : 'text-slate-300'
+                                star <= rev.rating ? 'fill-[#de7921] text-[#de7921]' : 'text-slate-300'
                               }
                             />
                           ))}

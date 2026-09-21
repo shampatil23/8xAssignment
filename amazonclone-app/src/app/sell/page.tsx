@@ -210,13 +210,13 @@ export default function SellPage() {
           <div className="lg:col-span-6 space-y-6">
             <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-5">
               <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-purple-600" />
+                <ShieldCheck className="h-5 w-5 text-amazon-orange" />
                 How Becoming an Amazon Seller Works
               </h2>
 
               <div className="space-y-4">
                 <div className="flex items-start gap-3.5">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-700 font-bold text-xs">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[#0f1111] font-bold text-xs">
                     1
                   </div>
                   <div>
@@ -228,7 +228,7 @@ export default function SellPage() {
                 </div>
 
                 <div className="flex items-start gap-3.5">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-700 font-bold text-xs">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[#0f1111] font-bold text-xs">
                     2
                   </div>
                   <div>
@@ -240,7 +240,7 @@ export default function SellPage() {
                 </div>
 
                 <div className="flex items-start gap-3.5">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-700 font-bold text-xs">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[#0f1111] font-bold text-xs">
                     3
                   </div>
                   <div>
@@ -380,7 +380,7 @@ export default function SellPage() {
                         value={existingStoreName}
                         onChange={(e) => setExistingStoreName(e.target.value)}
                         placeholder="e.g. Apex Electronics Co."
-                        className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                        className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden"
                       />
                     </div>
 
@@ -391,7 +391,7 @@ export default function SellPage() {
                       <select
                         value={existingCategory}
                         onChange={(e) => setExistingCategory(e.target.value)}
-                        className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-white focus:border-purple-500 focus:outline-hidden"
+                        className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-white focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden"
                       >
                         <option value="electronics">Electronics & Gadgets</option>
                         <option value="fashion">Fashion & Apparel</option>
@@ -408,7 +408,7 @@ export default function SellPage() {
                         value={existingPhone}
                         onChange={(e) => setExistingPhone(e.target.value)}
                         placeholder="+1 (555) 000-0000"
-                        className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                        className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden"
                       />
                     </div>
 
@@ -419,7 +419,7 @@ export default function SellPage() {
                         value={existingDesc}
                         onChange={(e) => setExistingDesc(e.target.value)}
                         placeholder="Tell us about the products you intend to sell on Amazon Clone..."
-                        className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden resize-none"
+                        className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden resize-none"
                       />
                     </div>
 
@@ -485,7 +485,7 @@ export default function SellPage() {
                             value={regName}
                             onChange={(e) => setRegName(e.target.value)}
                             placeholder="John Doe"
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden"
                           />
                         </div>
 
@@ -499,7 +499,7 @@ export default function SellPage() {
                             value={regStoreName}
                             onChange={(e) => setRegStoreName(e.target.value)}
                             placeholder="Apex Storefront"
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden"
                           />
                         </div>
                       </div>
@@ -514,7 +514,7 @@ export default function SellPage() {
                           value={regEmail}
                           onChange={(e) => setRegEmail(e.target.value)}
                           placeholder="seller@apexstore.com"
-                          className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden"
                         />
                       </div>
 
@@ -530,7 +530,7 @@ export default function SellPage() {
                             value={regPassword}
                             onChange={(e) => setRegPassword(e.target.value)}
                             placeholder="At least 6 characters"
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden"
                           />
                         </div>
 
@@ -541,7 +541,7 @@ export default function SellPage() {
                             value={regPhone}
                             onChange={(e) => setRegPhone(e.target.value)}
                             placeholder="+1 (555) 000-0000"
-                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                            className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden"
                           />
                         </div>
                       </div>
@@ -551,7 +551,7 @@ export default function SellPage() {
                         <select
                           value={regCategory}
                           onChange={(e) => setRegCategory(e.target.value)}
-                          className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden"
                         >
                           <option value="electronics">Electronics & Accessories</option>
                           <option value="fashion">Clothing & Shoes</option>
@@ -568,7 +568,7 @@ export default function SellPage() {
                           value={regDesc}
                           onChange={(e) => setRegDesc(e.target.value)}
                           placeholder="Brief summary of your products..."
-                          className="w-full px-3 py-2 rounded-lg border border-slate-200 resize-none"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden resize-none"
                         />
                       </div>
 
@@ -601,7 +601,7 @@ export default function SellPage() {
                           value={loginEmail}
                           onChange={(e) => setLoginEmail(e.target.value)}
                           placeholder="merchant@example.com"
-                          className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden"
                         />
                       </div>
 
@@ -615,7 +615,7 @@ export default function SellPage() {
                           value={loginPassword}
                           onChange={(e) => setLoginPassword(e.target.value)}
                           placeholder="••••••••"
-                          className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden"
                         />
                       </div>
 
@@ -634,7 +634,7 @@ export default function SellPage() {
                         <button
                           type="button"
                           onClick={() => setActiveTab('register')}
-                          className="text-purple-600 font-bold hover:underline"
+                          className="text-[#007185] font-bold hover:underline hover:text-[#c7511f] cursor-pointer"
                         >
                           Create one now
                         </button>

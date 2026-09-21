@@ -48,22 +48,22 @@ export function ConfirmationModal({
                 ? 'bg-red-100 text-red-600'
                 : variant === 'warning'
                   ? 'bg-amber-100 text-amber-600'
-                  : 'bg-purple-100 text-purple-600'
+                  : 'bg-amber-100 text-[#b12704]'
             }`}
           >
             <AlertTriangle size={20} />
           </div>
 
           <div className="flex-1 min-w-0">
-            <h3 className="text-base font-bold text-slate-900 leading-6">{title}</h3>
-            <p className="mt-1 text-xs text-slate-600 leading-relaxed">{message}</p>
+            <h3 className="text-base font-bold text-[#0f1111] leading-6">{title}</h3>
+            <p className="mt-1 text-xs text-[#565959] leading-relaxed">{message}</p>
           </div>
 
           <button
             type="button"
             onClick={onCancel}
             disabled={isLoading}
-            className="text-slate-400 hover:text-slate-600 p-1 rounded-md transition-colors"
+            className="text-slate-400 hover:text-[#0f1111] p-1 rounded-md transition-colors"
           >
             <X size={18} />
           </button>
@@ -88,10 +88,10 @@ export function ConfirmationModal({
             isLoading={isLoading}
             className={
               variant === 'danger'
-                ? 'bg-red-600 hover:bg-red-700 text-white'
+                ? 'bg-red-600 hover:bg-red-700 text-white border-red-700'
                 : variant === 'warning'
-                  ? 'bg-amber-600 hover:bg-amber-700 text-white'
-                  : 'bg-purple-600 hover:bg-purple-700 text-white'
+                  ? 'bg-amber-500 hover:bg-amber-600 text-white'
+                  : 'bg-amazon-yellow hover:bg-amazon-yellow-dark text-[#0f1111] border border-[#fcd200] font-semibold'
             }
           >
             {confirmText}

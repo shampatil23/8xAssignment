@@ -121,35 +121,35 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <AuthGuard requiredRole="admin">
-      <div className="min-h-screen bg-slate-100 flex flex-col">
+      <div className="min-h-screen bg-[#eaeded] flex flex-col font-sans">
         {/* ── Top Admin Navigation Bar ── */}
-        <header className="sticky top-0 z-40 bg-[#0f172a] text-white border-b border-slate-800 shadow-md">
+        <header className="sticky top-0 z-40 bg-[#131921] text-white shadow-md border-b border-gray-800">
           <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
             {/* Left: Hamburger & Brand */}
             <div className="flex items-center gap-4">
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-1 text-slate-400 hover:text-white cursor-pointer"
+                className="lg:hidden p-1 text-gray-300 hover:text-white cursor-pointer"
                 aria-label="Toggle Admin Menu"
               >
                 {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
               </button>
 
               <Link href="/admin" className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded bg-purple-600 text-white font-extrabold shadow-sm">
+                <div className="flex h-8 w-8 items-center justify-center rounded bg-amazon-orange text-[#131921] font-extrabold shadow-xs">
                   <ShieldCheck size={20} />
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-sm leading-none tracking-tight">
-                      amazon <span className="text-purple-400 text-xs font-semibold">admin central</span>
+                      amazon <span className="text-amazon-orange text-xs font-semibold">admin central</span>
                     </span>
-                    <span className="hidden sm:inline-block rounded bg-purple-500/20 px-1.5 py-0.5 text-[10px] font-bold text-purple-300 border border-purple-500/30 uppercase tracking-wider">
+                    <span className="hidden sm:inline-block rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-400 border border-amber-500/30 uppercase tracking-wider">
                       Console
                     </span>
                   </div>
-                  <span className="text-[10px] text-slate-400 truncate max-w-[200px]">
+                  <span className="text-[10px] text-gray-400 truncate max-w-[200px]">
                     {user?.email}
                   </span>
                 </div>
@@ -161,7 +161,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               <Link
                 href="/seller"
                 target="_blank"
-                className="hidden md:flex items-center gap-1 text-slate-300 hover:text-white px-2.5 py-1 rounded bg-slate-800/80 hover:bg-slate-700 transition-colors"
+                className="hidden md:flex items-center gap-1 text-gray-200 hover:text-white px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 transition-colors"
                 title="Open Seller Central"
               >
                 <Store size={13} />
@@ -171,7 +171,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               <Link
                 href="/"
                 target="_blank"
-                className="hidden sm:flex items-center gap-1 text-slate-300 hover:text-white px-2.5 py-1 rounded bg-slate-800/80 hover:bg-slate-700 transition-colors"
+                className="hidden sm:flex items-center gap-1 text-gray-200 hover:text-white px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 transition-colors"
                 title="Open Storefront"
               >
                 <span>Storefront</span>
@@ -181,7 +181,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="flex items-center gap-1.5 text-red-300 hover:text-red-200 px-2.5 py-1 rounded bg-red-950/40 hover:bg-red-900/50 border border-red-900/50 transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 text-red-300 hover:text-white px-2.5 py-1 rounded bg-red-500/20 hover:bg-red-600/30 border border-red-500/30 transition-colors cursor-pointer"
                 title="Sign out of Admin Console"
               >
                 <LogOut size={13} />
@@ -195,12 +195,12 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <div className="mx-auto flex max-w-7xl flex-1 w-full px-4 sm:px-6 py-6 gap-6">
           {/* ── Desktop Sidebar ── */}
           <aside className="hidden lg:block w-64 flex-shrink-0">
-            <div className="sticky top-20 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
-              <div className="px-3 py-2 border-b border-slate-100 mb-2 flex items-center justify-between">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            <div className="sticky top-20 rounded-lg border border-[#d5d9d9] bg-white p-3 shadow-xs">
+              <div className="px-3 py-2 border-b border-gray-100 mb-2 flex items-center justify-between">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-[#565959]">
                   Administration
                 </p>
-                <Lock size={12} className="text-slate-400" />
+                <Lock size={12} className="text-gray-400" />
               </div>
 
               <nav className="space-y-1">
@@ -210,13 +210,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                      className={`flex items-center gap-3 rounded px-3 py-2 text-xs font-semibold transition-colors ${
                         active
-                          ? 'bg-purple-600 text-white shadow-xs'
-                          : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                          ? 'bg-[#232f3e] text-white shadow-xs border-l-4 border-amazon-orange pl-2'
+                          : 'text-[#0f1111] hover:bg-[#f0f2f2] hover:text-[#0f1111]'
                       }`}
                     >
-                      <span className={active ? 'text-white' : 'text-slate-500'}>
+                      <span className={active ? 'text-amazon-orange' : 'text-gray-500'}>
                         {item.icon}
                       </span>
                       <span>{item.name}</span>
@@ -225,12 +225,12 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 })}
               </nav>
 
-              <div className="mt-6 pt-4 border-t border-slate-100 px-3 text-[11px] text-slate-500 space-y-1">
-                <div className="flex items-center gap-1.5 text-purple-700 font-semibold">
+              <div className="mt-6 pt-4 border-t border-gray-100 px-3 text-[11px] text-gray-500 space-y-1">
+                <div className="flex items-center gap-1.5 text-[#007185] font-semibold">
                   <ShieldCheck size={14} />
                   <span>Platform SuperAdmin</span>
                 </div>
-                <p className="text-[10px] text-slate-400 font-mono">
+                <p className="text-[10px] text-gray-400 font-mono">
                   UID: {user?.uid.slice(0, 14)}...
                 </p>
               </div>
@@ -246,17 +246,17 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               />
               <div className="relative w-72 max-w-xs bg-white h-full shadow-2xl p-4 flex flex-col justify-between z-10">
                 <div>
-                  <div className="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
+                  <div className="flex items-center justify-between pb-4 border-b border-gray-200 mb-4">
                     <div className="flex items-center gap-2">
-                      <ShieldCheck size={20} className="text-purple-600" />
-                      <span className="font-bold text-sm text-slate-900">
+                      <ShieldCheck size={20} className="text-amazon-orange" />
+                      <span className="font-bold text-sm text-[#0f1111]">
                         Admin Menu
                       </span>
                     </div>
                     <button
                       type="button"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="text-slate-500 hover:text-slate-800 p-1"
+                      className="text-gray-500 hover:text-gray-800 p-1"
                     >
                       <X size={20} />
                     </button>
@@ -270,13 +270,15 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                           key={item.href}
                           href={item.href}
                           onClick={() => setMobileMenuOpen(false)}
-                          className={`flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold ${
+                          className={`flex items-center gap-3 rounded px-3 py-2 text-xs font-semibold ${
                             active
-                              ? 'bg-purple-600 text-white shadow-xs'
-                              : 'text-slate-700 hover:bg-slate-100'
+                              ? 'bg-[#232f3e] text-white border-l-4 border-amazon-orange pl-2'
+                              : 'text-[#0f1111] hover:bg-gray-100'
                           }`}
                         >
-                          {item.icon}
+                          <span className={active ? 'text-amazon-orange' : 'text-gray-500'}>
+                            {item.icon}
+                          </span>
                           <span>{item.name}</span>
                         </Link>
                       );
@@ -284,11 +286,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   </nav>
                 </div>
 
-                <div className="pt-4 border-t border-slate-200 space-y-2">
+                <div className="pt-4 border-t border-gray-200 space-y-2">
                   <Link
                     href="/"
                     target="_blank"
-                    className="flex items-center justify-between text-xs text-slate-600 hover:text-slate-900 py-1"
+                    className="flex items-center justify-between text-xs text-gray-600 hover:text-[#0f1111] py-1"
                   >
                     <span>Storefront</span>
                     <ExternalLink size={14} />

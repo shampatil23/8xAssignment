@@ -113,15 +113,15 @@ export default function AdminReturnsPage() {
   const getStatusStepBadge = (status: ReturnRequest['status']) => {
     switch (status) {
       case 'REFUNDED':
-        return <span className="bg-emerald-100 text-emerald-800 rounded px-2 py-0.5 text-[10px] font-bold">Refunded</span>;
+        return <span className="bg-[#ebf8fa] text-[#007600] border border-[#a2d8df] rounded px-2 py-0.5 text-[10px] font-bold">Refunded</span>;
       case 'REFUND_PENDING':
-        return <span className="bg-purple-100 text-purple-800 rounded px-2 py-0.5 text-[10px] font-bold">Refund Pending</span>;
+        return <span className="bg-amber-50 text-[#b12704] border border-amber-200 rounded px-2 py-0.5 text-[10px] font-bold">Refund Pending</span>;
       case 'RETURNED':
-        return <span className="bg-blue-100 text-blue-800 rounded px-2 py-0.5 text-[10px] font-bold">Item Returned</span>;
+        return <span className="bg-blue-50 text-blue-800 border border-blue-200 rounded px-2 py-0.5 text-[10px] font-bold">Item Returned</span>;
       case 'RETURN_APPROVED':
-        return <span className="bg-indigo-100 text-indigo-800 rounded px-2 py-0.5 text-[10px] font-bold">Return Approved</span>;
+        return <span className="bg-blue-50 text-blue-800 border border-blue-200 rounded px-2 py-0.5 text-[10px] font-bold">Return Approved</span>;
       default:
-        return <span className="bg-amber-100 text-amber-800 rounded px-2 py-0.5 text-[10px] font-bold">Request Pending</span>;
+        return <span className="bg-amber-50 text-[#b12704] border border-amber-200 rounded px-2 py-0.5 text-[10px] font-bold">Request Pending</span>;
     }
   };
 
@@ -129,13 +129,13 @@ export default function AdminReturnsPage() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-lg border border-[#d5d9d9] shadow-xs">
           <div>
-            <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
-              <RotateCcw className="h-6 w-6 text-red-600" />
+            <h1 className="text-xl font-bold text-[#0f1111] flex items-center gap-2">
+              <RotateCcw className="h-6 w-6 text-amazon-orange" />
               Returns & Refunds Queue
             </h1>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#565959] mt-1">
               Process customer return claims, inspect dispute items, approve RMA, and disburse refunds.
             </p>
           </div>
@@ -145,23 +145,23 @@ export default function AdminReturnsPage() {
             size="sm"
             onClick={loadReturns}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 text-xs text-slate-700"
+            className="inline-flex items-center gap-1.5 text-xs text-[#0f1111] border-[#d5d9d9] hover:bg-[#f7fafa] cursor-pointer"
           >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={14} className={loading ? 'animate-spin text-amazon-orange' : 'text-[#565959]'} />
             <span>Refresh</span>
           </Button>
         </div>
 
         {/* Notifications */}
         {successMessage && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-center justify-between text-emerald-800 text-xs">
+          <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-4 flex items-center justify-between text-emerald-900 text-xs">
             <div className="flex items-center gap-2">
-              <CheckCircle size={16} className="text-emerald-600" />
+              <CheckCircle size={16} className="text-[#007600]" />
               <span>{successMessage}</span>
             </div>
             <button
               onClick={() => setSuccessMessage(null)}
-              className="text-emerald-600 hover:text-emerald-900"
+              className="text-emerald-700 hover:text-emerald-900 cursor-pointer"
             >
               <X size={16} />
             </button>
@@ -169,36 +169,36 @@ export default function AdminReturnsPage() {
         )}
 
         {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 flex items-center justify-between text-red-800 text-xs">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 flex items-center justify-between text-red-900 text-xs">
             <div className="flex items-center gap-2">
               <AlertCircle size={16} className="text-red-600" />
               <span>{error}</span>
             </div>
-            <button onClick={() => setError(null)} className="text-red-600 hover:text-red-900">
+            <button onClick={() => setError(null)} className="text-red-700 hover:text-red-900 cursor-pointer">
               <X size={16} />
             </button>
           </div>
         )}
 
         {/* Filters */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-3">
+        <div className="bg-white p-4 rounded-lg border border-[#d5d9d9] shadow-xs flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#565959]" />
             <input
               type="text"
               placeholder="Search by request ID, order ID, product title, reason..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+              className="w-full pl-9 pr-4 py-2 text-xs rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden text-[#0f1111]"
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500">Stage:</span>
+            <span className="text-xs text-[#565959]">Stage:</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="py-1.5 px-2.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-hidden"
+              className="py-1.5 px-2.5 text-xs rounded border border-[#d5d9d9] bg-white text-[#0f1111] focus:border-[#e77600] focus:outline-hidden"
             >
               <option value="all">All Stages</option>
               <option value="RETURN_REQUESTED">Pending Request</option>
@@ -277,7 +277,7 @@ export default function AdminReturnsPage() {
                           <button
                             type="button"
                             onClick={() => setSelectedReturn(r)}
-                            className="p-1.5 rounded text-slate-500 hover:text-purple-600 hover:bg-purple-50 transition-colors"
+                            className="p-1.5 rounded text-[#565959] hover:text-[#007185] hover:bg-slate-100 transition-colors cursor-pointer"
                             title="Inspect Details"
                           >
                             <Eye size={15} />
@@ -289,7 +289,7 @@ export default function AdminReturnsPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => handleOpenAdvance(r, 'RETURN_APPROVED')}
-                              className="h-7 text-[10px] text-purple-700 hover:bg-purple-50 border-purple-200"
+                              className="h-7 text-[10px] bg-amazon-yellow hover:bg-amazon-yellow-dark text-[#0f1111] border border-[#fcd200] font-bold"
                             >
                               Approve Return
                             </Button>

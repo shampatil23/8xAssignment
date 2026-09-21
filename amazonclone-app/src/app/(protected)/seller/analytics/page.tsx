@@ -102,7 +102,7 @@ export default function SellerAnalyticsPage() {
             <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-xs">
               <div className="flex items-center justify-between text-gray-500 mb-2">
                 <span className="text-xs font-semibold uppercase">Avg Order Value</span>
-                <TrendingUp size={18} className="text-purple-600" />
+                <TrendingUp size={18} className="text-amazon-orange" />
               </div>
               <p className="text-2xl font-extrabold text-gray-900">
                 ${avgOrderValue.toFixed(2)}

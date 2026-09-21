@@ -152,13 +152,13 @@ export default function AdminCategoriesPage() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-lg border border-[#d5d9d9] shadow-xs">
           <div>
-            <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
-              <Layers className="h-6 w-6 text-purple-600" />
+            <h1 className="text-xl font-bold text-[#0f1111] flex items-center gap-2">
+              <Layers className="h-6 w-6 text-amazon-orange" />
               Product Categories
             </h1>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#565959] mt-1">
               Maintain the marketplace category taxonomy, department trees, and navigation classifications.
             </p>
           </div>
@@ -169,9 +169,9 @@ export default function AdminCategoriesPage() {
               size="sm"
               onClick={loadCategories}
               disabled={loading}
-              className="inline-flex items-center gap-1.5 text-xs text-slate-700"
+              className="inline-flex items-center gap-1.5 text-xs text-[#0f1111] border-[#d5d9d9] hover:bg-[#f7fafa] cursor-pointer"
             >
-              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+              <RefreshCw size={14} className={loading ? 'animate-spin text-amazon-orange' : 'text-[#565959]'} />
               <span>Refresh</span>
             </Button>
 
@@ -179,7 +179,7 @@ export default function AdminCategoriesPage() {
               variant="primary"
               size="sm"
               onClick={handleOpenCreate}
-              className="inline-flex items-center gap-1.5 text-xs bg-purple-600 hover:bg-purple-700 text-white"
+              className="inline-flex items-center gap-1.5 text-xs bg-amazon-yellow hover:bg-amazon-yellow-dark text-[#0f1111] border border-[#fcd200] font-bold cursor-pointer"
             >
               <Plus size={14} />
               <span>Add Category</span>
@@ -189,14 +189,14 @@ export default function AdminCategoriesPage() {
 
         {/* Notifications */}
         {successMessage && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-center justify-between text-emerald-800 text-xs">
+          <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-4 flex items-center justify-between text-emerald-900 text-xs">
             <div className="flex items-center gap-2">
-              <CheckCircle size={16} className="text-emerald-600" />
+              <CheckCircle size={16} className="text-[#007600]" />
               <span>{successMessage}</span>
             </div>
             <button
               onClick={() => setSuccessMessage(null)}
-              className="text-emerald-600 hover:text-emerald-900"
+              className="text-emerald-700 hover:text-emerald-900 cursor-pointer"
             >
               <X size={16} />
             </button>
@@ -204,27 +204,27 @@ export default function AdminCategoriesPage() {
         )}
 
         {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 flex items-center justify-between text-red-800 text-xs">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 flex items-center justify-between text-red-900 text-xs">
             <div className="flex items-center gap-2">
               <AlertCircle size={16} className="text-red-600" />
               <span>{error}</span>
             </div>
-            <button onClick={() => setError(null)} className="text-red-600 hover:text-red-900">
+            <button onClick={() => setError(null)} className="text-red-700 hover:text-red-900 cursor-pointer">
               <X size={16} />
             </button>
           </div>
         )}
 
         {/* Search */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+        <div className="bg-white p-4 rounded-lg border border-[#d5d9d9] shadow-xs">
           <div className="relative">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#565959]" />
             <input
               type="text"
               placeholder="Search category name, slug, description..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+              className="w-full pl-9 pr-4 py-2 text-xs rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden text-[#0f1111]"
             />
           </div>
         </div>
@@ -232,28 +232,28 @@ export default function AdminCategoriesPage() {
         {/* Categories Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {loading ? (
-            <div className="col-span-full py-12 text-center text-xs text-slate-400">
+            <div className="col-span-full py-12 text-center text-xs text-[#565959]">
               Loading categories...
             </div>
           ) : filteredCategories.length === 0 ? (
-            <div className="col-span-full py-12 text-center text-xs text-slate-400">
+            <div className="col-span-full py-12 text-center text-xs text-[#565959]">
               No categories found.
             </div>
           ) : (
             filteredCategories.map((c) => (
               <div
                 key={c.id}
-                className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs flex flex-col justify-between"
+                className="bg-white rounded-lg border border-[#d5d9d9] p-4 shadow-xs flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5">
-                      <div className="h-9 w-9 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center font-bold shrink-0">
+                      <div className="h-9 w-9 rounded-md bg-amber-50 text-amazon-orange flex items-center justify-center font-bold shrink-0 border border-amber-200">
                         <Layers size={18} />
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold text-slate-900">{c.name}</h3>
-                        <p className="text-[11px] text-slate-400 font-mono">/{c.slug}</p>
+                        <h3 className="text-sm font-bold text-[#0f1111]">{c.name}</h3>
+                        <p className="text-[11px] text-[#565959] font-mono">/{c.slug}</p>
                       </div>
                     </div>
 
@@ -261,7 +261,7 @@ export default function AdminCategoriesPage() {
                       <button
                         type="button"
                         onClick={() => handleOpenEdit(c)}
-                        className="p-1 rounded text-slate-400 hover:text-purple-600 hover:bg-purple-50"
+                        className="p-1 rounded text-[#565959] hover:text-[#007185] hover:bg-slate-100 cursor-pointer"
                         title="Edit Category"
                       >
                         <Edit2 size={14} />
@@ -272,7 +272,7 @@ export default function AdminCategoriesPage() {
                           setTargetCategory(c);
                           setDeleteModalOpen(true);
                         }}
-                        className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50"
+                        className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 cursor-pointer"
                         title="Delete Category"
                       >
                         <Trash2 size={14} />
@@ -280,14 +280,14 @@ export default function AdminCategoriesPage() {
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-600 mt-3 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-[#565959] mt-3 line-clamp-2 leading-relaxed">
                     {c.description || 'No description provided for this department category.'}
                   </p>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                  <span className="text-slate-400">ID: {c.id}</span>
-                  <span className="text-purple-600 font-semibold uppercase text-[10px]">Active</span>
+                <div className="mt-4 pt-3 border-t border-[#eaeded] flex items-center justify-between text-[11px]">
+                  <span className="text-[#565959]">ID: {c.id}</span>
+                  <span className="text-[#007600] font-semibold uppercase text-[10px]">Active</span>
                 </div>
               </div>
             ))
@@ -303,16 +303,16 @@ export default function AdminCategoriesPage() {
             />
             <form
               onSubmit={handleSaveCategory}
-              className="relative w-full max-w-md rounded-xl bg-white p-6 shadow-2xl z-10 border border-slate-200 space-y-4"
+              className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-2xl z-10 border border-[#d5d9d9] space-y-4"
             >
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h3 className="text-base font-bold text-slate-900">
+              <div className="flex items-center justify-between pb-3 border-b border-[#eaeded]">
+                <h3 className="text-base font-bold text-[#0f1111]">
                   {isEditing ? 'Edit Category' : 'Create Category'}
                 </h3>
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="text-slate-400 hover:text-slate-600 p-1"
+                  className="text-slate-400 hover:text-[#0f1111] p-1 cursor-pointer"
                 >
                   <X size={18} />
                 </button>
@@ -320,7 +320,7 @@ export default function AdminCategoriesPage() {
 
               <div className="space-y-3 text-xs">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">
+                  <label className="font-bold text-[#0f1111] block mb-1">
                     Category Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -332,12 +332,12 @@ export default function AdminCategoriesPage() {
                       if (!isEditing) setCatSlug(slugify(e.target.value));
                     }}
                     placeholder="e.g. Electronics, Home & Kitchen"
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                    className="w-full px-3 py-2 text-xs rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden text-[#0f1111]"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">
+                  <label className="font-bold text-[#0f1111] block mb-1">
                     Slug <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -346,34 +346,34 @@ export default function AdminCategoriesPage() {
                     value={catSlug}
                     onChange={(e) => setCatSlug(e.target.value)}
                     placeholder="e.g. electronics"
-                    className="w-full px-3 py-2 text-xs font-mono rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                    className="w-full px-3 py-2 text-xs font-mono rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden text-[#0f1111]"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Description</label>
+                  <label className="font-bold text-[#0f1111] block mb-1">Description</label>
                   <textarea
                     rows={3}
                     value={catDesc}
                     onChange={(e) => setCatDesc(e.target.value)}
                     placeholder="Brief description of products in this category..."
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden resize-none"
+                    className="w-full px-3 py-2 text-xs rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden resize-none text-[#0f1111]"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Banner Image URL</label>
+                  <label className="font-bold text-[#0f1111] block mb-1">Banner Image URL</label>
                   <input
                     type="url"
                     value={catImage}
                     onChange={(e) => setCatImage(e.target.value)}
                     placeholder="https://images.unsplash.com/..."
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                    className="w-full px-3 py-2 text-xs rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden text-[#0f1111]"
                   />
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
+              <div className="pt-4 border-t border-[#eaeded] flex items-center justify-end gap-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -388,7 +388,7 @@ export default function AdminCategoriesPage() {
                   variant="primary"
                   size="sm"
                   isLoading={saving}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  className="bg-amazon-yellow hover:bg-amazon-yellow-dark text-[#0f1111] border border-[#fcd200] font-bold"
                 >
                   {isEditing ? 'Update Category' : 'Create Category'}
                 </Button>

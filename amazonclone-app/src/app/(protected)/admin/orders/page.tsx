@@ -108,19 +108,19 @@ export default function AdminOrdersPage() {
   const getStatusBadge = (status: OrderStatus) => {
     switch (status) {
       case 'delivered':
-        return <span className="bg-emerald-100 text-emerald-800 rounded px-2 py-0.5 text-[10px] font-bold uppercase">Delivered</span>;
+        return <span className="bg-[#ebf8fa] text-[#007600] border border-[#a2d8df] rounded px-2 py-0.5 text-[10px] font-bold uppercase">Delivered</span>;
       case 'shipped':
       case 'out_for_delivery':
-        return <span className="bg-blue-100 text-blue-800 rounded px-2 py-0.5 text-[10px] font-bold uppercase">{status.replace('_', ' ')}</span>;
+        return <span className="bg-blue-50 text-blue-800 border border-blue-200 rounded px-2 py-0.5 text-[10px] font-bold uppercase">{status.replace('_', ' ')}</span>;
       case 'cancelled':
-        return <span className="bg-red-100 text-red-800 rounded px-2 py-0.5 text-[10px] font-bold uppercase">Cancelled</span>;
+        return <span className="bg-red-50 text-red-800 border border-red-200 rounded px-2 py-0.5 text-[10px] font-bold uppercase">Cancelled</span>;
       case 'RETURN_REQUESTED':
       case 'RETURN_APPROVED':
       case 'REFUNDED':
       case 'refunded':
-        return <span className="bg-purple-100 text-purple-800 rounded px-2 py-0.5 text-[10px] font-bold uppercase">{status}</span>;
+        return <span className="bg-amber-50 text-[#b12704] border border-amber-200 rounded px-2 py-0.5 text-[10px] font-bold uppercase">{status}</span>;
       default:
-        return <span className="bg-amber-100 text-amber-800 rounded px-2 py-0.5 text-[10px] font-bold uppercase">{status}</span>;
+        return <span className="bg-amber-50 text-[#b12704] border border-amber-200 rounded px-2 py-0.5 text-[10px] font-bold uppercase">{status}</span>;
     }
   };
 
@@ -128,13 +128,13 @@ export default function AdminOrdersPage() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-lg border border-[#d5d9d9] shadow-xs">
           <div>
-            <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
-              <ClipboardList className="h-6 w-6 text-purple-600" />
+            <h1 className="text-xl font-bold text-[#0f1111] flex items-center gap-2">
+              <ClipboardList className="h-6 w-6 text-amazon-orange" />
               Global Orders Oversight
             </h1>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#565959] mt-1">
               Track real-time transactions, customer shipments, seller fulfillments, and admin status overrides.
             </p>
           </div>
@@ -144,23 +144,23 @@ export default function AdminOrdersPage() {
             size="sm"
             onClick={loadOrders}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 text-xs text-slate-700"
+            className="inline-flex items-center gap-1.5 text-xs text-[#0f1111] border-[#d5d9d9] hover:bg-[#f7fafa] cursor-pointer"
           >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={14} className={loading ? 'animate-spin text-amazon-orange' : 'text-[#565959]'} />
             <span>Refresh</span>
           </Button>
         </div>
 
         {/* Notifications */}
         {successMessage && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-center justify-between text-emerald-800 text-xs">
+          <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-4 flex items-center justify-between text-emerald-900 text-xs">
             <div className="flex items-center gap-2">
-              <CheckCircle size={16} className="text-emerald-600" />
+              <CheckCircle size={16} className="text-[#007600]" />
               <span>{successMessage}</span>
             </div>
             <button
               onClick={() => setSuccessMessage(null)}
-              className="text-emerald-600 hover:text-emerald-900"
+              className="text-emerald-700 hover:text-emerald-900 cursor-pointer"
             >
               <X size={16} />
             </button>
@@ -168,36 +168,36 @@ export default function AdminOrdersPage() {
         )}
 
         {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 flex items-center justify-between text-red-800 text-xs">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 flex items-center justify-between text-red-900 text-xs">
             <div className="flex items-center gap-2">
               <AlertCircle size={16} className="text-red-600" />
               <span>{error}</span>
             </div>
-            <button onClick={() => setError(null)} className="text-red-600 hover:text-red-900">
+            <button onClick={() => setError(null)} className="text-red-700 hover:text-red-900 cursor-pointer">
               <X size={16} />
             </button>
           </div>
         )}
 
         {/* Filter Bar */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-3">
+        <div className="bg-white p-4 rounded-lg border border-[#d5d9d9] shadow-xs flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#565959]" />
             <input
               type="text"
               placeholder="Search by order ID, recipient name, or item..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+              className="w-full pl-9 pr-4 py-2 text-xs rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden text-[#0f1111]"
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500">Status:</span>
+            <span className="text-xs text-[#565959]">Status:</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="py-1.5 px-2.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-hidden"
+              className="py-1.5 px-2.5 text-xs rounded border border-[#d5d9d9] bg-white text-[#0f1111] focus:border-[#e77600] focus:outline-hidden"
             >
               <option value="all">All Statuses</option>
               <option value="placed">Placed</option>
@@ -274,7 +274,7 @@ export default function AdminOrdersPage() {
                           <button
                             type="button"
                             onClick={() => setSelectedOrder(o)}
-                            className="p-1.5 rounded text-slate-500 hover:text-purple-600 hover:bg-purple-50 transition-colors"
+                            className="p-1.5 rounded text-[#565959] hover:text-[#007185] hover:bg-slate-100 transition-colors cursor-pointer"
                             title="Inspect Order Details"
                           >
                             <Eye size={15} />
@@ -283,7 +283,7 @@ export default function AdminOrdersPage() {
                           <select
                             value={o.status}
                             onChange={(e) => handleOpenStatusChange(o, e.target.value as OrderStatus)}
-                            className="text-[10px] py-1 px-1.5 rounded border border-slate-200 bg-white cursor-pointer"
+                            className="text-[10px] py-1 px-1.5 rounded border border-[#d5d9d9] bg-white text-[#0f1111] focus:border-[#e77600] focus:outline-hidden cursor-pointer"
                             title="Admin Status Override"
                           >
                             <option value="placed">Placed</option>
@@ -311,34 +311,34 @@ export default function AdminOrdersPage() {
               className="fixed inset-0 bg-black/60 backdrop-blur-xs"
               onClick={() => setSelectedOrder(null)}
             />
-            <div className="relative w-full max-w-2xl rounded-xl bg-white p-6 shadow-2xl z-10 border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="relative w-full max-w-2xl rounded-lg bg-white p-6 shadow-2xl z-10 border border-[#d5d9d9] space-y-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between pb-3 border-b border-[#eaeded]">
                 <div>
-                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <h3 className="text-base font-bold text-[#0f1111] flex items-center gap-2">
                     Order Details #{selectedOrder.id}
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-[#565959]">
                     Placed on {new Date(selectedOrder.createdAt).toLocaleString()}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setSelectedOrder(null)}
-                  className="text-slate-400 hover:text-slate-600 p-1"
+                  className="text-slate-400 hover:text-[#0f1111] p-1 cursor-pointer"
                 >
                   <X size={18} />
                 </button>
               </div>
 
               {/* Status & Total Banner */}
-              <div className="flex items-center justify-between rounded-lg bg-slate-50 p-3 border border-slate-200">
+              <div className="flex items-center justify-between rounded bg-[#f7fafa] p-3 border border-[#d5d9d9]">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-500">Current Status:</span>
+                  <span className="text-xs font-bold text-[#565959]">Current Status:</span>
                   {getStatusBadge(selectedOrder.status)}
                 </div>
                 <div className="text-right">
-                  <span className="text-xs text-slate-400">Grand Total: </span>
-                  <span className="text-base font-black text-emerald-700">
+                  <span className="text-xs text-[#565959]">Grand Total: </span>
+                  <span className="text-base font-bold text-[#007600]">
                     {formatPrice(selectedOrder.total)}
                   </span>
                 </div>
@@ -346,18 +346,18 @@ export default function AdminOrdersPage() {
 
               {/* Shipping & Payment Meta */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div className="rounded-lg border border-slate-200 p-3">
-                  <h4 className="font-bold text-slate-800 flex items-center gap-1.5 mb-1.5">
-                    <MapPin size={14} className="text-purple-600" />
+                <div className="rounded border border-[#d5d9d9] p-3 bg-white">
+                  <h4 className="font-bold text-[#0f1111] flex items-center gap-1.5 mb-1.5">
+                    <MapPin size={14} className="text-amazon-orange" />
                     Shipping Destination
                   </h4>
-                  <p className="font-semibold text-slate-800">
+                  <p className="font-semibold text-[#0f1111]">
                     {selectedOrder.shippingAddress?.fullName}
                   </p>
-                  <p className="text-slate-600">
+                  <p className="text-[#565959]">
                     {selectedOrder.shippingAddress?.street}
                   </p>
-                  <p className="text-slate-600">
+                  <p className="text-[#565959]">
                     {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.state}{' '}
                     {selectedOrder.shippingAddress?.postalCode}
                   </p>
@@ -366,15 +366,15 @@ export default function AdminOrdersPage() {
                   </p>
                 </div>
 
-                <div className="rounded-lg border border-slate-200 p-3">
-                  <h4 className="font-bold text-slate-800 flex items-center gap-1.5 mb-1.5">
-                    <CreditCard size={14} className="text-purple-600" />
+                <div className="rounded border border-[#d5d9d9] p-3 bg-white">
+                  <h4 className="font-bold text-[#0f1111] flex items-center gap-1.5 mb-1.5">
+                    <CreditCard size={14} className="text-amazon-orange" />
                     Payment Summary
                   </h4>
-                  <p className="text-slate-600 capitalize">
+                  <p className="text-[#565959] capitalize">
                     Method: {selectedOrder.paymentMethod?.type || 'Card'}
                   </p>
-                  <div className="space-y-1 mt-2 text-[11px] text-slate-600">
+                  <div className="space-y-1 mt-2 text-[11px] text-[#565959]">
                     <div className="flex justify-between">
                       <span>Subtotal:</span>
                       <span>{formatPrice(selectedOrder.subtotal)}</span>
@@ -393,8 +393,8 @@ export default function AdminOrdersPage() {
 
               {/* Purchased Items */}
               <div>
-                <h4 className="text-xs font-bold text-slate-800 mb-2 flex items-center gap-1.5">
-                  <Package size={14} className="text-purple-600" />
+                <h4 className="text-xs font-bold text-[#0f1111] mb-2 flex items-center gap-1.5">
+                  <Package size={14} className="text-amazon-orange" />
                   Purchased Items ({selectedOrder.items.length})
                 </h4>
                 <div className="divide-y divide-slate-100 border border-slate-200 rounded-lg overflow-hidden">

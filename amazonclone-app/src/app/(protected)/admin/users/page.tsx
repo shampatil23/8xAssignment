@@ -138,13 +138,13 @@ export default function AdminUsersPage() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-lg border border-[#d5d9d9] shadow-xs">
           <div>
-            <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
-              <Users className="h-6 w-6 text-blue-600" />
+            <h1 className="text-xl font-bold text-[#0f1111] flex items-center gap-2">
+              <Users className="h-6 w-6 text-[#007185]" />
               User Accounts Directory
             </h1>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#565959] mt-1">
               Search, filter, manage roles, and review security status for customer and seller accounts.
             </p>
           </div>
@@ -154,63 +154,49 @@ export default function AdminUsersPage() {
             size="sm"
             onClick={loadUsers}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 text-xs text-slate-700"
+            className="inline-flex items-center gap-1.5 text-xs text-[#0f1111] border-[#d5d9d9] hover:bg-[#f7fafa] cursor-pointer"
           >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={14} className={loading ? 'animate-spin text-amazon-orange' : 'text-[#565959]'} />
             <span>Refresh</span>
           </Button>
         </div>
 
-        {/* Notifications */}
-        {successMessage && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-center justify-between text-emerald-800 text-xs">
-            <div className="flex items-center gap-2">
-              <CheckCircle size={16} className="text-emerald-600" />
-              <span>{successMessage}</span>
-            </div>
-            <button
-              onClick={() => setSuccessMessage(null)}
-              className="text-emerald-600 hover:text-emerald-900"
-            >
-              <X size={16} />
-            </button>
+        {error && (
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 flex items-center gap-3 text-red-900 text-xs">
+            <AlertCircle size={18} className="shrink-0 text-red-600" />
+            <span className="flex-1">{error}</span>
           </div>
         )}
 
-        {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 flex items-center justify-between text-red-800 text-xs">
-            <div className="flex items-center gap-2">
-              <AlertCircle size={16} className="text-red-600" />
-              <span>{error}</span>
-            </div>
-            <button onClick={() => setError(null)} className="text-red-600 hover:text-red-900">
-              <X size={16} />
-            </button>
+        {successMessage && (
+          <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-4 flex items-center gap-3 text-emerald-900 text-xs">
+            <UserCheck size={18} className="shrink-0 text-[#007600]" />
+            <span className="flex-1">{successMessage}</span>
           </div>
         )}
 
         {/* Filters & Search Bar */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-3">
+        <div className="bg-white p-4 rounded-lg border border-[#d5d9d9] shadow-xs flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#565959]" />
             <input
               type="text"
               placeholder="Search by name, email, or UID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+              className="w-full pl-9 pr-4 py-2 text-xs rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden text-[#0f1111]"
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 text-xs text-slate-500">
+            <div className="flex items-center gap-1 text-xs text-[#565959]">
               <Filter size={14} />
               <span>Role:</span>
             </div>
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value as any)}
-              className="py-1.5 px-2.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-hidden"
+              className="py-1.5 px-2.5 text-xs rounded border border-[#d5d9d9] bg-white focus:border-[#e77600] focus:outline-hidden text-[#0f1111]"
             >
               <option value="all">All Roles</option>
               <option value="customer">Customers</option>
@@ -218,13 +204,13 @@ export default function AdminUsersPage() {
               <option value="admin">Admins</option>
             </select>
 
-            <div className="flex items-center gap-1 text-xs text-slate-500 ml-2">
+            <div className="flex items-center gap-1 text-xs text-[#565959] ml-2">
               <span>Status:</span>
             </div>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="py-1.5 px-2.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-hidden"
+              className="py-1.5 px-2.5 text-xs rounded border border-[#d5d9d9] bg-white focus:border-[#e77600] focus:outline-hidden text-[#0f1111]"
             >
               <option value="all">All Statuses</option>
               <option value="active">Active</option>
@@ -234,18 +220,18 @@ export default function AdminUsersPage() {
         </div>
 
         {/* Users Table */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+        <div className="bg-white rounded-lg border border-[#d5d9d9] shadow-xs overflow-hidden">
           {loading ? (
-            <div className="p-8 text-center text-xs text-slate-500">Loading user accounts...</div>
+            <div className="p-8 text-center text-xs text-[#565959]">Loading user accounts...</div>
           ) : filteredUsers.length === 0 ? (
-            <div className="p-8 text-center text-xs text-slate-400">
+            <div className="p-8 text-center text-xs text-[#565959]">
               No user accounts found matching your filters.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50/70 text-slate-500 font-bold uppercase text-[10px]">
+                  <tr className="border-b border-[#d5d9d9] bg-[#f0f2f2] text-[#565959] font-bold uppercase text-[10px]">
                     <th className="py-3 px-4">User</th>
                     <th className="py-3 px-4">Role</th>
                     <th className="py-3 px-4">Status</th>
@@ -254,19 +240,19 @@ export default function AdminUsersPage() {
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[#eaeded]">
                   {filteredUsers.map((u) => (
-                    <tr key={u.uid} className="hover:bg-slate-50/80 transition-colors">
+                    <tr key={u.uid} className="hover:bg-[#f7fafa] transition-colors">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2.5">
-                          <div className="h-8 w-8 rounded-full bg-slate-200 text-slate-700 font-bold flex items-center justify-center shrink-0 uppercase text-xs">
+                          <div className="h-8 w-8 rounded-full bg-slate-200 text-[#0f1111] font-bold flex items-center justify-center shrink-0 uppercase text-xs">
                             {u.displayName ? u.displayName[0] : (u.email ? u.email[0] : 'U')}
                           </div>
                           <div className="min-w-0">
-                            <p className="font-bold text-slate-900 truncate">
+                            <p className="font-bold text-[#0f1111] truncate">
                               {u.displayName || 'Customer'}
                             </p>
-                            <p className="text-[11px] text-slate-400 truncate">{u.email}</p>
+                            <p className="text-[11px] text-[#565959] truncate">{u.email}</p>
                           </div>
                         </div>
                       </td>
@@ -275,10 +261,10 @@ export default function AdminUsersPage() {
                         <span
                           className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
                             u.role === 'admin'
-                              ? 'bg-purple-100 text-purple-800'
+                              ? 'bg-[#131921] text-white border border-[#131921]'
                               : u.role === 'seller'
-                                ? 'bg-amber-100 text-amber-800'
-                                : 'bg-slate-100 text-slate-700'
+                                ? 'bg-amber-100 text-[#b12704] border border-amber-300'
+                                : 'bg-[#f0f2f2] text-[#0f1111] border border-[#d5d9d9]'
                           }`}
                         >
                           {u.role}
@@ -288,23 +274,23 @@ export default function AdminUsersPage() {
                       <td className="py-3 px-4">
                         <span
                           className={`inline-flex items-center gap-1.5 text-[11px] font-semibold ${
-                            u.status === 'suspended' ? 'text-red-600' : 'text-emerald-600'
+                            u.status === 'suspended' ? 'text-red-600' : 'text-[#007600]'
                           }`}
                         >
                           <span
                             className={`h-2 w-2 rounded-full ${
-                              u.status === 'suspended' ? 'bg-red-500' : 'bg-emerald-500'
+                              u.status === 'suspended' ? 'bg-red-500' : 'bg-[#007600]'
                             }`}
                           />
                           {u.status === 'suspended' ? 'Suspended' : 'Active'}
                         </span>
                       </td>
 
-                      <td className="py-3 px-4 text-slate-600">
+                      <td className="py-3 px-4 text-[#0f1111]">
                         {u.addresses ? `${u.addresses.length} saved` : '0 saved'}
                       </td>
 
-                      <td className="py-3 px-4 text-slate-500 text-[11px]">
+                      <td className="py-3 px-4 text-[#565959] text-[11px]">
                         {new Date(u.createdAt).toLocaleDateString()}
                       </td>
 
@@ -314,7 +300,7 @@ export default function AdminUsersPage() {
                           <button
                             type="button"
                             onClick={() => setSelectedUser(u)}
-                            className="p-1.5 rounded text-slate-500 hover:text-purple-600 hover:bg-purple-50 transition-colors"
+                            className="p-1.5 rounded text-[#565959] hover:text-[#007185] hover:bg-slate-100 transition-colors cursor-pointer"
                             title="Inspect User Details"
                           >
                             <Eye size={15} />
@@ -327,7 +313,7 @@ export default function AdminUsersPage() {
                               onChange={(e) =>
                                 handleOpenConfirm(u, 'change_role', e.target.value as UserRole)
                               }
-                              className="text-[10px] py-1 px-1.5 rounded border border-slate-200 bg-white"
+                              className="text-[10px] py-1 px-1.5 rounded border border-[#d5d9d9] bg-white text-[#0f1111] focus:border-[#e77600] focus:outline-hidden"
                               title="Assign Role"
                             >
                               <option value="customer">Customer</option>
@@ -341,7 +327,7 @@ export default function AdminUsersPage() {
                             <button
                               type="button"
                               onClick={() => handleOpenConfirm(u, 'activate')}
-                              className="p-1.5 rounded text-emerald-600 hover:bg-emerald-50 transition-colors"
+                              className="p-1.5 rounded text-[#007600] hover:bg-emerald-50 transition-colors cursor-pointer"
                               title="Activate Account"
                             >
                               <UserCheck size={15} />
@@ -350,7 +336,7 @@ export default function AdminUsersPage() {
                             <button
                               type="button"
                               onClick={() => handleOpenConfirm(u, 'suspend')}
-                              className="p-1.5 rounded text-red-600 hover:bg-red-50 transition-colors"
+                              className="p-1.5 rounded text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                               title="Suspend Account"
                             >
                               <UserX size={15} />
@@ -373,50 +359,50 @@ export default function AdminUsersPage() {
               className="fixed inset-0 bg-black/60 backdrop-blur-xs"
               onClick={() => setSelectedUser(null)}
             />
-            <div className="relative w-full max-w-lg rounded-xl bg-white p-6 shadow-2xl z-10 border border-slate-200 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="relative w-full max-w-lg rounded-lg bg-white p-6 shadow-2xl z-10 border border-[#d5d9d9] space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-[#eaeded]">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-purple-100 text-purple-700 font-extrabold flex items-center justify-center text-sm">
+                  <div className="h-10 w-10 rounded-full bg-slate-100 text-[#007185] font-extrabold flex items-center justify-center text-sm border border-[#d5d9d9]">
                     {selectedUser.displayName ? selectedUser.displayName[0] : 'U'}
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-slate-900">
+                    <h3 className="text-base font-bold text-[#0f1111]">
                       {selectedUser.displayName || 'Customer Account'}
                     </h3>
-                    <p className="text-xs text-slate-400 font-mono">UID: {selectedUser.uid}</p>
+                    <p className="text-xs text-[#565959] font-mono">UID: {selectedUser.uid}</p>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setSelectedUser(null)}
-                  className="text-slate-400 hover:text-slate-600 p-1"
+                  className="text-slate-400 hover:text-[#0f1111] p-1 cursor-pointer"
                 >
                   <X size={18} />
                 </button>
               </div>
 
               <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="rounded-lg bg-slate-50 p-3 border border-slate-100">
-                  <span className="text-slate-400 text-[10px] uppercase font-bold">Email</span>
-                  <p className="font-semibold text-slate-800 mt-0.5 truncate">
+                <div className="rounded bg-[#f7fafa] p-3 border border-[#d5d9d9]">
+                  <span className="text-[#565959] text-[10px] uppercase font-bold">Email</span>
+                  <p className="font-semibold text-[#0f1111] mt-0.5 truncate">
                     {selectedUser.email || 'None'}
                   </p>
                 </div>
-                <div className="rounded-lg bg-slate-50 p-3 border border-slate-100">
-                  <span className="text-slate-400 text-[10px] uppercase font-bold">Role</span>
-                  <p className="font-semibold text-purple-700 uppercase mt-0.5">
+                <div className="rounded bg-[#f7fafa] p-3 border border-[#d5d9d9]">
+                  <span className="text-[#565959] text-[10px] uppercase font-bold">Role</span>
+                  <p className="font-bold text-[#b12704] uppercase mt-0.5">
                     {selectedUser.role}
                   </p>
                 </div>
-                <div className="rounded-lg bg-slate-50 p-3 border border-slate-100">
-                  <span className="text-slate-400 text-[10px] uppercase font-bold">Status</span>
-                  <p className="font-semibold text-slate-800 mt-0.5">
+                <div className="rounded bg-[#f7fafa] p-3 border border-[#d5d9d9]">
+                  <span className="text-[#565959] text-[10px] uppercase font-bold">Status</span>
+                  <p className="font-semibold text-[#0f1111] mt-0.5">
                     {selectedUser.status === 'suspended' ? 'Suspended' : 'Active'}
                   </p>
                 </div>
-                <div className="rounded-lg bg-slate-50 p-3 border border-slate-100">
-                  <span className="text-slate-400 text-[10px] uppercase font-bold">Created</span>
-                  <p className="font-semibold text-slate-800 mt-0.5">
+                <div className="rounded bg-[#f7fafa] p-3 border border-[#d5d9d9]">
+                  <span className="text-[#565959] text-[10px] uppercase font-bold">Created</span>
+                  <p className="font-semibold text-[#0f1111] mt-0.5">
                     {new Date(selectedUser.createdAt).toLocaleDateString()}
                   </p>
                 </div>

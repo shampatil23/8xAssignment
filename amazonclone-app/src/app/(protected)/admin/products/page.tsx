@@ -161,13 +161,13 @@ export default function AdminProductsPage() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-lg border border-[#d5d9d9] shadow-xs">
           <div>
-            <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
-              <Package className="h-6 w-6 text-amber-600" />
+            <h1 className="text-xl font-bold text-[#0f1111] flex items-center gap-2">
+              <Package className="h-6 w-6 text-amazon-orange" />
               Catalog Oversight
             </h1>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#565959] mt-1">
               Inspect all marketplace products, toggle visibility, adjust live inventory, and manage listings.
             </p>
           </div>
@@ -177,23 +177,23 @@ export default function AdminProductsPage() {
             size="sm"
             onClick={loadData}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 text-xs text-slate-700"
+            className="inline-flex items-center gap-1.5 text-xs text-[#0f1111] border-[#d5d9d9] hover:bg-[#f7fafa] cursor-pointer"
           >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={14} className={loading ? 'animate-spin text-amazon-orange' : 'text-[#565959]'} />
             <span>Refresh</span>
           </Button>
         </div>
 
         {/* Notifications */}
         {successMessage && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-center justify-between text-emerald-800 text-xs">
+          <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-4 flex items-center justify-between text-emerald-900 text-xs">
             <div className="flex items-center gap-2">
-              <CheckCircle size={16} className="text-emerald-600" />
+              <CheckCircle size={16} className="text-[#007600]" />
               <span>{successMessage}</span>
             </div>
             <button
               onClick={() => setSuccessMessage(null)}
-              className="text-emerald-600 hover:text-emerald-900"
+              className="text-emerald-700 hover:text-emerald-900 cursor-pointer"
             >
               <X size={16} />
             </button>
@@ -201,27 +201,27 @@ export default function AdminProductsPage() {
         )}
 
         {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 flex items-center justify-between text-red-800 text-xs">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 flex items-center justify-between text-red-900 text-xs">
             <div className="flex items-center gap-2">
               <AlertCircle size={16} className="text-red-600" />
               <span>{error}</span>
             </div>
-            <button onClick={() => setError(null)} className="text-red-600 hover:text-red-900">
+            <button onClick={() => setError(null)} className="text-red-700 hover:text-red-900 cursor-pointer">
               <X size={16} />
             </button>
           </div>
         )}
 
         {/* Filter Toolbar */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-3">
+        <div className="bg-white p-4 rounded-lg border border-[#d5d9d9] shadow-xs flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#565959]" />
             <input
               type="text"
               placeholder="Search title, SKU, brand..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+              className="w-full pl-9 pr-4 py-2 text-xs rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden text-[#0f1111]"
             />
           </div>
 
@@ -229,7 +229,7 @@ export default function AdminProductsPage() {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="py-1.5 px-2.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-hidden"
+              className="py-1.5 px-2.5 text-xs rounded border border-[#d5d9d9] bg-white text-[#0f1111] focus:border-[#e77600] focus:outline-hidden"
             >
               <option value="all">All Categories</option>
               {categories.map((c) => (
@@ -333,17 +333,17 @@ export default function AdminProductsPage() {
                               min="0"
                               value={newStockVal}
                               onChange={(e) => setNewStockVal(parseInt(e.target.value) || 0)}
-                              className="w-16 px-1.5 py-0.5 text-xs rounded border border-purple-400"
+                              className="w-16 px-1.5 py-0.5 text-xs rounded border border-[#e77600] focus:outline-hidden"
                             />
                             <button
                               onClick={() => handleSaveStock(p.id)}
-                              className="text-[10px] text-purple-600 font-bold hover:underline"
+                              className="text-[10px] text-[#007185] font-bold hover:text-[#c7511f] hover:underline cursor-pointer"
                             >
                               Save
                             </button>
                             <button
                               onClick={() => setEditingStockId(null)}
-                              className="text-[10px] text-slate-400 hover:text-slate-600"
+                              className="text-[10px] text-[#565959] hover:text-[#0f1111] cursor-pointer"
                             >
                               Cancel
                             </button>
@@ -358,8 +358,8 @@ export default function AdminProductsPage() {
                               p.stock === 0
                                 ? 'text-red-600'
                                 : p.stock < 5
-                                  ? 'text-amber-600'
-                                  : 'text-slate-700'
+                                  ? 'text-[#b12704]'
+                                  : 'text-[#0f1111]'
                             }`}
                             title="Click to edit inventory stock"
                           >
@@ -374,10 +374,10 @@ export default function AdminProductsPage() {
                           onChange={(e) => handleToggleStatus(p, e.target.value as ProductStatus)}
                           className={`text-[10px] font-bold uppercase rounded px-2 py-0.5 border cursor-pointer ${
                             p.status === 'active'
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              ? 'bg-[#ebf8fa] text-[#007600] border-[#a2d8df]'
                               : p.status === 'out_of_stock'
                                 ? 'bg-red-50 text-red-700 border-red-200'
-                                : 'bg-slate-100 text-slate-700 border-slate-300'
+                                : 'bg-[#f0f2f2] text-[#0f1111] border-[#d5d9d9]'
                           }`}
                         >
                           <option value="active">Active</option>
@@ -387,7 +387,7 @@ export default function AdminProductsPage() {
                         </select>
                       </td>
 
-                      <td className="py-3 px-4 text-slate-500 text-[11px] truncate max-w-[120px]">
+                      <td className="py-3 px-4 text-[#565959] text-[11px] truncate max-w-[120px]">
                         {p.sellerName || p.seller?.name || 'Amazon Official'}
                       </td>
 
@@ -405,7 +405,7 @@ export default function AdminProductsPage() {
                           <button
                             type="button"
                             onClick={() => setInspectProduct(p)}
-                            className="p-1.5 rounded text-slate-500 hover:text-purple-600 hover:bg-purple-50 transition-colors"
+                            className="p-1.5 rounded text-[#565959] hover:text-[#007185] hover:bg-slate-100 transition-colors cursor-pointer"
                             title="Inspect Details"
                           >
                             <Eye size={15} />
@@ -417,7 +417,7 @@ export default function AdminProductsPage() {
                               setTargetProduct(p);
                               setDeleteModalOpen(true);
                             }}
-                            className="p-1.5 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                            className="p-1.5 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                             title="Delete Product from Platform"
                           >
                             <Trash2 size={15} />
@@ -439,39 +439,39 @@ export default function AdminProductsPage() {
               className="fixed inset-0 bg-black/60 backdrop-blur-xs"
               onClick={() => setInspectProduct(null)}
             />
-            <div className="relative w-full max-w-xl rounded-xl bg-white p-6 shadow-2xl z-10 border border-slate-200 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="relative w-full max-w-xl rounded-lg bg-white p-6 shadow-2xl z-10 border border-[#d5d9d9] space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-[#eaeded]">
                 <div>
-                  <h3 className="text-base font-bold text-slate-900 truncate max-w-[400px]">
+                  <h3 className="text-base font-bold text-[#0f1111] truncate max-w-[400px]">
                     {inspectProduct.title}
                   </h3>
-                  <p className="text-xs text-slate-400">SKU: {inspectProduct.sku}</p>
+                  <p className="text-xs text-[#565959]">SKU: {inspectProduct.sku}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setInspectProduct(null)}
-                  className="text-slate-400 hover:text-slate-600 p-1"
+                  className="text-slate-400 hover:text-[#0f1111] p-1 cursor-pointer"
                 >
                   <X size={18} />
                 </button>
               </div>
 
               <div className="grid grid-cols-3 gap-3 text-center">
-                <div className="rounded-lg bg-slate-50 p-2.5 border border-slate-100">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Price</span>
-                  <p className="text-base font-black text-slate-900 mt-0.5">
+                <div className="rounded bg-[#f7fafa] p-2.5 border border-[#d5d9d9]">
+                  <span className="text-[10px] uppercase font-bold text-[#565959]">Price</span>
+                  <p className="text-base font-bold text-[#0f1111] mt-0.5">
                     {formatPrice(inspectProduct.price)}
                   </p>
                 </div>
-                <div className="rounded-lg bg-slate-50 p-2.5 border border-slate-100">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Stock</span>
-                  <p className="text-base font-black text-purple-600 mt-0.5">
+                <div className="rounded bg-[#f7fafa] p-2.5 border border-[#d5d9d9]">
+                  <span className="text-[10px] uppercase font-bold text-[#565959]">Stock</span>
+                  <p className="text-base font-bold text-[#0f1111] mt-0.5">
                     {inspectProduct.stock} units
                   </p>
                 </div>
-                <div className="rounded-lg bg-slate-50 p-2.5 border border-slate-100">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Rating</span>
-                  <p className="text-base font-black text-amber-500 mt-0.5">
+                <div className="rounded bg-[#f7fafa] p-2.5 border border-[#d5d9d9]">
+                  <span className="text-[10px] uppercase font-bold text-[#565959]">Rating</span>
+                  <p className="text-base font-bold text-amber-500 mt-0.5">
                     ★ {inspectProduct.rating} ({inspectProduct.reviewCount})
                   </p>
                 </div>
@@ -479,39 +479,39 @@ export default function AdminProductsPage() {
 
               <div className="text-xs space-y-2">
                 <div>
-                  <span className="font-bold text-slate-700">Description:</span>
-                  <p className="text-slate-600 mt-1 line-clamp-3 leading-relaxed">
+                  <span className="font-bold text-[#0f1111]">Description:</span>
+                  <p className="text-[#565959] mt-1 line-clamp-3 leading-relaxed">
                     {inspectProduct.description}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-[11px]">
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#eaeded] text-[11px]">
                   <div>
-                    <span className="text-slate-400">Category:</span>{' '}
-                    <span className="font-semibold text-slate-700">{inspectProduct.category}</span>
+                    <span className="text-[#565959]">Category:</span>{' '}
+                    <span className="font-semibold text-[#0f1111]">{inspectProduct.category}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400">Brand:</span>{' '}
-                    <span className="font-semibold text-slate-700">{inspectProduct.brand || 'Generic'}</span>
+                    <span className="text-[#565959]">Brand:</span>{' '}
+                    <span className="font-semibold text-[#0f1111]">{inspectProduct.brand || 'Generic'}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400">Seller:</span>{' '}
-                    <span className="font-semibold text-slate-700">
+                    <span className="text-[#565959]">Seller:</span>{' '}
+                    <span className="font-semibold text-[#0f1111]">
                       {inspectProduct.sellerName || inspectProduct.seller?.name || 'Amazon'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-400">Status:</span>{' '}
-                    <span className="font-semibold text-slate-700 uppercase">{inspectProduct.status}</span>
+                    <span className="text-[#565959]">Status:</span>{' '}
+                    <span className="font-semibold text-[#0f1111] uppercase">{inspectProduct.status}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="pt-3 border-t border-[#eaeded] flex items-center justify-between">
                 <Link
                   href={`/products/${inspectProduct.slug || inspectProduct.id}`}
                   target="_blank"
-                  className="text-xs font-bold text-purple-600 hover:underline flex items-center gap-1"
+                  className="text-xs font-bold text-[#007185] hover:text-[#c7511f] hover:underline flex items-center gap-1"
                 >
                   <span>Open Storefront Page</span>
                   <ExternalLink size={12} />

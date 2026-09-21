@@ -174,7 +174,7 @@ export default function SellerDashboardPage() {
             <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-xs flex flex-col justify-between">
               <div className="flex items-center justify-between text-gray-500">
                 <span className="text-xs font-semibold uppercase tracking-wider">Total Orders</span>
-                <Truck size={18} className="text-purple-600" />
+                <Truck size={18} className="text-[#007185]" />
               </div>
               <div className="mt-3">
                 <p className="text-2xl font-extrabold text-gray-900">

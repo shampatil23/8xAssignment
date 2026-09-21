@@ -30,7 +30,7 @@ export default function AccountPage() {
   const roleBadgeColor = {
     customer: 'bg-blue-100 text-blue-800 border-blue-200',
     seller: 'bg-amber-100 text-amber-800 border-amber-200',
-    admin: 'bg-purple-100 text-purple-800 border-purple-200',
+    admin: 'bg-[#131921] text-white border-gray-700',
   }[user?.role ?? 'customer'];
 
   const accountCards = [

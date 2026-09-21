@@ -182,13 +182,13 @@ export default function AdminSellersPage() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-lg border border-[#d5d9d9] shadow-xs">
           <div>
-            <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
-              <Store className="h-6 w-6 text-amber-600" />
+            <h1 className="text-xl font-bold text-[#0f1111] flex items-center gap-2">
+              <Store className="h-6 w-6 text-amazon-orange" />
               Sellers & Merchants
             </h1>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#565959] mt-1">
               Oversee marketplace sellers, monitor catalog volume, fulfillments, and manage merchant privileges.
             </p>
           </div>
@@ -198,23 +198,23 @@ export default function AdminSellersPage() {
             size="sm"
             onClick={loadSellers}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 text-xs text-slate-700"
+            className="inline-flex items-center gap-1.5 text-xs text-[#0f1111] border-[#d5d9d9] hover:bg-[#f7fafa] cursor-pointer"
           >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw size={14} className={loading ? 'animate-spin text-amazon-orange' : 'text-[#565959]'} />
             <span>Refresh</span>
           </Button>
         </div>
 
         {/* Notifications */}
         {successMessage && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-center justify-between text-emerald-800 text-xs">
+          <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-4 flex items-center justify-between text-emerald-900 text-xs">
             <div className="flex items-center gap-2">
-              <CheckCircle size={16} className="text-emerald-600" />
+              <CheckCircle size={16} className="text-[#007600]" />
               <span>{successMessage}</span>
             </div>
             <button
               onClick={() => setSuccessMessage(null)}
-              className="text-emerald-600 hover:text-emerald-900"
+              className="text-emerald-700 hover:text-emerald-900 cursor-pointer"
             >
               <X size={16} />
             </button>
@@ -222,36 +222,36 @@ export default function AdminSellersPage() {
         )}
 
         {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 flex items-center justify-between text-red-800 text-xs">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 flex items-center justify-between text-red-900 text-xs">
             <div className="flex items-center gap-2">
               <AlertCircle size={16} className="text-red-600" />
               <span>{error}</span>
             </div>
-            <button onClick={() => setError(null)} className="text-red-600 hover:text-red-900">
+            <button onClick={() => setError(null)} className="text-red-700 hover:text-red-900 cursor-pointer">
               <X size={16} />
             </button>
           </div>
         )}
 
         {/* Filters */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row gap-3">
+        <div className="bg-white p-4 rounded-lg border border-[#d5d9d9] shadow-xs flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#565959]" />
             <input
               type="text"
               placeholder="Search by store name, email, or UID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+              className="w-full pl-9 pr-4 py-2 text-xs rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden text-[#0f1111]"
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500">Status:</span>
+            <span className="text-xs text-[#565959]">Status:</span>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="py-1.5 px-2.5 text-xs rounded-lg border border-slate-200 bg-white focus:outline-hidden"
+              className="py-1.5 px-2.5 text-xs rounded border border-[#d5d9d9] bg-white text-[#0f1111] focus:border-[#e77600] focus:outline-hidden"
             >
               <option value="all">All Statuses</option>
               <option value="pending">Pending Verification ({pendingSellersCount})</option>
@@ -375,7 +375,7 @@ export default function AdminSellersPage() {
                           <button
                             type="button"
                             onClick={() => setSelectedSeller(s)}
-                            className="p-1.5 rounded text-slate-500 hover:text-purple-600 hover:bg-purple-50 transition-colors"
+                            className="p-1.5 rounded text-[#565959] hover:text-[#007185] hover:bg-slate-100 transition-colors cursor-pointer"
                             title="Inspect Merchant"
                           >
                             <Eye size={15} />
@@ -383,7 +383,7 @@ export default function AdminSellersPage() {
 
                           <Link
                             href={`/admin/products?seller=${encodeURIComponent(s.user.uid)}`}
-                            className="text-[11px] font-semibold text-purple-600 hover:underline px-1.5"
+                            className="text-[11px] font-semibold text-[#007185] hover:text-[#c7511f] hover:underline px-1.5"
                           >
                             Products
                           </Link>
@@ -394,7 +394,7 @@ export default function AdminSellersPage() {
                                 variant="primary"
                                 size="sm"
                                 onClick={() => handleOpenConfirm(s, 'approve')}
-                                className="h-7 text-[11px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                                className="h-7 text-[11px] bg-amazon-yellow hover:bg-amazon-yellow-dark text-[#0f1111] border border-[#fcd200] font-bold"
                               >
                                 Approve & Verify
                               </Button>
@@ -443,78 +443,78 @@ export default function AdminSellersPage() {
               className="fixed inset-0 bg-black/60 backdrop-blur-xs"
               onClick={() => setSelectedSeller(null)}
             />
-            <div className="relative w-full max-w-lg rounded-xl bg-white p-6 shadow-2xl z-10 border border-slate-200 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="relative w-full max-w-lg rounded-lg bg-white p-6 shadow-2xl z-10 border border-[#d5d9d9] space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-[#eaeded]">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-lg bg-amber-50 text-amazon-orange flex items-center justify-center border border-amber-200">
                     <Store size={22} />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-slate-900">
+                    <h3 className="text-base font-bold text-[#0f1111]">
                       {selectedSeller.user.displayName || 'Merchant Partner'}
                     </h3>
-                    <p className="text-xs text-slate-400 font-mono">UID: {selectedSeller.user.uid}</p>
+                    <p className="text-xs text-[#565959] font-mono">UID: {selectedSeller.user.uid}</p>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setSelectedSeller(null)}
-                  className="text-slate-400 hover:text-slate-600 p-1"
+                  className="text-slate-400 hover:text-[#0f1111] p-1 cursor-pointer"
                 >
                   <X size={18} />
                 </button>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                <div className="rounded-lg bg-slate-50 p-3 border border-slate-100">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Total Listings</span>
-                  <p className="text-lg font-black text-slate-900 mt-1">
+                <div className="rounded bg-[#f7fafa] p-3 border border-[#d5d9d9]">
+                  <span className="text-[10px] uppercase font-bold text-[#565959]">Total Listings</span>
+                  <p className="text-lg font-bold text-[#0f1111] mt-1">
                     {selectedSeller.totalProducts}
                   </p>
                 </div>
-                <div className="rounded-lg bg-slate-50 p-3 border border-slate-100">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Active Listings</span>
-                  <p className="text-lg font-black text-emerald-600 mt-1">
+                <div className="rounded bg-[#f7fafa] p-3 border border-[#d5d9d9]">
+                  <span className="text-[10px] uppercase font-bold text-[#565959]">Active Listings</span>
+                  <p className="text-lg font-bold text-[#007600] mt-1">
                     {selectedSeller.activeProducts}
                   </p>
                 </div>
-                <div className="rounded-lg bg-slate-50 p-3 border border-slate-100">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Orders Fulfilled</span>
-                  <p className="text-lg font-black text-purple-600 mt-1">
+                <div className="rounded bg-[#f7fafa] p-3 border border-[#d5d9d9]">
+                  <span className="text-[10px] uppercase font-bold text-[#565959]">Orders Fulfilled</span>
+                  <p className="text-lg font-bold text-[#0f1111] mt-1">
                     {selectedSeller.totalOrders}
                   </p>
                 </div>
-                <div className="rounded-lg bg-slate-50 p-3 border border-slate-100">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Total Revenue</span>
-                  <p className="text-sm font-black text-emerald-700 mt-1 truncate">
+                <div className="rounded bg-[#f7fafa] p-3 border border-[#d5d9d9]">
+                  <span className="text-[10px] uppercase font-bold text-[#565959]">Total Revenue</span>
+                  <p className="text-sm font-bold text-[#007600] mt-1 truncate">
                     {formatPrice(selectedSeller.totalRevenue)}
                   </p>
                 </div>
               </div>
 
               <div className="space-y-2 pt-2 text-xs">
-                <div className="flex justify-between py-1.5 border-b border-slate-100">
-                  <span className="text-slate-500">Contact Email:</span>
-                  <span className="font-semibold text-slate-800">{selectedSeller.user.email}</span>
+                <div className="flex justify-between py-1.5 border-b border-[#eaeded]">
+                  <span className="text-[#565959]">Contact Email:</span>
+                  <span className="font-semibold text-[#0f1111]">{selectedSeller.user.email}</span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-slate-100">
-                  <span className="text-slate-500">Merchant Account Status:</span>
-                  <span className="font-semibold text-slate-800 capitalize">
+                <div className="flex justify-between py-1.5 border-b border-[#eaeded]">
+                  <span className="text-[#565959]">Merchant Account Status:</span>
+                  <span className="font-semibold text-[#0f1111] capitalize">
                     {selectedSeller.user.status || 'Active'}
                   </span>
                 </div>
-                <div className="flex justify-between py-1.5 border-b border-slate-100">
-                  <span className="text-slate-500">Joined Marketplace:</span>
-                  <span className="font-semibold text-slate-800">
+                <div className="flex justify-between py-1.5 border-b border-[#eaeded]">
+                  <span className="text-[#565959]">Joined Marketplace:</span>
+                  <span className="font-semibold text-[#0f1111]">
                     {new Date(selectedSeller.user.createdAt).toLocaleDateString()}
                   </span>
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <div className="pt-3 border-t border-[#eaeded] flex items-center justify-between">
                 <Link
                   href={`/admin/products?seller=${encodeURIComponent(selectedSeller.user.uid)}`}
-                  className="text-xs font-bold text-purple-600 hover:underline flex items-center gap-1"
+                  className="text-xs font-bold text-[#007185] hover:text-[#c7511f] hover:underline flex items-center gap-1"
                 >
                   <span>Inspect Seller Catalog</span>
                   <ExternalLink size={12} />

@@ -257,7 +257,7 @@ export default function SellerOrdersPage() {
                           currentStatus === 'delivered'
                             ? 'bg-green-100 text-green-800'
                             : currentStatus === 'shipped' || currentStatus === 'out_for_delivery'
-                            ? 'bg-purple-100 text-purple-800'
+                            ? 'bg-[#ebf8fa] text-[#007185] border border-[#a2d8df]'
                             : currentStatus === 'processing'
                             ? 'bg-amber-100 text-amber-800'
                             : 'bg-blue-100 text-blue-800'

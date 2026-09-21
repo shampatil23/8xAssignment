@@ -187,13 +187,13 @@ export default function AdminPromotionsPage() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 rounded-lg border border-[#d5d9d9] shadow-xs">
           <div>
-            <h1 className="text-xl font-black text-slate-900 flex items-center gap-2">
-              <Tag className="h-6 w-6 text-purple-600" />
+            <h1 className="text-xl font-bold text-[#0f1111] flex items-center gap-2">
+              <Tag className="h-6 w-6 text-amazon-orange" />
               Promotions & Coupons
             </h1>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#565959] mt-1">
               Create marketing campaigns, configure percent/fixed discounts, and schedule promotional eligibility.
             </p>
           </div>
@@ -204,9 +204,9 @@ export default function AdminPromotionsPage() {
               size="sm"
               onClick={loadPromotions}
               disabled={loading}
-              className="inline-flex items-center gap-1.5 text-xs text-slate-700"
+              className="inline-flex items-center gap-1.5 text-xs text-[#0f1111] border-[#d5d9d9] hover:bg-[#f7fafa] cursor-pointer"
             >
-              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+              <RefreshCw size={14} className={loading ? 'animate-spin text-amazon-orange' : 'text-[#565959]'} />
               <span>Refresh</span>
             </Button>
 
@@ -214,7 +214,7 @@ export default function AdminPromotionsPage() {
               variant="primary"
               size="sm"
               onClick={handleOpenCreate}
-              className="inline-flex items-center gap-1.5 text-xs bg-purple-600 hover:bg-purple-700 text-white"
+              className="inline-flex items-center gap-1.5 text-xs bg-amazon-yellow hover:bg-amazon-yellow-dark text-[#0f1111] border border-[#fcd200] font-bold cursor-pointer"
             >
               <Plus size={14} />
               <span>New Promotion</span>
@@ -224,14 +224,14 @@ export default function AdminPromotionsPage() {
 
         {/* Notifications */}
         {successMessage && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-center justify-between text-emerald-800 text-xs">
+          <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-4 flex items-center justify-between text-emerald-900 text-xs">
             <div className="flex items-center gap-2">
-              <CheckCircle size={16} className="text-emerald-600" />
+              <CheckCircle size={16} className="text-[#007600]" />
               <span>{successMessage}</span>
             </div>
             <button
               onClick={() => setSuccessMessage(null)}
-              className="text-emerald-600 hover:text-emerald-900"
+              className="text-emerald-700 hover:text-emerald-900 cursor-pointer"
             >
               <X size={16} />
             </button>
@@ -239,27 +239,27 @@ export default function AdminPromotionsPage() {
         )}
 
         {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 flex items-center justify-between text-red-800 text-xs">
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 flex items-center justify-between text-red-900 text-xs">
             <div className="flex items-center gap-2">
               <AlertCircle size={16} className="text-red-600" />
               <span>{error}</span>
             </div>
-            <button onClick={() => setError(null)} className="text-red-600 hover:text-red-900">
+            <button onClick={() => setError(null)} className="text-red-700 hover:text-red-900 cursor-pointer">
               <X size={16} />
             </button>
           </div>
         )}
 
         {/* Search */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+        <div className="bg-white p-4 rounded-lg border border-[#d5d9d9] shadow-xs">
           <div className="relative">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#565959]" />
             <input
               type="text"
               placeholder="Search by promo code or description..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+              className="w-full pl-9 pr-4 py-2 text-xs rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden text-[#0f1111]"
             />
           </div>
         </div>
@@ -267,11 +267,11 @@ export default function AdminPromotionsPage() {
         {/* Promotions Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {loading ? (
-            <div className="col-span-full py-12 text-center text-xs text-slate-400">
+            <div className="col-span-full py-12 text-center text-xs text-[#565959]">
               Loading active promotions...
             </div>
           ) : filteredPromotions.length === 0 ? (
-            <div className="col-span-full py-12 text-center text-xs text-slate-400">
+            <div className="col-span-full py-12 text-center text-xs text-[#565959]">
               No promotional campaigns found. Click &quot;New Promotion&quot; to configure one.
             </div>
           ) : (
@@ -280,37 +280,37 @@ export default function AdminPromotionsPage() {
               return (
                 <div
                   key={promo.id}
-                  className={`rounded-xl border p-5 shadow-xs flex flex-col justify-between transition-colors bg-white ${
-                    !promo.isActive || isExpired ? 'border-slate-300 opacity-75' : 'border-purple-200'
+                  className={`rounded-lg border p-5 shadow-xs flex flex-col justify-between transition-colors bg-white ${
+                    !promo.isActive || isExpired ? 'border-[#d5d9d9] bg-[#f7fafa] opacity-75' : 'border-[#d5d9d9]'
                   }`}
                 >
                   <div>
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-base font-black text-purple-700 tracking-wider">
+                          <span className="font-mono text-base font-bold text-[#0f1111] tracking-wider">
                             {promo.code}
                           </span>
                           <span
                             className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${
                               !promo.isActive
-                                ? 'bg-slate-100 text-slate-600'
+                                ? 'bg-slate-100 text-[#565959]'
                                 : isExpired
-                                  ? 'bg-red-100 text-red-700'
-                                  : 'bg-emerald-100 text-emerald-700'
+                                  ? 'bg-red-50 text-red-700 border border-red-200'
+                                  : 'bg-[#ebf8fa] text-[#007600] border border-[#a2d8df]'
                             }`}
                           >
                             {!promo.isActive ? 'Disabled' : isExpired ? 'Expired' : 'Active'}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-600 mt-1">{promo.description}</p>
+                        <p className="text-xs text-[#565959] mt-1">{promo.description}</p>
                       </div>
 
                       <div className="flex items-center gap-1">
                         <button
                           type="button"
                           onClick={() => handleOpenEdit(promo)}
-                          className="p-1 rounded text-slate-400 hover:text-purple-600 hover:bg-purple-50"
+                          className="p-1 rounded text-[#565959] hover:text-[#007185] hover:bg-slate-100 cursor-pointer"
                           title="Edit"
                         >
                           <Edit2 size={14} />
@@ -321,7 +321,7 @@ export default function AdminPromotionsPage() {
                             setTargetPromo(promo);
                             setDeleteModalOpen(true);
                           }}
-                          className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50"
+                          className="p-1 rounded text-slate-400 hover:text-red-600 hover:bg-red-50 cursor-pointer"
                           title="Delete"
                         >
                           <Trash2 size={14} />
@@ -406,12 +406,12 @@ export default function AdminPromotionsPage() {
                     value={code}
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
                     placeholder="e.g. PRIME20, SUMMER50"
-                    className="w-full px-3 py-2 text-xs font-mono font-bold uppercase rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                    className="w-full px-3 py-2 text-xs font-mono font-bold uppercase rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden text-[#0f1111]"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">
+                  <label className="font-bold text-[#0f1111] block mb-1">
                     Description <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -420,17 +420,17 @@ export default function AdminPromotionsPage() {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="e.g. 20% discount on orders over $50"
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                    className="w-full px-3 py-2 text-xs rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden text-[#0f1111]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Discount Type</label>
+                    <label className="font-bold text-[#0f1111] block mb-1">Discount Type</label>
                     <select
                       value={discountType}
                       onChange={(e) => setDiscountType(e.target.value as any)}
-                      className="w-full py-2 px-2.5 text-xs rounded-lg border border-slate-200 bg-white"
+                      className="w-full py-2 px-2.5 text-xs rounded border border-[#d5d9d9] bg-white text-[#0f1111] focus:border-[#e77600] focus:outline-hidden"
                     >
                       <option value="percentage">Percentage (%)</option>
                       <option value="fixed">Fixed Amount ($)</option>
@@ -438,7 +438,7 @@ export default function AdminPromotionsPage() {
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">
+                    <label className="font-bold text-[#0f1111] block mb-1">
                       Discount Value <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -447,13 +447,13 @@ export default function AdminPromotionsPage() {
                       required
                       value={discountValue}
                       onChange={(e) => setDiscountValue(parseFloat(e.target.value) || 0)}
-                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                      className="w-full px-3 py-2 text-xs rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden text-[#0f1111]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">
+                  <label className="font-bold text-[#0f1111] block mb-1">
                     Minimum Order Amount ($)
                   </label>
                   <input
@@ -462,28 +462,28 @@ export default function AdminPromotionsPage() {
                     value={minOrderAmount}
                     onChange={(e) => setMinOrderAmount(parseFloat(e.target.value) || 0)}
                     placeholder="0 for no minimum"
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-purple-500 focus:outline-hidden"
+                    className="w-full px-3 py-2 text-xs rounded border border-[#d5d9d9] focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden text-[#0f1111]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Start Date</label>
+                    <label className="font-bold text-[#0f1111] block mb-1">Start Date</label>
                     <input
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-white"
+                      className="w-full px-3 py-2 text-xs rounded border border-[#d5d9d9] bg-white text-[#0f1111]"
                     />
                   </div>
 
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">End Date</label>
+                    <label className="font-bold text-[#0f1111] block mb-1">End Date</label>
                     <input
                       type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-white"
+                      className="w-full px-3 py-2 text-xs rounded border border-[#d5d9d9] bg-white text-[#0f1111]"
                     />
                   </div>
                 </div>
@@ -494,15 +494,15 @@ export default function AdminPromotionsPage() {
                     id="isActivePromo"
                     checked={isActive}
                     onChange={(e) => setIsActive(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                    className="h-4 w-4 rounded border-slate-300 text-amazon-orange focus:ring-amazon-orange cursor-pointer"
                   />
-                  <label htmlFor="isActivePromo" className="text-xs font-bold text-slate-700 cursor-pointer">
+                  <label htmlFor="isActivePromo" className="text-xs font-bold text-[#0f1111] cursor-pointer">
                     Enable this promotion immediately
                   </label>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
+              <div className="pt-4 border-t border-[#eaeded] flex items-center justify-end gap-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -517,7 +517,7 @@ export default function AdminPromotionsPage() {
                   variant="primary"
                   size="sm"
                   isLoading={saving}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  className="bg-amazon-yellow hover:bg-amazon-yellow-dark text-[#0f1111] border border-[#fcd200] font-bold"
                 >
                   {isEditing ? 'Save Changes' : 'Publish Promotion'}
                 </Button>
