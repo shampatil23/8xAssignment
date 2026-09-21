@@ -6,6 +6,7 @@
 import React from 'react';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
+import { WishlistProvider } from '@/context/WishlistContext';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -15,8 +16,11 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <AuthProvider>
       <CartProvider>
-        {children}
+        <WishlistProvider>
+          {children}
+        </WishlistProvider>
       </CartProvider>
     </AuthProvider>
   );
 }
+

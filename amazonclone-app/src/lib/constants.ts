@@ -7,10 +7,11 @@ export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000
 
 // Navigation categories (nav bar)
 export const NAV_LINKS = [
+  { label: 'Wishlist', href: '/wishlist' },
+  { label: "Today's Deals", href: '/deals' },
   { label: 'Prime Video', href: '/prime-video' },
   { label: 'Coupons', href: '/coupons' },
   { label: 'Customer Service', href: '/customer-service' },
-  { label: "Today's Deals", href: '/deals' },
   { label: 'Registry', href: '/registry' },
   { label: 'Gift Cards', href: '/gift-cards' },
   { label: 'Sell', href: '/sell' },

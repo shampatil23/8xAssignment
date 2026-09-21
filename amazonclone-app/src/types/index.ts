@@ -118,19 +118,44 @@ export interface Review {
 export interface CartItem {
   id: string;
   productId: string;
-  product: Pick<Product, 'id' | 'title' | 'price' | 'images' | 'stock' | 'isPrimeEligible' | 'brand'>;
+  variantId?: string;
+  variantTitle?: string;
+  selectedVariant?: ProductVariant;
+  product: Pick<
+    Product,
+    'id' | 'title' | 'price' | 'images' | 'stock' | 'isPrimeEligible' | 'brand' | 'slug' | 'status'
+  >;
   quantity: number;
   addedAt: string;
+  isAvailable?: boolean;
+  stockError?: string;
 }
 
 export interface Cart {
   id: string;
   userId: string;
   items: CartItem[];
+  savedItems?: CartItem[];
   subtotal: number;
   itemCount: number;
   updatedAt: string;
 }
+
+// --- Wishlist Types ---
+export interface WishlistItem {
+  id: string;
+  productId: string;
+  product: Product;
+  addedAt: string;
+}
+
+export interface Wishlist {
+  id: string;
+  userId: string;
+  items: WishlistItem[];
+  updatedAt: string;
+}
+
 
 // --- Order Types ---
 export interface Order {

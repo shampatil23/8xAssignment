@@ -13,7 +13,7 @@ import {
   type DataSnapshot,
 } from 'firebase/database';
 import { firebaseApp } from './config';
-import type { User as AppUser, UserRole, Category, Product } from '@/types';
+import type { User as AppUser, UserRole, Category, Product, Cart, Wishlist } from '@/types';
 import { SEED_CATEGORIES, SEED_PRODUCTS } from './seedData';
 
 let _db: Database | null = null;
@@ -245,4 +245,41 @@ export async function seedCatalogData(force = false): Promise<{
       productsCount: SEED_PRODUCTS.length,
     };
   }
+}
+
+// ============================================================================
+// User Cart Operations (RTDB)
+// Stored under users/${uid}/cart
+// ============================================================================
+export async function getUserCart(uid: string): Promise<Cart | null> {
+  const db = getRTDB();
+  const snap = await get(ref(db, `users/${uid}/cart`));
+  if (!snap.exists()) return null;
+  const cart = snap.val() as Cart;
+  if (!cart.items) cart.items = [];
+  if (!cart.savedItems) cart.savedItems = [];
+  return cart;
+}
+
+export async function saveUserCart(uid: string, cart: Cart): Promise<void> {
+  const db = getRTDB();
+  await set(ref(db, `users/${uid}/cart`), cart);
+}
+
+// ============================================================================
+// User Wishlist Operations (RTDB)
+// Stored under users/${uid}/wishlist
+// ============================================================================
+export async function getUserWishlist(uid: string): Promise<Wishlist | null> {
+  const db = getRTDB();
+  const snap = await get(ref(db, `users/${uid}/wishlist`));
+  if (!snap.exists()) return null;
+  const wishlist = snap.val() as Wishlist;
+  if (!wishlist.items) wishlist.items = [];
+  return wishlist;
+}
+
+export async function saveUserWishlist(uid: string, wishlist: Wishlist): Promise<void> {
+  const db = getRTDB();
+  await set(ref(db, `users/${uid}/wishlist`), wishlist);
 }
