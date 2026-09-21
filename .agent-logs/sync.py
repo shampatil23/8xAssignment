@@ -28,6 +28,10 @@ def parse_transcript(transcript_path, session_id, author="bavis", project="Amazo
             content = data.get("content", "")
             
             if src == "USER_EXPLICIT" and msg_type == "USER_INPUT":
+                # Save previous prompt if there was one pending
+                if current_prompt is not None and current_prompt.get("prompt"):
+                    exchanges.append(current_prompt)
+                
                 # Extract prompt content from <USER_REQUEST> if present
                 match = re.search(r'<USER_REQUEST>(.*?)</USER_REQUEST>', content, re.DOTALL)
                 if match:
@@ -41,14 +45,13 @@ def parse_transcript(transcript_path, session_id, author="bavis", project="Amazo
                     "response": None,
                     "response_timestamp": None
                 }
-            elif (src == "MODEL" or msg_type == "PLANNER_RESPONSE") and current_prompt is not None and content:
+            elif msg_type == "PLANNER_RESPONSE" and current_prompt is not None and content:
                 # Clean out thinking tags if any present
                 text_content = re.sub(r'<thinking>.*?</thinking>', '', content, flags=re.DOTALL).strip()
                 if text_content:
+                    # Update response with the latest PLANNER_RESPONSE text content in this turn
                     current_prompt["response"] = text_content
                     current_prompt["response_timestamp"] = created_at
-                    exchanges.append(current_prompt)
-                    current_prompt = None
 
     if current_prompt and current_prompt.get("prompt"):
         exchanges.append(current_prompt)
