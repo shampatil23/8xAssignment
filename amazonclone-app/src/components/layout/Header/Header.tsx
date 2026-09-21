@@ -51,7 +51,9 @@ export function Header() {
 
         {/* Search bar — takes remaining space */}
         <div className="flex-1 min-w-0">
-          <SearchBar />
+          <React.Suspense fallback={<div className="h-10 w-full bg-white rounded" />}>
+            <SearchBar />
+          </React.Suspense>
         </div>
 
         {/* Language selector (hidden on mobile) */}
