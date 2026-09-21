@@ -122,6 +122,34 @@ def parse_transcript(transcript_path, session_id, author="bavis", project="Amazo
     return out_path
 
 if __name__ == "__main__":
-    sess_id = sys.argv[1] if len(sys.argv) > 1 else "1153c1cf-5971-4d84-9186-130d5306a624"
-    t_path = f"C:\\Users\\bavis\\.gemini\\antigravity-ide\\brain\\{sess_id}\\.system_generated\\logs\\transcript_full.jsonl"
-    parse_transcript(t_path, sess_id)
+    brain_root = r"C:\Users\bavis\.gemini\antigravity-ide\brain"
+    active_id = "51531d7c-42e8-4803-b06c-d00adf923a4e"
+
+    if len(sys.argv) > 1:
+        sessions_to_sync = [sys.argv[1]]
+    else:
+        sessions_to_sync = [active_id]
+        if os.path.exists(brain_root):
+            try:
+                dirs = [
+                    d for d in os.listdir(brain_root)
+                    if os.path.isdir(os.path.join(brain_root, d))
+                    and os.path.exists(os.path.join(brain_root, d, ".system_generated", "logs", "transcript_full.jsonl"))
+                ]
+                # Sort by modification time descending
+                dirs.sort(
+                    key=lambda d: os.path.getmtime(os.path.join(brain_root, d, ".system_generated", "logs", "transcript_full.jsonl")),
+                    reverse=True
+                )
+                if dirs:
+                    sessions_to_sync = dirs[:2]
+            except Exception as e:
+                print(f"Could not list brain directory: {e}")
+
+    for s_id in sessions_to_sync:
+        t_path = os.path.join(brain_root, s_id, ".system_generated", "logs", "transcript_full.jsonl")
+        if os.path.exists(t_path):
+            parse_transcript(t_path, s_id)
+        else:
+            print(f"Transcript not found for session {s_id}: {t_path}")
+
