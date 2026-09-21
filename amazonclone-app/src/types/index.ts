@@ -123,7 +123,7 @@ export interface CartItem {
   selectedVariant?: ProductVariant;
   product: Pick<
     Product,
-    'id' | 'title' | 'price' | 'images' | 'stock' | 'isPrimeEligible' | 'brand' | 'slug' | 'status'
+    'id' | 'title' | 'price' | 'images' | 'stock' | 'isPrimeEligible' | 'brand' | 'slug' | 'status' | 'category'
   >;
   quantity: number;
   addedAt: string;
@@ -193,7 +193,46 @@ export type OrderStatus =
   | 'shipped'
   | 'delivered'
   | 'cancelled'
+  | 'RETURN_REQUESTED'
+  | 'RETURN_APPROVED'
+  | 'RETURNED'
+  | 'REFUND_PENDING'
+  | 'REFUNDED'
   | 'refunded';
+
+export interface ReturnRequest {
+  id: string;
+  orderId: string;
+  userId: string;
+  productId: string;
+  itemTitle: string;
+  itemImage: string;
+  quantity: number;
+  refundAmount: number;
+  reason: string;
+  note?: string;
+  status: 'RETURN_REQUESTED' | 'RETURN_APPROVED' | 'RETURNED' | 'REFUND_PENDING' | 'REFUNDED';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface QuestionAnswer {
+  id: string;
+  text: string;
+  authorName: string;
+  authorRole: 'customer' | 'seller' | 'admin';
+  createdAt: string;
+}
+
+export interface ProductQuestion {
+  id: string;
+  productId: string;
+  userId: string;
+  userName: string;
+  question: string;
+  answers: QuestionAnswer[];
+  createdAt: string;
+}
 
 export interface PaymentMethod {
   type: 'card' | 'upi' | 'netbanking' | 'cod';

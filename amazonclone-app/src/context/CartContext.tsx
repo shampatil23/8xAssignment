@@ -243,6 +243,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             isPrimeEligible: product.isPrimeEligible,
             brand: product.brand,
             slug: product.slug,
+            category: product.category,
             status: product.status,
           },
           quantity: cappedQty,

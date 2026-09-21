@@ -23,6 +23,11 @@ import type {
   Wishlist,
   Address,
   Order,
+  OrderStatus,
+  Review,
+  ReturnRequest,
+  ProductQuestion,
+  QuestionAnswer,
 } from '@/types';
 import { SEED_CATEGORIES, SEED_PRODUCTS } from './seedData';
 
@@ -381,5 +386,193 @@ export async function getUserOrdersFromDB(uid: string): Promise<Order[]> {
   // Sort newest first
   fullOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   return fullOrders;
+}
+
+export async function updateOrderStatusInDB(orderId: string, status: OrderStatus): Promise<void> {
+  const db = getRTDB();
+  const order = await getOrder(orderId);
+  if (!order) return;
+
+  const updates: Record<string, any> = {
+    [`orders/${orderId}/status`]: status,
+    [`orders/${orderId}/updatedAt`]: new Date().toISOString(),
+    [`users/${order.userId}/orders/${orderId}/status`]: status,
+  };
+  await update(ref(db), updates);
+}
+
+// ============================================================================
+// Purchase Verification
+// Check if user has an active/completed order containing the specified product
+// ============================================================================
+export async function hasUserPurchasedProduct(userId: string, productId: string): Promise<boolean> {
+  const db = getRTDB();
+  const orders = await getUserOrdersFromDB(userId);
+  return orders.some((order) =>
+    order.items.some((item) => item.productId === productId),
+  );
+}
+
+// ============================================================================
+// Product Reviews Operations (RTDB)
+// Stored under reviews/${productId}/${reviewId}
+// Indexed under users/${userId}/reviews/${productId}
+// ============================================================================
+export async function getProductReviews(productId: string): Promise<Review[]> {
+  const db = getRTDB();
+  const snap = await get(ref(db, `reviews/${productId}`));
+  if (!snap.exists()) return [];
+  const raw = snap.val() as Record<string, Review>;
+  const list = Object.values(raw);
+  // Sort newest first
+  list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  return list;
+}
+
+export async function saveProductReview(
+  review: Review,
+): Promise<{ newRating: number; newCount: number }> {
+  const db = getRTDB();
+  const updates: Record<string, any> = {
+    [`reviews/${review.productId}/${review.id}`]: review,
+    [`users/${review.userId}/reviews/${review.productId}`]: review.id,
+  };
+  await update(ref(db), updates);
+
+  // Recalculate average rating & count
+  const allReviews = await getProductReviews(review.productId);
+  const newCount = allReviews.length;
+  const newRating =
+    newCount > 0
+      ? Number(
+          (allReviews.reduce((sum, r) => sum + r.rating, 0) / newCount).toFixed(1),
+        )
+      : 5.0;
+
+  await update(ref(db), {
+    [`products/${review.productId}/rating`]: newRating,
+    [`products/${review.productId}/reviewCount`]: newCount,
+  });
+
+  return { newRating, newCount };
+}
+
+export async function deleteProductReview(
+  productId: string,
+  reviewId: string,
+  userId: string,
+): Promise<{ newRating: number; newCount: number }> {
+  const db = getRTDB();
+  await remove(ref(db, `reviews/${productId}/${reviewId}`));
+  await remove(ref(db, `users/${userId}/reviews/${productId}`));
+
+  // Recalculate average rating & count
+  const allReviews = await getProductReviews(productId);
+  const newCount = allReviews.length;
+  const newRating =
+    newCount > 0
+      ? Number(
+          (allReviews.reduce((sum, r) => sum + r.rating, 0) / newCount).toFixed(1),
+        )
+      : 5.0;
+
+  await update(ref(db), {
+    [`products/${productId}/rating`]: newRating,
+    [`products/${productId}/reviewCount`]: newCount,
+  });
+
+  return { newRating, newCount };
+}
+
+// ============================================================================
+// Product Questions & Answers (RTDB)
+// Stored under questions/${productId}/${questionId}
+// ============================================================================
+export async function getProductQuestions(productId: string): Promise<ProductQuestion[]> {
+  const db = getRTDB();
+  const snap = await get(ref(db, `questions/${productId}`));
+  if (!snap.exists()) return [];
+  const raw = snap.val() as Record<string, ProductQuestion>;
+  const list = Object.values(raw);
+  list.forEach((q) => {
+    if (!q.answers) q.answers = [];
+  });
+  list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  return list;
+}
+
+export async function saveProductQuestion(question: ProductQuestion): Promise<void> {
+  const db = getRTDB();
+  await set(ref(db, `questions/${question.productId}/${question.id}`), question);
+}
+
+export async function addQuestionAnswer(
+  productId: string,
+  questionId: string,
+  answer: QuestionAnswer,
+): Promise<void> {
+  const db = getRTDB();
+  const snap = await get(ref(db, `questions/${productId}/${questionId}`));
+  if (!snap.exists()) return;
+  const q = snap.val() as ProductQuestion;
+  const answers = q.answers || [];
+  answers.push(answer);
+  await update(ref(db, `questions/${productId}/${questionId}`), { answers });
+}
+
+// ============================================================================
+// Returns & Refunds Operations (RTDB)
+// Stored under returns/${returnId}
+// Indexed under users/${userId}/returns/${returnId}
+// ============================================================================
+export async function saveReturnRequest(req: ReturnRequest): Promise<void> {
+  const db = getRTDB();
+  const updates: Record<string, any> = {
+    [`returns/${req.id}`]: req,
+    [`users/${req.userId}/returns/${req.id}`]: req,
+    [`orders/${req.orderId}/returns/${req.id}`]: req,
+    [`orders/${req.orderId}/status`]: req.status,
+    [`users/${req.userId}/orders/${req.orderId}/status`]: req.status,
+  };
+  await update(ref(db), updates);
+}
+
+export async function getReturnRequestsByUser(userId: string): Promise<ReturnRequest[]> {
+  const db = getRTDB();
+  const snap = await get(ref(db, `users/${userId}/returns`));
+  if (!snap.exists()) return [];
+  const raw = snap.val() as Record<string, ReturnRequest>;
+  const list = Object.values(raw);
+  list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  return list;
+}
+
+export async function getReturnRequestsByOrder(orderId: string): Promise<ReturnRequest[]> {
+  const db = getRTDB();
+  const snap = await get(ref(db, `orders/${orderId}/returns`));
+  if (!snap.exists()) return [];
+  const raw = snap.val() as Record<string, ReturnRequest>;
+  return Object.values(raw);
+}
+
+export async function updateReturnStatusInDB(
+  returnId: string,
+  orderId: string,
+  userId: string,
+  status: ReturnRequest['status'],
+): Promise<void> {
+  const db = getRTDB();
+  const now = new Date().toISOString();
+  const updates: Record<string, any> = {
+    [`returns/${returnId}/status`]: status,
+    [`returns/${returnId}/updatedAt`]: now,
+    [`users/${userId}/returns/${returnId}/status`]: status,
+    [`users/${userId}/returns/${returnId}/updatedAt`]: now,
+    [`orders/${orderId}/returns/${returnId}/status`]: status,
+    [`orders/${orderId}/returns/${returnId}/updatedAt`]: now,
+    [`orders/${orderId}/status`]: status,
+    [`users/${userId}/orders/${orderId}/status`]: status,
+  };
+  await update(ref(db), updates);
 }
 

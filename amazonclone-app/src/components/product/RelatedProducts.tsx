@@ -7,15 +7,18 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Star, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import { fetchProducts } from '@/services/productService';
+import { getRecommendationsForProduct } from '@/services/recommendationService';
 import type { Product } from '@/types';
 
 interface RelatedProductsProps {
+  product?: Product;
   category: string;
   currentProductId: string;
   className?: string;
 }
 
 export function RelatedProducts({
+  product,
   category,
   currentProductId,
   className = '',
@@ -27,10 +30,15 @@ export function RelatedProducts({
     let isMounted = true;
     async function loadRelated() {
       try {
-        const res = await fetchProducts({ category });
-        if (!isMounted) return;
-        if (res.success && res.data) {
-          setProducts(res.data.filter((p) => p.id !== currentProductId).slice(0, 8));
+        if (product) {
+          const recs = await getRecommendationsForProduct(product, 8);
+          if (isMounted) setProducts(recs);
+        } else {
+          const res = await fetchProducts({ category });
+          if (!isMounted) return;
+          if (res.success && res.data) {
+            setProducts(res.data.filter((p) => p.id !== currentProductId).slice(0, 8));
+          }
         }
       } catch (err) {
         console.error('Failed to load related products', err);
@@ -43,7 +51,7 @@ export function RelatedProducts({
     return () => {
       isMounted = false;
     };
-  }, [category, currentProductId]);
+  }, [product, category, currentProductId]);
 
   if (loading) {
     return (

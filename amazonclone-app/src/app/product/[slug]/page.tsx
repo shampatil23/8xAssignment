@@ -28,6 +28,7 @@ import { DeliveryInfoCard } from '@/components/product/DeliveryInfoCard';
 import { OffersCard } from '@/components/product/OffersCard';
 import { FrequentlyBoughtTogether } from '@/components/product/FrequentlyBoughtTogether';
 import { RelatedProducts } from '@/components/product/RelatedProducts';
+import { ProductQA } from '@/components/product/ProductQA';
 import { CustomerReviews } from '@/components/product/CustomerReviews';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -522,17 +523,38 @@ export default function ProductDetailPage({ params }: PageProps) {
         {/* ── Related Products Carousel / Grid ── */}
         <div className="mt-12">
           <RelatedProducts
+            product={product}
             category={product.category}
             currentProductId={product.id}
           />
         </div>
 
-        {/* ── Customer Reviews Section Foundation ── */}
+        {/* ── Customer Questions & Answers ── */}
+        <div className="mt-12">
+          <ProductQA
+            productId={product.id}
+            productTitle={product.title}
+          />
+        </div>
+
+        {/* ── Customer Reviews Section ── */}
         <div className="mt-12">
           <CustomerReviews
+            productId={product.id}
             productTitle={product.title}
             rating={product.rating}
             reviewCount={product.reviewCount}
+            onRatingUpdated={(newRating, newCount) => {
+              setProduct((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      rating: newRating,
+                      reviewCount: newCount,
+                    }
+                  : null,
+              );
+            }}
           />
         </div>
       </div>

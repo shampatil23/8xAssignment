@@ -20,7 +20,10 @@ import {
   ArrowRight,
   RotateCcw,
   Check,
+  Star,
 } from 'lucide-react';
+import { getRecommendationsForHome } from '@/services/recommendationService';
+import type { Product } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { AddressManager } from '@/components/checkout/AddressManager';
 import { DeliveryOptions } from '@/components/checkout/DeliveryOptions';
@@ -70,6 +73,13 @@ export default function CheckoutPage() {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
   const [confirmedOrder, setConfirmedOrder] = useState<Order | null>(null);
+  const [confirmationRecs, setConfirmationRecs] = useState<Product[]>([]);
+
+  useEffect(() => {
+    if (confirmedOrder) {
+      getRecommendationsForHome(4).then((recs) => setConfirmationRecs(recs));
+    }
+  }, [confirmedOrder]);
 
   // Load customer addresses from RTDB
   useEffect(() => {
@@ -364,7 +374,60 @@ export default function CheckoutPage() {
               >
                 Continue Shopping
               </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => router.push(`/orders/${confirmedOrder.id}`)}
+                className="font-bold"
+              >
+                View Order &amp; Returns
+              </Button>
             </div>
+
+            {/* Recommendations Strip */}
+            {confirmationRecs.length > 0 && (
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <h3 className="font-bold text-gray-900 text-sm mb-4">
+                  Recommended based on your purchase
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  {confirmationRecs.map((p) => {
+                    const img =
+                      p.images?.[0]?.url ||
+                      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300';
+                    return (
+                      <Link
+                        key={p.id}
+                        href={`/product/${p.slug}`}
+                        className="group flex flex-col justify-between rounded-lg border border-gray-200 p-3 hover:border-gray-300 hover:shadow-xs transition-all bg-white"
+                      >
+                        <div>
+                          <div className="relative h-24 w-full rounded bg-white overflow-hidden mb-2">
+                            <Image
+                              src={img}
+                              alt={p.title}
+                              fill
+                              sizes="120px"
+                              className="object-contain p-1 group-hover:scale-105 transition-transform"
+                            />
+                          </div>
+                          <h4 className="text-xs font-medium text-amazon-link group-hover:underline line-clamp-2">
+                            {p.title}
+                          </h4>
+                          <div className="mt-1 flex items-center gap-1 text-xs text-amber-500">
+                            <Star size={11} className="fill-amber-400 text-amber-400" />
+                            <span className="text-gray-700 font-bold">{p.rating.toFixed(1)}</span>
+                          </div>
+                        </div>
+                        <div className="mt-2 pt-1 border-t border-gray-100 text-xs font-bold text-gray-900">
+                          ${p.price.toFixed(2)}
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </main>
       </div>

@@ -24,7 +24,9 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/Button';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/hooks/useAuth';
-import type { CartItem } from '@/types';
+import { getRecommendationsForCart } from '@/services/recommendationService';
+import type { CartItem, Product } from '@/types';
+import { Star } from 'lucide-react';
 
 const FREE_SHIPPING_THRESHOLD = 35.0;
 
@@ -47,6 +49,23 @@ export default function CartPage() {
 
   const [isGift, setIsGift] = useState(false);
   const [movingItemId, setMovingItemId] = useState<string | null>(null);
+  const [recommendations, setRecommendations] = useState<Product[]>([]);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    async function loadRecs() {
+      try {
+        const recs = await getRecommendationsForCart({ items } as any, 4);
+        if (isMounted) setRecommendations(recs);
+      } catch (err) {
+        console.error('Failed to load cart recommendations', err);
+      }
+    }
+    loadRecs();
+    return () => {
+      isMounted = false;
+    };
+  }, [items]);
 
   const amountNeededForFreeShipping = Math.max(
     0,
@@ -505,6 +524,53 @@ export default function CartPage() {
             </div>
           </div>
         </div>
+
+        {/* ── Recommendations: Customers who bought items in your cart also bought ── */}
+        {recommendations.length > 0 && (
+          <div className="mt-10 rounded-lg border border-gray-200 bg-white p-5 shadow-xs">
+            <h2 className="text-base font-bold text-gray-900 mb-4">
+              Customers who bought items in your cart also bought
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {recommendations.map((p) => {
+                const img =
+                  p.images?.[0]?.url ||
+                  'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300';
+                return (
+                  <Link
+                    key={p.id}
+                    href={`/product/${p.slug}`}
+                    className="group flex flex-col justify-between rounded-lg border border-gray-200 p-3 hover:border-gray-300 hover:shadow-xs transition-all bg-white"
+                  >
+                    <div>
+                      <div className="relative h-28 w-full rounded bg-white overflow-hidden mb-2">
+                        <Image
+                          src={img}
+                          alt={p.title}
+                          fill
+                          sizes="150px"
+                          className="object-contain p-1 group-hover:scale-105 transition-transform"
+                        />
+                      </div>
+                      <h3 className="text-xs font-medium text-amazon-link group-hover:underline line-clamp-2">
+                        {p.title}
+                      </h3>
+                      <div className="mt-1 flex items-center gap-1 text-xs text-amber-500">
+                        <Star size={12} className="fill-amber-400 text-amber-400" />
+                        <span className="text-gray-700 font-bold">{p.rating.toFixed(1)}</span>
+                        <span className="text-gray-400">({p.reviewCount})</span>
+                      </div>
+                    </div>
+
+                    <div className="mt-2 pt-1 border-t border-gray-100 text-sm font-bold text-gray-900">
+                      ${p.price.toFixed(2)}
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </MainLayout>
   );
