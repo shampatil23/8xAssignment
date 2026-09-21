@@ -120,8 +120,14 @@ export async function createSellerProduct(
       );
     }
 
-    const initialStatus: ProductStatus =
-      data.status || (data.stock <= 0 ? 'out_of_stock' : 'active');
+    // Check if seller account is pending admin verification
+    const { getUserProfile } = await import('@/lib/firebase/database');
+    const profile = await getUserProfile(sellerId);
+    const isPendingSeller = profile?.accountStatus === 'pending';
+
+    const initialStatus: ProductStatus = isPendingSeller
+      ? 'draft'
+      : (data.status || (data.stock <= 0 ? 'out_of_stock' : 'active'));
 
     const newProduct: Product = {
       id,
@@ -175,7 +181,9 @@ export async function createSellerProduct(
     return {
       success: true,
       data: newProduct,
-      message: 'Product created and published to marketplace.',
+      message: isPendingSeller
+        ? 'Product saved as draft! It will automatically be officially published once your seller account is verified by Admin.'
+        : 'Product created and published to marketplace.',
     };
   } catch (error) {
     console.error('[sellerService.createSellerProduct] error:', error);

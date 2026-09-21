@@ -3,6 +3,18 @@
 // ============================================================================
 
 // --- User Types ---
+export interface SellerApplication {
+  storeName: string;
+  businessEmail: string;
+  phone?: string;
+  category?: string;
+  description?: string;
+  appliedAt: string;
+  verificationStatus: 'pending' | 'approved' | 'rejected';
+  verifiedAt?: string;
+  rejectionReason?: string;
+}
+
 export interface User {
   uid: string;
   email: string | null;
@@ -13,6 +25,8 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   role: UserRole;
+  status?: 'active' | 'suspended' | 'pending';
+  sellerApplication?: SellerApplication;
   addresses: Address[];
   defaultAddressId?: string;
 }
@@ -111,6 +125,7 @@ export interface Review {
   body: string;
   helpfulCount: number;
   verifiedPurchase: boolean;
+  status?: 'approved' | 'hidden' | 'flagged';
   createdAt: string;
 }
 
@@ -338,3 +353,48 @@ export interface UIState {
   loading: boolean;
   error: string | null;
 }
+
+// --- Admin & Platform Types ---
+export interface Promotion {
+  id: string;
+  code: string;
+  description: string;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+  minOrderAmount?: number;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  usageCount?: number;
+  createdAt: string;
+}
+
+export interface PlatformSettings {
+  siteName: string;
+  supportEmail: string;
+  currency: string;
+  freeShippingThreshold: number;
+  standardShippingFee: number;
+  taxRatePercent: number;
+  maintenanceMode: boolean;
+  allowNewRegistrations: boolean;
+  autoApproveReviews: boolean;
+  updatedAt: string;
+}
+
+export interface AdminDashboardStats {
+  totalUsers: number;
+  totalCustomers: number;
+  totalSellers: number;
+  totalProducts: number;
+  activeProducts: number;
+  totalOrders: number;
+  pendingOrders: number;
+  totalReturns: number;
+  pendingReturns: number;
+  platformGMV: number;
+  recentOrders: Order[];
+  recentReturns: ReturnRequest[];
+  recentUsers: User[];
+}
+

@@ -259,7 +259,20 @@ export function SellerLayout({ children }: SellerLayoutProps) {
           )}
 
           {/* ── Content Area ── */}
-          <main className="flex-1 min-w-0">{children}</main>
+          <main className="flex-1 min-w-0 space-y-4">
+            {user?.status === 'pending' && (
+              <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 shadow-xs flex items-start gap-3">
+                <ShieldCheck className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                <div className="text-xs text-amber-900">
+                  <p className="font-bold">Seller Verification Pending Admin Approval</p>
+                  <p className="mt-0.5 text-amber-800 leading-relaxed">
+                    Your seller store application is currently in the Amazon Admin verification queue. You can prepare and manage your catalog in draft mode; listings will automatically become officially active in the marketplace once approved by an administrator.
+                  </p>
+                </div>
+              </div>
+            )}
+            {children}
+          </main>
         </div>
       </div>
     </AuthGuard>

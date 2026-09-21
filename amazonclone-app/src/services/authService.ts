@@ -31,6 +31,13 @@ export async function loginWithEmail(
   }
 }
 
+export interface SellerRegisterData extends RegisterData {
+  storeName: string;
+  phone?: string;
+  category?: string;
+  description?: string;
+}
+
 // ── Register with email/password (creates RTDB profile) ──────────────────
 export async function registerUser(
   data: RegisterData,
@@ -44,6 +51,59 @@ export async function registerUser(
     return { success: true, message: 'Account created successfully' };
   } catch (error) {
     return { success: false, error: getAuthErrorMessage(error) };
+  }
+}
+
+export async function registerSeller(
+  data: SellerRegisterData,
+): Promise<ApiResponse<User>> {
+  const { registerWithEmail } = await import('@/lib/firebase/auth');
+  const { applyForSellerAccount } = await import('@/lib/firebase/database');
+  try {
+    const cred = await registerWithEmail(data.email, data.password, data.displayName);
+    await applyForSellerAccount(cred.user.uid, {
+      storeName: data.storeName,
+      businessEmail: data.email,
+      phone: data.phone,
+      category: data.category,
+      description: data.description,
+      appliedAt: new Date().toISOString(),
+      verificationStatus: 'pending',
+    });
+    if (typeof document !== 'undefined') {
+      document.cookie = 'auth_session=1; path=/; max-age=2592000; SameSite=Lax';
+    }
+    return {
+      success: true,
+      message: 'Seller account registered! Your store application is submitted for admin review.',
+    };
+  } catch (error) {
+    return { success: false, error: getAuthErrorMessage(error) };
+  }
+}
+
+export async function applyCurrentCustomerAsSeller(
+  uid: string,
+  data: { storeName: string; businessEmail: string; phone?: string; category?: string; description?: string },
+): Promise<ApiResponse<void>> {
+  const { applyForSellerAccount } = await import('@/lib/firebase/database');
+  try {
+    await applyForSellerAccount(uid, {
+      storeName: data.storeName,
+      businessEmail: data.businessEmail,
+      phone: data.phone,
+      category: data.category,
+      description: data.description,
+      appliedAt: new Date().toISOString(),
+      verificationStatus: 'pending',
+    });
+    return {
+      success: true,
+      message: 'Application submitted! Your seller store is under review by Amazon Admin.',
+    };
+  } catch (error) {
+    console.error('[applyCurrentCustomerAsSeller] error:', error);
+    return { success: false, error: 'Failed to submit seller application.' };
   }
 }
 

@@ -92,6 +92,23 @@ export default function AccountPage() {
               >
                 {user?.role ?? 'customer'}
               </span>
+
+              {/* Development Role Switcher */}
+              <select
+                value={user?.role ?? 'customer'}
+                onChange={async (e) => {
+                  if (!user) return;
+                  const newRole = e.target.value as 'customer' | 'seller' | 'admin';
+                  await setUserRole(user.uid, newRole);
+                  window.location.reload();
+                }}
+                className="text-[11px] font-bold rounded border border-gray-300 bg-white px-2 py-1 text-gray-700 hover:border-gray-400 focus:outline-hidden cursor-pointer"
+                title="Switch role for testing"
+              >
+                <option value="customer">Role: Customer</option>
+                <option value="seller">Role: Seller</option>
+                <option value="admin">Role: Admin</option>
+              </select>
             </div>
             <p className="text-sm text-gray-500">{user?.email}</p>
           </div>

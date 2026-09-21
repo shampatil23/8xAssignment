@@ -28,6 +28,9 @@ import type {
   ReturnRequest,
   ProductQuestion,
   QuestionAnswer,
+  Promotion,
+  PlatformSettings,
+  SellerApplication,
 } from '@/types';
 import { SEED_CATEGORIES, SEED_PRODUCTS } from './seedData';
 
@@ -48,6 +51,7 @@ export interface UserProfile {
   photoURL: string | null;
   role: UserRole;
   accountStatus: 'active' | 'suspended' | 'pending';
+  sellerApplication?: SellerApplication;
   emailVerified: boolean;
   createdAt: string;
   updatedAt: string;
@@ -159,6 +163,11 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
 export async function saveCategory(category: Category): Promise<void> {
   const db = getRTDB();
   await set(ref(db, `categories/${category.id}`), category);
+}
+
+export async function deleteCategoryFromDB(categoryId: string): Promise<void> {
+  const db = getRTDB();
+  await remove(ref(db, `categories/${categoryId}`));
 }
 
 // ============================================================================
@@ -603,4 +612,242 @@ export async function updateReturnStatusInDB(
   };
   await update(ref(db), updates);
 }
+
+// ============================================================================
+// Admin Operations (RTDB)
+// ============================================================================
+
+export async function getAllUsersFromDB(): Promise<AppUser[]> {
+  const db = getRTDB();
+  try {
+    const snap = await get(ref(db, 'users'));
+    if (!snap.exists()) return [];
+    const val = snap.val() as Record<string, any>;
+    return Object.entries(val).map(([uid, u]) => ({
+      uid,
+      email: u.email || null,
+      displayName: u.displayName || 'Customer',
+      photoURL: u.photoURL || null,
+      phoneNumber: u.phoneNumber || null,
+      emailVerified: Boolean(u.emailVerified),
+      createdAt: u.createdAt || new Date().toISOString(),
+      updatedAt: u.updatedAt || new Date().toISOString(),
+      role: (u.role as UserRole) || 'customer',
+      status: (u.status || u.accountStatus || 'active') as 'active' | 'suspended' | 'pending',
+      sellerApplication: u.sellerApplication || undefined,
+      addresses: u.addresses ? Object.values(u.addresses as Record<string, Address>) : [],
+      defaultAddressId: u.defaultAddressId,
+    }));
+  } catch (err) {
+    console.warn('[database.getAllUsersFromDB] failed:', err);
+    return [];
+  }
+}
+
+export async function updateUserStatusInDB(
+  uid: string,
+  status: 'active' | 'suspended' | 'pending',
+  role?: UserRole,
+): Promise<void> {
+  const db = getRTDB();
+  const updates: Record<string, any> = {
+    [`users/${uid}/status`]: status,
+    [`users/${uid}/accountStatus`]: status,
+    [`users/${uid}/updatedAt`]: new Date().toISOString(),
+  };
+  if (role) {
+    updates[`users/${uid}/role`] = role;
+  }
+  await update(ref(db), updates);
+}
+
+export async function applyForSellerAccount(
+  uid: string,
+  application: SellerApplication,
+): Promise<void> {
+  const db = getRTDB();
+  const now = new Date().toISOString();
+  await update(ref(db, `users/${uid}`), {
+    role: 'seller',
+    status: 'pending',
+    accountStatus: 'pending',
+    sellerApplication: application,
+    updatedAt: now,
+  });
+}
+
+export async function approveSellerAccount(uid: string): Promise<void> {
+  const db = getRTDB();
+  const now = new Date().toISOString();
+  await update(ref(db, `users/${uid}`), {
+    status: 'active',
+    accountStatus: 'active',
+    'sellerApplication/verificationStatus': 'approved',
+    'sellerApplication/verifiedAt': now,
+    updatedAt: now,
+  });
+
+  // Automatically activate any draft products created by this seller
+  const allProducts = await getAllProducts();
+  const sellerProducts = allProducts.filter(
+    (p) => p.sellerId === uid || p.seller?.id === uid,
+  );
+  for (const p of sellerProducts) {
+    if (p.status === 'draft') {
+      await updateProduct(p.id, { status: 'active' });
+    }
+  }
+}
+
+export async function rejectSellerAccount(uid: string, reason?: string): Promise<void> {
+  const db = getRTDB();
+  const now = new Date().toISOString();
+  await update(ref(db, `users/${uid}`), {
+    status: 'suspended',
+    accountStatus: 'suspended',
+    'sellerApplication/verificationStatus': 'rejected',
+    'sellerApplication/rejectionReason': reason || 'Verification declined by administrator.',
+    updatedAt: now,
+  });
+}
+
+export async function getAllReviewsFromDB(): Promise<Review[]> {
+  const db = getRTDB();
+  try {
+    const snap = await get(ref(db, 'reviews'));
+    if (!snap.exists()) return [];
+    const val = snap.val() as Record<string, Record<string, Review>>;
+    const allReviews: Review[] = [];
+    Object.values(val).forEach((productReviews) => {
+      if (productReviews && typeof productReviews === 'object') {
+        Object.values(productReviews).forEach((rev) => {
+          if (rev && rev.id) {
+            allReviews.push(rev);
+          }
+        });
+      }
+    });
+    allReviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return allReviews;
+  } catch (err) {
+    console.warn('[database.getAllReviewsFromDB] failed:', err);
+    return [];
+  }
+}
+
+export async function updateReviewStatusInDB(
+  productId: string,
+  reviewId: string,
+  status: 'approved' | 'hidden' | 'flagged',
+): Promise<void> {
+  const db = getRTDB();
+  await update(ref(db), {
+    [`reviews/${productId}/${reviewId}/status`]: status,
+  });
+}
+
+export async function adminDeleteReviewInDB(
+  productId: string,
+  reviewId: string,
+): Promise<void> {
+  const db = getRTDB();
+  // Read review to find userId if needed
+  const snap = await get(ref(db, `reviews/${productId}/${reviewId}`));
+  if (snap.exists()) {
+    const rev = snap.val() as Review;
+    if (rev.userId) {
+      await remove(ref(db, `users/${rev.userId}/reviews/${productId}`));
+    }
+  }
+  await remove(ref(db, `reviews/${productId}/${reviewId}`));
+
+  // Recalculate rating & reviewCount
+  const allReviews = await getProductReviews(productId);
+  const newCount = allReviews.length;
+  const newRating =
+    newCount > 0
+      ? Number((allReviews.reduce((sum, r) => sum + r.rating, 0) / newCount).toFixed(1))
+      : 5.0;
+
+  await update(ref(db), {
+    [`products/${productId}/rating`]: newRating,
+    [`products/${productId}/reviewCount`]: newCount,
+  });
+}
+
+export async function getAllReturnsFromDB(): Promise<ReturnRequest[]> {
+  const db = getRTDB();
+  try {
+    const snap = await get(ref(db, 'returns'));
+    if (!snap.exists()) return [];
+    const raw = snap.val() as Record<string, ReturnRequest>;
+    const list = Object.values(raw);
+    list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return list;
+  } catch (err) {
+    console.warn('[database.getAllReturnsFromDB] failed:', err);
+    return [];
+  }
+}
+
+export async function getPromotionsFromDB(): Promise<Promotion[]> {
+  const db = getRTDB();
+  try {
+    const snap = await get(ref(db, 'promotions'));
+    if (!snap.exists()) return [];
+    const val = snap.val() as Record<string, Promotion>;
+    const list = Object.values(val);
+    list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return list;
+  } catch (err) {
+    console.warn('[database.getPromotionsFromDB] failed:', err);
+    return [];
+  }
+}
+
+export async function savePromotionInDB(promo: Promotion): Promise<void> {
+  const db = getRTDB();
+  await set(ref(db, `promotions/${promo.id}`), promo);
+}
+
+export async function deletePromotionInDB(promoId: string): Promise<void> {
+  const db = getRTDB();
+  await remove(ref(db, `promotions/${promoId}`));
+}
+
+const DEFAULT_SETTINGS: PlatformSettings = {
+  siteName: 'Amazon Clone',
+  supportEmail: 'support@amazonclone.com',
+  currency: 'USD',
+  freeShippingThreshold: 35,
+  standardShippingFee: 5.99,
+  taxRatePercent: 8.25,
+  maintenanceMode: false,
+  allowNewRegistrations: true,
+  autoApproveReviews: true,
+  updatedAt: new Date().toISOString(),
+};
+
+export async function getPlatformSettingsFromDB(): Promise<PlatformSettings> {
+  const db = getRTDB();
+  try {
+    const snap = await get(ref(db, 'settings/platform'));
+    if (!snap.exists()) {
+      return DEFAULT_SETTINGS;
+    }
+    return { ...DEFAULT_SETTINGS, ...snap.val() };
+  } catch (err) {
+    console.warn('[database.getPlatformSettingsFromDB] failed:', err);
+    return DEFAULT_SETTINGS;
+  }
+}
+
+export async function savePlatformSettingsInDB(settings: PlatformSettings): Promise<void> {
+  const db = getRTDB();
+  await set(ref(db, 'settings/platform'), {
+    ...settings,
+    updatedAt: new Date().toISOString(),
+  });
+}
+
 

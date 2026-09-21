@@ -11,6 +11,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
+  isLoading?: boolean;
   fullWidth?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
@@ -44,6 +45,7 @@ export function Button({
   variant = 'primary',
   size = 'md',
   loading = false,
+  isLoading = false,
   fullWidth = false,
   leftIcon,
   rightIcon,
@@ -52,7 +54,8 @@ export function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const isDisabled = disabled || loading;
+  const isCurrentlyLoading = loading || isLoading;
+  const isDisabled = disabled || isCurrentlyLoading;
 
   return (
     <button
@@ -71,13 +74,13 @@ export function Button({
         .join(' ')}
       {...props}
     >
-      {loading ? (
+      {isCurrentlyLoading ? (
         <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
       ) : (
         leftIcon
       )}
       {children}
-      {!loading && rightIcon}
+      {!isCurrentlyLoading && rightIcon}
     </button>
   );
 }
