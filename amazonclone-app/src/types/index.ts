@@ -179,6 +179,7 @@ export interface Order {
 
 export interface OrderItem {
   productId: string;
+  sellerId?: string;
   title: string;
   image: string;
   price: number;
@@ -186,11 +187,41 @@ export interface OrderItem {
   subtotal: number;
 }
 
+export interface SellerAnalyticsMetrics {
+  totalProducts: number;
+  activeProducts: number;
+  lowStockProducts: number;
+  outOfStockProducts: number;
+  totalOrders: number;
+  totalUnitsSold: number;
+  totalRevenue: number;
+  pendingOrdersCount: number;
+  topProducts: {
+    id: string;
+    title: string;
+    image: string;
+    unitsSold: number;
+    revenue: number;
+    stock: number;
+  }[];
+}
+
+export interface SellerSettingsData {
+  storeName: string;
+  businessEmail: string;
+  storeDescription?: string;
+  phone?: string;
+  standardDeliveryDays?: number;
+  returnWindowDays?: number;
+}
+
 export type OrderStatus =
   | 'pending'
+  | 'placed'
   | 'confirmed'
   | 'processing'
   | 'shipped'
+  | 'out_for_delivery'
   | 'delivered'
   | 'cancelled'
   | 'RETURN_REQUESTED'

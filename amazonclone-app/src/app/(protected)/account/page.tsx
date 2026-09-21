@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
+import { setUserRole } from '@/lib/firebase/database';
 
 export default function AccountPage() {
   const { user, signOut, isSeller, isAdmin } = useAuth();
@@ -125,6 +126,36 @@ export default function AccountPage() {
           </Link>
         ))}
       </div>
+
+      {/* ── Seller Onboarding Banner (for customer accounts) ── */}
+      {user?.role === 'customer' && (
+        <div className="mt-8 rounded-xl border border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 p-6 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <Store className="h-8 w-8 text-amazon-orange flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="text-base font-bold text-gray-900">
+                Start Selling on Amazon Clone
+              </h3>
+              <p className="text-xs text-gray-600 mt-1 max-w-xl">
+                Become a registered merchant partner today. List products with Cloudinary images, manage inventory in real time, and fulfill customer orders through Seller Central.
+              </p>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            variant="buy-now"
+            onClick={async () => {
+              if (!user) return;
+              await setUserRole(user.uid, 'seller');
+              window.location.href = '/seller';
+            }}
+            className="text-xs font-bold px-5 py-2.5 whitespace-nowrap shadow-xs"
+          >
+            Activate Seller Account &rarr;
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

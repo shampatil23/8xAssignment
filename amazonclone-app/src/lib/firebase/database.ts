@@ -94,6 +94,14 @@ export async function updateUserProfile(
   });
 }
 
+export async function setUserRole(uid: string, role: UserRole): Promise<void> {
+  const db = getRTDB();
+  await update(ref(db, `users/${uid}`), {
+    role,
+    updatedAt: new Date().toISOString(),
+  });
+}
+
 // ── Subscribe to profile changes (real-time) ─────────────────────────────
 export function subscribeToUserProfile(
   uid: string,
@@ -214,6 +222,16 @@ export async function updateProduct(
     ...data,
     updatedAt: new Date().toISOString(),
   });
+}
+
+export async function deleteProductFromDB(id: string): Promise<void> {
+  const db = getRTDB();
+  await remove(ref(db, `products/${id}`));
+}
+
+export async function getProductsBySellerFromDB(sellerId: string): Promise<Product[]> {
+  const all = await getAllProducts();
+  return all.filter((p) => p.sellerId === sellerId || p.seller?.id === sellerId);
 }
 
 // ============================================================================
@@ -386,6 +404,16 @@ export async function getUserOrdersFromDB(uid: string): Promise<Order[]> {
   // Sort newest first
   fullOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   return fullOrders;
+}
+
+export async function getAllOrdersFromDB(): Promise<Order[]> {
+  const db = getRTDB();
+  const snap = await get(ref(db, 'orders'));
+  if (!snap.exists()) return [];
+  const val = snap.val() as Record<string, Order>;
+  const list = Object.values(val);
+  list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  return list;
 }
 
 export async function updateOrderStatusInDB(orderId: string, status: OrderStatus): Promise<void> {

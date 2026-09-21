@@ -184,6 +184,10 @@ export async function placeOrder(
   // Map CartItems to OrderItems
   const orderItems: OrderItem[] = cart.items.map((item) => ({
     productId: item.productId,
+    sellerId:
+      (item.product as any)?.sellerId ||
+      (item.product as any)?.seller?.id ||
+      '',
     title: item.variantTitle
       ? `${item.product.title} (${item.variantTitle})`
       : item.product.title,

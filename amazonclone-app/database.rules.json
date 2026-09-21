@@ -2,8 +2,8 @@
   "rules": {
     "users": {
       "$uid": {
-        ".read": "auth != null && auth.uid === $uid",
-        ".write": "auth != null && auth.uid === $uid",
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".write": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'admin')",
         "cart": {
           ".read": "auth != null && auth.uid === $uid",
           ".write": "auth != null && auth.uid === $uid"
@@ -11,12 +11,28 @@
         "wishlist": {
           ".read": "auth != null && auth.uid === $uid",
           ".write": "auth != null && auth.uid === $uid"
+        },
+        "orders": {
+          ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'seller')",
+          ".write": "auth != null"
         }
       }
     },
     "products": {
       ".read": true,
-      ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'seller')"
+      "$productId": {
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (!data.exists() && root.child('users').child(auth.uid).child('role').val() === 'seller') || (data.child('sellerId').val() === auth.uid) || (data.child('seller/id').val() === auth.uid))"
+      }
+    },
+    "orders": {
+      ".read": "auth != null",
+      "$orderId": {
+        ".write": "auth != null"
+      }
+    },
+    "returns": {
+      ".read": "auth != null",
+      ".write": "auth != null"
     },
     "categories": {
       ".read": true,
