@@ -7,13 +7,15 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   hint?: string;
+  helperText?: string;
   leftAddon?: React.ReactNode;
   rightAddon?: React.ReactNode;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, hint, leftAddon, rightAddon, className = '', id, ...props }, ref) => {
+  ({ label, error, hint, helperText, leftAddon, rightAddon, className = '', id, ...props }, ref) => {
     const inputId = id ?? label?.toLowerCase().replace(/\s+/g, '-');
+    const displayHint = hint ?? helperText;
 
     return (
       <div className="flex flex-col gap-1">
@@ -53,7 +55,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
         {error && <p className="text-xs text-red-500">{error}</p>}
-        {hint && !error && <p className="text-xs text-gray-500">{hint}</p>}
+        {displayHint && !error && <p className="text-xs text-gray-500">{displayHint}</p>}
       </div>
     );
   },

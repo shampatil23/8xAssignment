@@ -7,6 +7,8 @@ import { X, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { NAV_LINKS, SEARCH_CATEGORIES } from '@/lib/constants';
 
+import { useAuth } from '@/hooks/useAuth';
+
 interface MobileMenuProps {
   onClose: () => void;
 }
@@ -14,6 +16,8 @@ interface MobileMenuProps {
 const DEPARTMENTS = SEARCH_CATEGORIES.filter((c) => c.value !== 'all');
 
 export function MobileMenu({ onClose }: MobileMenuProps) {
+  const { user, signOut } = useAuth();
+
   // Close on Escape key
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -53,7 +57,9 @@ export function MobileMenu({ onClose }: MobileMenuProps) {
       >
         {/* Header */}
         <div className="flex items-center justify-between bg-amazon-dark px-4 py-3 text-white">
-          <span className="font-bold text-base">Shop by Department</span>
+          <span className="font-bold text-base">
+            {user ? `Hello, ${user.displayName?.split(' ')[0] ?? 'User'}` : 'Shop by Department'}
+          </span>
           <button
             id="mobile-menu-close-btn"
             onClick={onClose}
@@ -98,15 +104,36 @@ export function MobileMenu({ onClose }: MobileMenuProps) {
           ))}
         </nav>
 
-        {/* Sign in CTA */}
-        <div className="border-t p-4">
-          <Link
-            href="/auth/sign-in"
-            onClick={onClose}
-            className="block w-full rounded border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
-          >
-            Sign in
-          </Link>
+        {/* Auth CTA */}
+        <div className="border-t p-4 flex flex-col gap-2">
+          {user ? (
+            <>
+              <Link
+                href="/account"
+                onClick={onClose}
+                className="block w-full rounded border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+              >
+                Your Account
+              </Link>
+              <button
+                onClick={async () => {
+                  await signOut();
+                  onClose();
+                }}
+                className="block w-full rounded border border-gray-200 px-4 py-2 text-center text-xs text-gray-500 hover:bg-gray-50 transition-colors"
+              >
+                Sign out
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/auth/sign-in"
+              onClick={onClose}
+              className="block w-full rounded border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+            >
+              Sign in
+            </Link>
+          )}
         </div>
       </aside>
     </>

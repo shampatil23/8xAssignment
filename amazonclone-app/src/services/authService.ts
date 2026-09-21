@@ -1,8 +1,10 @@
 // ============================================================================
-// Auth Service — business logic layer (stub, implemented in Phase 2)
-// Wraps Firebase Auth; keeps UI components free of SDK details.
+// Auth Service — full Phase 2 implementation
+// Wraps Firebase auth + RTDB profile operations.
+// Maps Firebase error codes to friendly messages.
 // ============================================================================
 import type { User, ApiResponse } from '@/types';
+import { getAuthErrorMessage } from '@/lib/firebase/errorMessages';
 
 export interface AuthCredentials {
   email: string;
@@ -13,73 +15,64 @@ export interface RegisterData extends AuthCredentials {
   displayName: string;
 }
 
-/**
- * Sign in with Google OAuth popup.
- * Full implementation in Phase 2.
- */
-export async function loginWithGoogle(): Promise<ApiResponse<User>> {
-  // Dynamically import Firebase to avoid loading it server-side
-  const { signInWithGoogle } = await import('@/lib/firebase/auth');
-  try {
-    await signInWithGoogle();
-    return { success: true, message: 'Signed in with Google' };
-  } catch (error) {
-    return { success: false, error: (error as Error).message };
-  }
-}
-
-/**
- * Sign in with email and password.
- */
+// ── Sign in with email/password ───────────────────────────────────────────
 export async function loginWithEmail(
   credentials: AuthCredentials,
 ): Promise<ApiResponse<User>> {
   const { signInWithEmail } = await import('@/lib/firebase/auth');
   try {
     await signInWithEmail(credentials.email, credentials.password);
+    if (typeof document !== 'undefined') {
+      document.cookie = 'auth_session=1; path=/; max-age=2592000; SameSite=Lax';
+    }
     return { success: true, message: 'Signed in successfully' };
   } catch (error) {
-    return { success: false, error: (error as Error).message };
+    return { success: false, error: getAuthErrorMessage(error) };
   }
 }
 
-/**
- * Register a new user with email, password, and display name.
- */
+// ── Register with email/password (creates RTDB profile) ──────────────────
 export async function registerUser(
   data: RegisterData,
 ): Promise<ApiResponse<User>> {
   const { registerWithEmail } = await import('@/lib/firebase/auth');
   try {
     await registerWithEmail(data.email, data.password, data.displayName);
+    if (typeof document !== 'undefined') {
+      document.cookie = 'auth_session=1; path=/; max-age=2592000; SameSite=Lax';
+    }
     return { success: true, message: 'Account created successfully' };
   } catch (error) {
-    return { success: false, error: (error as Error).message };
+    return { success: false, error: getAuthErrorMessage(error) };
   }
 }
 
-/**
- * Sign out the current user.
- */
+// ── Sign out ──────────────────────────────────────────────────────────────
 export async function logout(): Promise<ApiResponse> {
   const { signOutUser } = await import('@/lib/firebase/auth');
   try {
+    if (typeof document !== 'undefined') {
+      document.cookie = 'auth_session=; path=/; max-age=0; SameSite=Lax';
+    }
     await signOutUser();
     return { success: true };
   } catch (error) {
-    return { success: false, error: (error as Error).message };
+    return { success: false, error: getAuthErrorMessage(error) };
   }
 }
 
-/**
- * Send a password reset email.
- */
+// ── Send password reset email ─────────────────────────────────────────────
 export async function sendPasswordReset(email: string): Promise<ApiResponse> {
   const { resetPassword } = await import('@/lib/firebase/auth');
   try {
     await resetPassword(email);
-    return { success: true, message: 'Password reset email sent' };
+    return { success: true, message: 'Password reset email sent. Check your inbox.' };
   } catch (error) {
-    return { success: false, error: (error as Error).message };
+    return { success: false, error: getAuthErrorMessage(error) };
   }
+}
+
+// Google auth stub kept for future — not exposed in UI
+export async function loginWithGoogle(): Promise<ApiResponse<User>> {
+  return { success: false, error: 'Google sign-in is not enabled.' };
 }

@@ -15,6 +15,8 @@ interface EmptyStateProps {
     label: string;
     onClick: () => void;
   };
+  actionLabel?: string;
+  onAction?: () => void;
   className?: string;
 }
 
@@ -23,8 +25,12 @@ export function EmptyState({
   description = 'When items appear they will show here.',
   icon,
   action,
+  actionLabel,
+  onAction,
   className = '',
 }: EmptyStateProps) {
+  const resolvedAction =
+    action || (actionLabel && onAction ? { label: actionLabel, onClick: onAction } : undefined);
   return (
     <div
       className={[
@@ -43,9 +49,9 @@ export function EmptyState({
           <p className="mt-1 text-sm text-gray-500">{description}</p>
         )}
       </div>
-      {action && (
-        <Button variant="primary" size="sm" onClick={action.onClick}>
-          {action.label}
+      {resolvedAction && (
+        <Button variant="primary" size="sm" onClick={resolvedAction.onClick}>
+          {resolvedAction.label}
         </Button>
       )}
     </div>

@@ -32,24 +32,58 @@ export interface Address {
 }
 
 // --- Product Types ---
+export type ProductStatus = 'active' | 'draft' | 'archived' | 'out_of_stock';
+
+export interface ProductVariant {
+  id: string;
+  sku: string;
+  title: string;
+  price: number;
+  compareAtPrice?: number;
+  stock: number;
+  image?: string;
+  attributes: Record<string, string>; // e.g. { "Color": "Space Gray", "Storage": "256GB" }
+}
+
+export interface DeliveryInfo {
+  isFreeDelivery: boolean;
+  estimatedDays: number;
+  fastestDeliveryDate: string; // e.g. "Tomorrow, 8 AM - 12 PM"
+  standardDeliveryDate: string; // e.g. "Thursday, Oct 12"
+  shippingFee?: number;
+}
+
+export interface SellerInfo {
+  id: string;
+  name: string;
+  rating?: number;
+}
+
 export interface Product {
   id: string;
+  sku: string;
   title: string;
+  slug: string;
   description: string;
   price: number;
   originalPrice?: number;
+  compareAtPrice?: number;
   discountPercent?: number;
-  category: string;
+  category: string; // category slug
+  categoryName?: string;
   subcategory?: string;
   brand?: string;
   images: ProductImage[];
+  variants?: ProductVariant[];
   stock: number;
-  sku?: string;
+  status: ProductStatus;
   rating: number;
   reviewCount: number;
   tags: string[];
   features?: string[];
   specifications?: Record<string, string>;
+  deliveryInfo: DeliveryInfo;
+  seller?: SellerInfo;
   sellerId?: string;
   sellerName?: string;
   isFeatured?: boolean;
@@ -147,7 +181,9 @@ export interface Category {
   id: string;
   name: string;
   slug: string;
+  description?: string;
   image?: string;
+  itemCount?: number;
   parentId?: string;
   children?: Category[];
 }

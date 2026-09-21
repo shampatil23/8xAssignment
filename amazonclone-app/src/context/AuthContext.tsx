@@ -1,7 +1,7 @@
 'use client';
 // ============================================================================
-// Auth Context — provides current user state to the entire component tree.
-// Full auth logic implemented in Phase 2.
+// Auth Context — Phase 2 full implementation
+// Listens to Firebase Auth state, fetches RTDB profile, exposes role helpers.
 // ============================================================================
 import React, {
   createContext,
@@ -11,16 +11,25 @@ import React, {
   useCallback,
   type ReactNode,
 } from 'react';
-import type { User as AppUser } from '@/types';
+import type { User as AppUser, UserRole } from '@/types';
 import type { User as FirebaseUser } from 'firebase/auth';
 
 interface AuthContextValue {
+  /** Full application user (from RTDB profile) */
   user: AppUser | null;
+  /** Raw Firebase auth user */
   firebaseUser: FirebaseUser | null;
+  /** True while Firebase is restoring the session or fetching the profile */
   loading: boolean;
+  /** Any error that occurred during auth state init */
   error: string | null;
-  /** Sign out the current user */
+  /** Sign out */
   signOut: () => Promise<void>;
+  /** Convenience role checkers */
+  isCustomer: boolean;
+  isSeller: boolean;
+  isAdmin: boolean;
+  hasRole: (role: UserRole) => boolean;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -32,59 +41,93 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Dynamically import to avoid SSR issues with Firebase
     let unsubscribe: (() => void) | undefined;
 
-    import('@/lib/firebase/auth')
-      .then(({ onAuthChange }) => {
-        unsubscribe = onAuthChange((fbUser) => {
+    async function init() {
+      try {
+        const { onAuthChange } = await import('@/lib/firebase/auth');
+        const { getUserProfile, profileToAppUser } = await import('@/lib/firebase/database');
+
+        unsubscribe = onAuthChange(async (fbUser) => {
           setFirebaseUser(fbUser);
 
           if (fbUser) {
-            // Map FirebaseUser → AppUser (Phase 2 will fetch full profile from Firestore)
-            setUser({
-              uid: fbUser.uid,
-              email: fbUser.email,
-              displayName: fbUser.displayName,
-              photoURL: fbUser.photoURL,
-              phoneNumber: fbUser.phoneNumber,
-              emailVerified: fbUser.emailVerified,
-              createdAt: fbUser.metadata.creationTime ?? new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-              role: 'customer',
-              addresses: [],
-            });
+            if (typeof document !== 'undefined') {
+              document.cookie = 'auth_session=1; path=/; max-age=2592000; SameSite=Lax';
+            }
+            try {
+              // Always fetch profile from RTDB — role comes from the database, not the client
+              const profile = await getUserProfile(fbUser.uid);
+              if (profile) {
+                setUser(profileToAppUser(profile));
+              } else {
+                // Profile missing (e.g. old test account) — use safe defaults
+                setUser({
+                  uid: fbUser.uid,
+                  email: fbUser.email,
+                  displayName: fbUser.displayName,
+                  photoURL: fbUser.photoURL,
+                  phoneNumber: null,
+                  emailVerified: fbUser.emailVerified,
+                  role: 'customer',
+                  addresses: [],
+                  createdAt: fbUser.metadata.creationTime ?? new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                });
+              }
+            } catch (profileErr) {
+              console.error('[AuthContext] profile fetch failed:', profileErr);
+              setUser(null);
+            }
           } else {
+            if (typeof document !== 'undefined') {
+              document.cookie = 'auth_session=; path=/; max-age=0; SameSite=Lax';
+            }
             setUser(null);
           }
 
           setLoading(false);
         });
-      })
-      .catch((err: Error) => {
-        setError(err.message);
+      } catch (err) {
+        setError((err as Error).message);
         setLoading(false);
-      });
+      }
+    }
 
+    init();
     return () => unsubscribe?.();
   }, []);
 
   const signOut = useCallback(async () => {
+    if (typeof document !== 'undefined') {
+      document.cookie = 'auth_session=; path=/; max-age=0; SameSite=Lax';
+    }
     const { signOutUser } = await import('@/lib/firebase/auth');
     await signOutUser();
   }, []);
 
-  return (
-    <AuthContext.Provider value={{ user, firebaseUser, loading, error, signOut }}>
-      {children}
-    </AuthContext.Provider>
+  const hasRole = useCallback(
+    (role: UserRole) => user?.role === role,
+    [user],
   );
+
+  const value: AuthContextValue = {
+    user,
+    firebaseUser,
+    loading,
+    error,
+    signOut,
+    isCustomer: user?.role === 'customer',
+    isSeller: user?.role === 'seller',
+    isAdmin: user?.role === 'admin',
+    hasRole,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuthContext(): AuthContextValue {
   const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error('useAuthContext must be used inside <AuthProvider>');
-  }
+  if (!ctx) throw new Error('useAuthContext must be used inside <AuthProvider>');
   return ctx;
 }
