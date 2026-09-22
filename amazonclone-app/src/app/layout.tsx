@@ -11,25 +11,16 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Amazon Clone — Shop Online',
-    template: '%s | Amazon Clone',
+    default: 'Amazon Clone (Portfolio Demo) — Educational Full-Stack Project',
+    template: '%s | Amazon Clone Demo',
   },
   description:
-    'Shop millions of products at great prices. Fast delivery, easy returns. Your one-stop online marketplace.',
-  keywords: ['shopping', 'ecommerce', 'online store', 'deals', 'marketplace'],
-  authors: [{ name: 'Amazon Clone Team' }],
-  openGraph: {
-    type: 'website',
-    siteName: 'Amazon Clone',
-    title: 'Amazon Clone — Shop Online',
-    description: 'Shop millions of products at great prices.',
-  },
-  twitter: {
-    card: 'summary_large_image',
-  },
+    'An educational portfolio demonstration of a multi-vendor e-commerce platform. For learning and evaluation purposes only. Not affiliated with Amazon.com, Inc.',
+  keywords: ['portfolio', 'demo', 'educational project', 'ecommerce clone', 'nextjs'],
+  authors: [{ name: 'Developer Portfolio' }],
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
   },
 };
 
@@ -47,6 +38,12 @@ export default function RootLayout({
   return (
     <html lang="en" data-scroll-behavior="smooth" className={`${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
+        {/* Global Educational & Portfolio Disclaimer Banner */}
+        <div className="bg-[#232f3e] text-white text-[11px] px-3 py-1.5 text-center font-medium border-b border-gray-700 flex items-center justify-center gap-2 select-none">
+          <span>
+            🎓 <strong>Educational Portfolio Project</strong> — Demonstration &amp; evaluation only. Not affiliated with Amazon.com, Inc. No real credit card or sensitive credentials are collected.
+          </span>
+        </div>
         <Providers>{children}</Providers>
       </body>
     </html>

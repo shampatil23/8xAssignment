@@ -1,11 +1,11 @@
 'use client';
 // ============================================================================
-// Sign-In page
+// Sign-In page — Includes Educational Demo Warning & 1-Click Test Credentials
 // ============================================================================
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ShieldAlert, KeyRound, UserCheck, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { InlineError } from '@/components/ui/ErrorState';
@@ -22,6 +22,21 @@ function SignInContent() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // 1-Click Demo Login Fill
+  const handleFillDemoCredentials = (role: 'customer' | 'seller' | 'admin') => {
+    if (role === 'customer') {
+      setEmail('customer@amazonclone.com');
+      setPassword('Customer@123456');
+    } else if (role === 'seller') {
+      setEmail('seller@amazonclone.com');
+      setPassword('Seller@123456');
+    } else if (role === 'admin') {
+      setEmail('admin@amazonclone.com');
+      setPassword('Admin@123456');
+    }
+    setError(null);
+  };
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -37,8 +52,42 @@ function SignInContent() {
 
   return (
     <div className="w-full max-w-sm">
-      <div className="rounded border border-gray-300 p-6 mt-4">
-        <h1 className="text-2xl font-medium text-gray-900 mb-4">Sign in</h1>
+      {/* Educational Notice Badge */}
+      <div className="rounded-lg bg-blue-50 border border-blue-200 p-3 text-xs text-blue-900 mb-4 space-y-1">
+        <div className="flex items-center gap-1.5 font-bold text-blue-800">
+          <ShieldCheck size={16} className="text-blue-600 shrink-0" />
+          <span>Educational Portfolio Demo</span>
+        </div>
+        <p className="text-[11px] text-blue-700 leading-normal">
+          This is an independent portfolio demonstration. <strong>Do not enter real Amazon.com passwords.</strong> Use the test accounts below:
+        </p>
+        <div className="flex flex-wrap gap-1.5 pt-1.5">
+          <button
+            type="button"
+            onClick={() => handleFillDemoCredentials('customer')}
+            className="text-[10px] bg-white hover:bg-blue-100 text-blue-800 font-bold px-2 py-1 rounded border border-blue-300 transition-colors cursor-pointer"
+          >
+            Fill Shopper
+          </button>
+          <button
+            type="button"
+            onClick={() => handleFillDemoCredentials('seller')}
+            className="text-[10px] bg-white hover:bg-blue-100 text-blue-800 font-bold px-2 py-1 rounded border border-blue-300 transition-colors cursor-pointer"
+          >
+            Fill Merchant
+          </button>
+          <button
+            type="button"
+            onClick={() => handleFillDemoCredentials('admin')}
+            className="text-[10px] bg-white hover:bg-blue-100 text-blue-800 font-bold px-2 py-1 rounded border border-blue-300 transition-colors cursor-pointer"
+          >
+            Fill Admin
+          </button>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-gray-300 p-6 bg-white shadow-2xs">
+        <h1 className="text-2xl font-normal text-gray-900 mb-4">Sign in</h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
           <Input
@@ -65,7 +114,7 @@ function SignInContent() {
                 <button
                   type="button"
                   onClick={() => setShowPw((v) => !v)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 cursor-pointer"
                   aria-label={showPw ? 'Hide password' : 'Show password'}
                 >
                   {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
@@ -91,25 +140,23 @@ function SignInContent() {
             fullWidth
             loading={loading}
           >
-            Sign in
+            Sign in (Demo)
           </Button>
         </form>
 
-        <p className="mt-4 text-xs text-gray-600 leading-5">
-          By continuing, you agree to Amazon Clone&apos;s{' '}
-          <a href="#" className="text-amazon-link hover:underline">Conditions of Use</a> and{' '}
-          <a href="#" className="text-amazon-link hover:underline">Privacy Notice</a>.
+        <p className="mt-4 text-xs text-gray-500 leading-normal">
+          By continuing, you agree to Amazon Clone Demo&apos;s educational terms of use.
         </p>
       </div>
 
       <div className="mt-4 text-center">
-        <span className="text-sm text-gray-600">New to Amazon Clone?&nbsp;</span>
+        <span className="text-xs text-gray-600">New to Amazon Clone Demo?&nbsp;</span>
         <Link
           href={`/auth/sign-up${redirectTo !== '/account' ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`}
           id="go-to-signup-link"
-          className="text-sm font-medium text-amazon-dark hover:text-amazon-link hover:underline"
+          className="text-xs font-semibold text-amazon-dark hover:text-amazon-link hover:underline"
         >
-          Create your Amazon Clone account
+          Create your demo account
         </Link>
       </div>
     </div>
