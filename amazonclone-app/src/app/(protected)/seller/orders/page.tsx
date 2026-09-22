@@ -30,6 +30,7 @@ import {
   ALLOWED_STATUS_TRANSITIONS,
   type SellerOrderRecord,
 } from '@/services/sellerService';
+import { formatPrice } from '@/lib/utils';
 import type { OrderStatus } from '@/types';
 
 type StatusFilter = 'all' | 'pending' | 'processing' | 'shipped' | 'delivered';
@@ -268,7 +269,7 @@ export default function SellerOrdersPage() {
 
                       <div className="text-right">
                         <span className="text-sm font-bold text-gray-900">
-                          ${rec.sellerTotal.toFixed(2)}
+                          {formatPrice(rec.sellerTotal)}
                         </span>
                       </div>
                     </div>
@@ -298,7 +299,7 @@ export default function SellerOrdersPage() {
                                 {item.title}
                               </p>
                               <p className="text-[11px] text-gray-500">
-                                Qty: <strong className="text-gray-800">{item.quantity}</strong> · ${item.price.toFixed(2)} each · Subtotal: <strong className="text-gray-800">${item.subtotal.toFixed(2)}</strong>
+                                Qty: <strong className="text-gray-800">{item.quantity}</strong> · {formatPrice(item.price)} each · Subtotal: <strong className="text-gray-800">{formatPrice(item.subtotal)}</strong>
                               </p>
                             </div>
                           </div>

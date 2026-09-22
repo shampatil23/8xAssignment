@@ -2,20 +2,76 @@
 // General utility functions
 // ============================================================================
 
+export const CURRENCY_RATES: Record<string, { rate: number; symbol: string; locale: string }> = {
+  INR: { rate: 83.0, symbol: '₹', locale: 'en-IN' },
+  USD: { rate: 1.0, symbol: '$', locale: 'en-US' },
+  GBP: { rate: 0.79, symbol: '£', locale: 'en-GB' },
+  EUR: { rate: 0.92, symbol: '€', locale: 'de-DE' },
+  CAD: { rate: 1.36, symbol: 'C$', locale: 'en-CA' },
+  AUD: { rate: 1.52, symbol: 'A$', locale: 'en-AU' },
+  JPY: { rate: 155.0, symbol: '¥', locale: 'ja-JP' },
+  AED: { rate: 3.67, symbol: 'AED ', locale: 'ar-AE' },
+};
+
 /**
- * Format a price number as a currency string.
+ * Format a price number into a localized currency string.
+ * Automatically converts base catalog USD amounts into INR (or active currency) using live rates.
  */
 export function formatPrice(
   amount: number,
-  currency: string = 'INR',
-  locale: string = 'en-IN',
+  currency?: string,
+  locale?: string,
+  options?: {
+    alreadyConverted?: boolean;
+    showCode?: boolean;
+  },
 ): string {
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(amount);
+  if (typeof amount !== 'number' || isNaN(amount)) {
+    return currency === 'USD' ? '$0.00' : '₹0';
+  }
+
+  // Detect active currency: parameter -> localStorage -> default 'INR'
+  let activeCurrency = currency;
+  if (!activeCurrency && typeof window !== 'undefined') {
+    try {
+      const savedCountry = localStorage.getItem('amazon_clone_delivery_country');
+      if (savedCountry === 'US') activeCurrency = 'USD';
+      else if (savedCountry === 'GB') activeCurrency = 'GBP';
+      else if (savedCountry === 'CA') activeCurrency = 'CAD';
+      else if (savedCountry === 'EU' || savedCountry === 'DE') activeCurrency = 'EUR';
+      else if (savedCountry === 'JP') activeCurrency = 'JPY';
+      else if (savedCountry === 'AE') activeCurrency = 'AED';
+      else if (savedCountry === 'AU') activeCurrency = 'AUD';
+      else activeCurrency = 'INR';
+    } catch {
+      activeCurrency = 'INR';
+    }
+  }
+  if (!activeCurrency) activeCurrency = 'INR';
+
+  const config = CURRENCY_RATES[activeCurrency] || CURRENCY_RATES.INR;
+  const targetLocale = locale || config.locale;
+
+  // Convert base USD amount to target currency if not already converted
+  const converted = options?.alreadyConverted ? amount : amount * config.rate;
+
+  const isZeroDecimal = activeCurrency === 'INR' || activeCurrency === 'JPY';
+
+  try {
+    const formatted = new Intl.NumberFormat(targetLocale, {
+      style: 'currency',
+      currency: activeCurrency,
+      minimumFractionDigits: isZeroDecimal ? 0 : 2,
+      maximumFractionDigits: isZeroDecimal ? 0 : 2,
+    }).format(converted);
+
+    if (options?.showCode) {
+      return `${formatted} (${activeCurrency})`;
+    }
+    return formatted;
+  } catch {
+    return `${config.symbol}${Math.round(converted).toLocaleString(targetLocale)}`;
+  }
 }
 
 /**

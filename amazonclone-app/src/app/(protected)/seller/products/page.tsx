@@ -27,6 +27,7 @@ import {
   deleteSellerProduct,
   toggleProductStatus,
 } from '@/services/sellerService';
+import { formatPrice } from '@/lib/utils';
 import type { Product, ProductStatus } from '@/types';
 
 export default function SellerProductsPage() {
@@ -263,11 +264,11 @@ export default function SellerProductsPage() {
                         {/* Price */}
                         <td className="px-4 py-3 text-right">
                           <span className="font-bold text-gray-900">
-                            ${p.price.toFixed(2)}
+                            {formatPrice(p.price)}
                           </span>
                           {p.compareAtPrice && p.compareAtPrice > p.price && (
                             <span className="block text-[10px] text-gray-400 line-through">
-                              ${p.compareAtPrice.toFixed(2)}
+                              {formatPrice(p.compareAtPrice)}
                             </span>
                           )}
                         </td>

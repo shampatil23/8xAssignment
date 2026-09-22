@@ -23,6 +23,7 @@ import { SellerLayout } from '@/components/seller/SellerLayout';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 import { fetchSellerProducts, updateSellerStock } from '@/services/sellerService';
+import { formatPrice } from '@/lib/utils';
 import type { Product } from '@/types';
 
 type StockFilter = 'all' | 'in_stock' | 'low_stock' | 'out_of_stock';
@@ -279,8 +280,8 @@ export default function SellerInventoryPage() {
                                 {p.title}
                               </p>
                               <div className="flex items-center gap-2 mt-0.5">
-                                <span className="text-[11px] text-gray-400">
-                                  ${p.price.toFixed(2)}
+                                <span className="text-[11px] text-gray-500 font-semibold">
+                                  {formatPrice(p.price)}
                                 </span>
                                 <Link
                                   href={`/product/${p.slug}`}

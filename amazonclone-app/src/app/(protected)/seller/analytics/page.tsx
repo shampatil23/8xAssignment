@@ -19,6 +19,7 @@ import {
 import { SellerLayout } from '@/components/seller/SellerLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { fetchSellerAnalytics } from '@/services/sellerService';
+import { formatPrice } from '@/lib/utils';
 import type { SellerAnalyticsMetrics } from '@/types';
 
 export default function SellerAnalyticsPage() {
@@ -76,7 +77,7 @@ export default function SellerAnalyticsPage() {
                 <DollarSign size={18} className="text-green-600" />
               </div>
               <p className="text-2xl font-extrabold text-gray-900">
-                ${(metrics?.totalRevenue || 0).toFixed(2)}
+                {formatPrice(metrics?.totalRevenue || 0)}
               </p>
               <p className="text-[11px] text-green-700 font-semibold mt-1 flex items-center gap-0.5">
                 <ArrowUpRight size={13} />
@@ -105,7 +106,7 @@ export default function SellerAnalyticsPage() {
                 <TrendingUp size={18} className="text-amazon-orange" />
               </div>
               <p className="text-2xl font-extrabold text-gray-900">
-                ${avgOrderValue.toFixed(2)}
+                {formatPrice(avgOrderValue)}
               </p>
               <p className="text-[11px] text-gray-500 mt-1">
                 Per customer transaction
@@ -179,8 +180,8 @@ export default function SellerAnalyticsPage() {
                       <td className="px-4 py-3 text-center font-bold text-gray-900">
                         {prod.unitsSold}
                       </td>
-                      <td className="px-4 py-3 text-right font-extrabold text-green-700">
-                        ${prod.revenue.toFixed(2)}
+                      <td className="px-4 py-3 text-right font-bold text-gray-900">
+                        {formatPrice(prod.revenue)}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span
