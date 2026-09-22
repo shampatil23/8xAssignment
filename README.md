@@ -239,9 +239,9 @@ The platform includes built-in test accounts across all roles:
 
 | Role | Email | Password | Access Area |
 | :--- | :--- | :--- | :--- |
-| **Marketplace Admin** | `admin@amazonclone.com` | `Admin@123456` | `/admin` (Full telemetry & governance) |
-| **Verified Merchant** | `seller@amazonclone.com` | `Seller@123456` | `/seller` (Inventory & order fulfillment) |
-| **Customer Shopper** | `customer@amazonclone.com` | `Customer@123456` | Storefront, Cart, Checkout, `/orders` |
+| **Marketplace Admin** | `admin@gmail.com` | `admin123` | `/admin` (Full telemetry & governance) |
+| **Verified Merchant** | `sham2@gmail.com` | `sham123` | `/seller` (Inventory & order fulfillment) |
+| **Customer Shopper** | `sham@gmail.com` | `sham123` | Storefront, Cart, Checkout, `/orders` |
 
 ---
 
