@@ -5,15 +5,19 @@
 // ============================================================================
 import React from 'react';
 import Link from 'next/link';
-import { MapPin, Globe, ChevronDown, ShoppingCart } from 'lucide-react';
+import { MapPin, Globe, ChevronDown, ShoppingCart, Bell } from 'lucide-react';
 import { SearchBar } from './SearchBar';
 import { NavBar } from './NavBar';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
+import { useNotifications } from '@/hooks/useNotifications';
+import { useLocation } from '@/context/LocationContext';
 
 export function Header() {
   const { itemCount } = useCart();
   const { user } = useAuth();
+  const { unreadCount } = useNotifications();
+  const { country, postalCode, selectedAddress, openLocationModal } = useLocation();
 
   const firstName = user?.displayName?.split(' ')[0] ?? null;
 
@@ -26,10 +30,8 @@ export function Header() {
         <Link
           href="/"
           id="header-logo"
-          className="flex-shrink-0 rounded p-1 hover:ring-1 hover:ring-white transition-all"
-          aria-label="Amazon Clone home"
+          className="flex flex-shrink-0 items-center gap-0.5 px-2 py-1 rounded hover:ring-1 hover:ring-white transition-all"
         >
-          {/* Text logo — replace with SVG in production */}
           <span className="font-extrabold text-white text-xl tracking-tight leading-none">
             amazon<span className="text-amazon-orange">.</span>
             <span className="text-xs align-super">clone</span>
@@ -37,17 +39,21 @@ export function Header() {
         </Link>
 
         {/* Deliver to (hidden on xs) */}
-        <Link
-          href="/account/addresses"
+        <button
+          type="button"
+          onClick={openLocationModal}
           id="header-location"
-          className="hidden sm:flex flex-col flex-shrink-0 px-2 py-1 rounded hover:ring-1 hover:ring-white transition-all"
+          className="hidden sm:flex flex-col flex-shrink-0 px-2 py-1 rounded hover:ring-1 hover:ring-white transition-all text-left cursor-pointer"
+          title="Change delivery location"
         >
-          <span className="text-gray-300 text-[10px] leading-tight">Deliver to</span>
-          <span className="text-white text-xs font-bold flex items-center gap-0.5">
-            <MapPin size={11} className="text-white" />
-            India
+          <span className="text-gray-300 text-[10px] leading-tight truncate max-w-[130px]">
+            {selectedAddress ? `Deliver to ${selectedAddress.fullName.split(' ')[0]}` : 'Deliver to'}
           </span>
-        </Link>
+          <span className="text-white text-xs font-bold flex items-center gap-0.5 truncate max-w-[130px]">
+            <MapPin size={11} className="text-white shrink-0" />
+            <span className="truncate">{selectedAddress ? `${selectedAddress.city} ${postalCode || ''}` : country.name}</span>
+          </span>
+        </button>
 
         {/* Search bar — takes remaining space */}
         <div className="flex-1 min-w-0">
@@ -56,15 +62,20 @@ export function Header() {
           </React.Suspense>
         </div>
 
-        {/* Language selector (hidden on mobile) */}
+        {/* Language & Currency selector */}
         <button
           id="header-language-btn"
-          className="hidden md:flex flex-col flex-shrink-0 items-start px-2 py-1 rounded hover:ring-1 hover:ring-white transition-all"
-          aria-label="Change language"
+          type="button"
+          onClick={openLocationModal}
+          className="hidden md:flex flex-col flex-shrink-0 items-start px-2 py-1 rounded hover:ring-1 hover:ring-white transition-all cursor-pointer text-left"
+          aria-label="Change currency and location"
+          title={`Active currency: ${country.name} (${country.currency} - ${country.symbol})`}
         >
+          <span className="text-gray-300 text-[9px] leading-none uppercase">{country.currency}</span>
           <span className="text-white text-xs font-bold flex items-center gap-0.5">
-            <Globe size={13} />
-            EN <ChevronDown size={10} />
+            <span className="mr-0.5 text-[11px]">{country.flag}</span>
+            <span>{country.symbol}</span>
+            <ChevronDown size={10} />
           </span>
         </button>
 
@@ -91,6 +102,29 @@ export function Header() {
           <span className="text-gray-300 text-[10px] leading-tight">Returns</span>
           <span className="text-white text-xs font-bold">&amp; Orders</span>
         </Link>
+
+        {/* Notifications */}
+        {user && (
+          <Link
+            href="/account/notifications"
+            id="header-notifications-link"
+            className="flex flex-col items-center justify-center flex-shrink-0 px-2 py-1 rounded hover:ring-1 hover:ring-white transition-all relative text-white"
+            title="Notifications & Alerts"
+            aria-label={`Notifications, ${unreadCount} unread`}
+          >
+            <div className="relative">
+              <Bell size={20} className="text-white" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1.5 -right-2 min-w-[16px] h-[16px] px-1 flex items-center justify-center rounded-full bg-amazon-orange text-[10px] font-bold text-white shadow-xs">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </div>
+            <span className="text-[10px] text-gray-300 leading-none mt-0.5 hidden md:block">
+              Alerts
+            </span>
+          </Link>
+        )}
 
         {/* Cart */}
         <Link

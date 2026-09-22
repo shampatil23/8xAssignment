@@ -3,8 +3,9 @@
 // SearchFilters — Amazon-style left sidebar facet filtering
 // ============================================================================
 import React, { useState } from 'react';
-import { Star, Check, X, RotateCcw } from 'lucide-react';
+import { Star, Check, X, RotateCcw, MapPin } from 'lucide-react';
 import type { SearchFacets, SearchParams } from '@/services/searchService';
+import { useLocation } from '@/context/LocationContext';
 
 interface SearchFiltersProps {
   facets: SearchFacets;
@@ -21,20 +22,31 @@ export function SearchFilters({
   onClearFilters,
   className = '',
 }: SearchFiltersProps) {
-  const [customMin, setCustomMin] = useState(
-    appliedParams.minPrice ? appliedParams.minPrice.toString() : '',
-  );
-  const [customMax, setCustomMax] = useState(
-    appliedParams.maxPrice ? appliedParams.maxPrice.toString() : '',
-  );
+  const { country, openLocationModal } = useLocation();
+
+  // Convert applied base USD prices to local currency for display in custom input
+  const initialLocalMin = appliedParams.minPrice
+    ? Math.round(appliedParams.minPrice * country.rate).toString()
+    : '';
+  const initialLocalMax = appliedParams.maxPrice
+    ? Math.round(appliedParams.maxPrice * country.rate).toString()
+    : '';
+
+  const [customMin, setCustomMin] = useState(initialLocalMin);
+  const [customMax, setCustomMax] = useState(initialLocalMax);
 
   function handlePriceSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const min = customMin ? parseFloat(customMin) : undefined;
-    const max = customMax ? parseFloat(customMax) : undefined;
+    const rawMin = customMin ? parseFloat(customMin) : undefined;
+    const rawMax = customMax ? parseFloat(customMax) : undefined;
+
+    // Convert local currency input back to base USD for catalog querying
+    const baseMin = rawMin && !isNaN(rawMin) ? Math.round(rawMin / country.rate) : undefined;
+    const baseMax = rawMax && !isNaN(rawMax) ? Math.round(rawMax / country.rate) : undefined;
+
     onFilterChange({
-      minPrice: min && !isNaN(min) ? min : undefined,
-      maxPrice: max && !isNaN(max) ? max : undefined,
+      minPrice: baseMin,
+      maxPrice: baseMax,
       page: 1,
     });
   }
@@ -190,30 +202,44 @@ export function SearchFilters({
         </div>
       )}
 
-      {/* ── 4. Price Filter ── */}
+      {/* ── 4. Delivery & Location ── */}
       <div className="border-b pb-5">
-        <h3 className="font-bold text-sm text-gray-900 mb-2">Price</h3>
+        <h3 className="font-bold text-sm text-gray-900 mb-2">Delivery &amp; Location</h3>
+        <div className="bg-gray-50 rounded p-2.5 border border-gray-200 space-y-2">
+          <div className="flex items-center gap-1.5 text-xs text-gray-800">
+            <MapPin size={13} className="text-amazon-orange shrink-0" />
+            <span className="truncate">Shipping to <strong>{country.name}</strong></span>
+          </div>
+          <button
+            type="button"
+            onClick={openLocationModal}
+            className="text-[11px] text-amazon-link font-medium hover:underline block"
+          >
+            Change destination / currency ({country.symbol})
+          </button>
+        </div>
+      </div>
 
-        {/* Quick price brackets */}
+      {/* ── 5. Price Filter ── */}
+      <div className="border-b pb-5">
+        <h3 className="font-bold text-sm text-gray-900 mb-2">Price ({country.symbol} {country.currency})</h3>
+
+        {/* Quick price brackets based on selected country */}
         <div className="space-y-1.5 mb-3">
-          {[
-            { label: 'Under $25', max: 25 },
-            { label: '$25 to $50', min: 25, max: 50 },
-            { label: '$50 to $100', min: 50, max: 100 },
-            { label: '$100 to $300', min: 100, max: 300 },
-            { label: '$300 & Above', min: 300 },
-          ].map((bracket) => {
+          {country.priceBrackets.map((bracket) => {
+            const baseMin = bracket.min ? Math.round(bracket.min / country.rate) : undefined;
+            const baseMax = bracket.max ? Math.round(bracket.max / country.rate) : undefined;
             const isMatch =
-              appliedParams.minPrice === bracket.min &&
-              appliedParams.maxPrice === bracket.max;
+              appliedParams.minPrice === baseMin &&
+              appliedParams.maxPrice === baseMax;
             return (
               <button
                 key={bracket.label}
                 type="button"
                 onClick={() => {
                   onFilterChange({
-                    minPrice: isMatch ? undefined : bracket.min,
-                    maxPrice: isMatch ? undefined : bracket.max,
+                    minPrice: isMatch ? undefined : baseMin,
+                    maxPrice: isMatch ? undefined : baseMax,
                     page: 1,
                   });
                   setCustomMin(bracket.min ? bracket.min.toString() : '');
@@ -229,10 +255,10 @@ export function SearchFilters({
           })}
         </div>
 
-        {/* Custom Min / Max input */}
+        {/* Custom Min / Max input with active currency symbol */}
         <form onSubmit={handlePriceSubmit} className="flex items-center gap-1.5">
           <div className="relative flex-1">
-            <span className="absolute left-2 top-1.5 text-gray-400">$</span>
+            <span className="absolute left-1.5 top-1.5 text-gray-500 text-[11px] font-medium">{country.symbol}</span>
             <input
               type="number"
               placeholder="Min"
@@ -244,7 +270,7 @@ export function SearchFilters({
           </div>
           <span className="text-gray-400">-</span>
           <div className="relative flex-1">
-            <span className="absolute left-2 top-1.5 text-gray-400">$</span>
+            <span className="absolute left-1.5 top-1.5 text-gray-500 text-[11px] font-medium">{country.symbol}</span>
             <input
               type="number"
               placeholder="Max"

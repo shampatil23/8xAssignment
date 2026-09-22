@@ -13,6 +13,7 @@ import { ProductRating } from './ProductRating';
 import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useAuth } from '@/hooks/useAuth';
+import { useLocation } from '@/context/LocationContext';
 
 interface ProductCardProps {
   product: Product;
@@ -23,6 +24,7 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
   const router = useRouter();
   const { user } = useAuth();
   const { addItem } = useCart();
+  const { country } = useLocation();
   const { isWishlisted, toggleWishlist } = useWishlist();
 
   const [addedNotice, setAddedNotice] = useState(false);
@@ -169,7 +171,7 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
           {product.deliveryInfo && !isOutOfStock && (
             <p className="text-xs text-gray-600 mb-2">
               <span className="font-semibold text-gray-900">
-                {product.deliveryInfo.isFreeDelivery ? 'FREE delivery ' : 'Delivery '}
+                {product.deliveryInfo.isFreeDelivery ? `FREE delivery to ${country.name} ` : `Delivery to ${country.name} `}
               </span>
               <span>{product.deliveryInfo.fastestDeliveryDate}</span>
             </p>

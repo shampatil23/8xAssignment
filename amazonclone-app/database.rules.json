@@ -54,6 +54,12 @@
     "settings": {
       ".read": true,
       ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'"
+    },
+    "supportTickets": {
+      ".read": "auth != null",
+      "$ticketId": {
+        ".write": "auth != null"
+      }
     }
   }
 }

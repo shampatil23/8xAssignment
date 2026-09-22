@@ -29,6 +29,15 @@ export interface User {
   sellerApplication?: SellerApplication;
   addresses: Address[];
   defaultAddressId?: string;
+  preferences?: UserPreferences;
+}
+
+export interface UserPreferences {
+  language?: string;
+  currency?: string;
+  orderUpdates?: boolean;
+  promotionalEmails?: boolean;
+  securityAlerts?: boolean;
 }
 
 export type UserRole = 'customer' | 'admin' | 'seller';
@@ -396,5 +405,59 @@ export interface AdminDashboardStats {
   recentOrders: Order[];
   recentReturns: ReturnRequest[];
   recentUsers: User[];
+}
+
+// --- Notification Types ---
+export type NotificationType = 'order' | 'return' | 'promotion' | 'system' | 'security';
+
+export interface Notification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  link?: string;
+  read: boolean;
+  orderId?: string;
+  returnId?: string;
+  createdAt: string;
+}
+
+// --- Customer Support Types ---
+export type SupportTopic =
+  | 'orders'
+  | 'delivery'
+  | 'returns'
+  | 'payments'
+  | 'account'
+  | 'seller'
+  | 'other';
+
+export type SupportTicketStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
+export type SupportPriority = 'low' | 'medium' | 'high';
+
+export interface SupportMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderRole: 'customer' | 'support' | 'admin';
+  message: string;
+  createdAt: string;
+}
+
+export interface SupportTicket {
+  id: string;
+  ticketNumber: string;
+  userId: string;
+  userEmail: string;
+  userName: string;
+  topic: SupportTopic;
+  subject: string;
+  status: SupportTicketStatus;
+  priority: SupportPriority;
+  orderId?: string;
+  messages: SupportMessage[];
+  createdAt: string;
+  updatedAt: string;
 }
 

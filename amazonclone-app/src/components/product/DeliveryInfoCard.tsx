@@ -3,9 +3,10 @@
 // DeliveryInfoCard — Amazon-style delivery information and trust guarantees
 // Reusable across Product Details Page and Checkout
 // ============================================================================
-import React, { useState } from 'react';
+import React from 'react';
 import { Truck, MapPin, RotateCcw, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import type { DeliveryInfo } from '@/types';
+import { useLocation } from '@/context/LocationContext';
 
 interface DeliveryInfoCardProps {
   deliveryInfo?: DeliveryInfo;
@@ -18,19 +19,7 @@ export function DeliveryInfoCard({
   isOutOfStock = false,
   className = '',
 }: DeliveryInfoCardProps) {
-  const [pincode, setPincode] = useState('110001');
-  const [city, setCity] = useState('New Delhi');
-  const [isEditingLocation, setIsEditingLocation] = useState(false);
-  const [tempPincode, setTempPincode] = useState(pincode);
-
-  function handleSaveLocation(e: React.FormEvent) {
-    e.preventDefault();
-    if (tempPincode.trim().length >= 4) {
-      setPincode(tempPincode.trim());
-      setCity('Select Location');
-      setIsEditingLocation(false);
-    }
-  }
+  const { country, postalCode, selectedAddress, openLocationModal } = useLocation();
 
   if (isOutOfStock) {
     return (
@@ -43,47 +32,26 @@ export function DeliveryInfoCard({
     );
   }
 
+  const destinationLabel = selectedAddress
+    ? `${selectedAddress.city} ${postalCode || ''}`
+    : `${country.name} ${postalCode || ''}`;
+
   return (
     <div className={`flex flex-col gap-3 text-xs text-gray-700 ${className}`}>
       {/* ── Location Selector ── */}
       <div className="flex items-center gap-1.5 text-gray-600">
         <MapPin size={14} className="text-amazon-link flex-shrink-0" />
-        {isEditingLocation ? (
-          <form onSubmit={handleSaveLocation} className="flex items-center gap-1">
-            <input
-              type="text"
-              value={tempPincode}
-              onChange={(e) => setTempPincode(e.target.value)}
-              placeholder="Enter Pincode"
-              maxLength={6}
-              className="w-24 rounded border border-gray-300 px-2 py-0.5 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-amazon-orange"
-            />
-            <button
-              type="submit"
-              className="rounded bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-800 hover:bg-gray-200"
-            >
-              Apply
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsEditingLocation(false)}
-              className="text-[11px] text-gray-500 hover:underline"
-            >
-              Cancel
-            </button>
-          </form>
-        ) : (
-          <div className="flex items-center gap-1">
-            <span>Deliver to</span>
-            <button
-              type="button"
-              onClick={() => setIsEditingLocation(true)}
-              className="font-semibold text-amazon-link hover:underline hover:text-amazon-link-hover"
-            >
-              {city} {pincode}
-            </button>
-          </div>
-        )}
+        <div className="flex items-center gap-1">
+          <span>Deliver to</span>
+          <button
+            type="button"
+            onClick={openLocationModal}
+            className="font-semibold text-amazon-link hover:underline hover:text-amazon-link-hover cursor-pointer"
+            title="Change delivery address or country"
+          >
+            {destinationLabel}
+          </button>
+        </div>
       </div>
 
       {/* ── Delivery Promises ── */}
@@ -94,7 +62,7 @@ export function DeliveryInfoCard({
             <div>
               <p className="text-gray-900">
                 <span className="font-bold text-gray-900">
-                  {deliveryInfo.isFreeDelivery ? 'FREE delivery ' : 'Delivery '}
+                  {deliveryInfo.isFreeDelivery ? `FREE delivery to ${country.name} ` : `Delivery to ${country.name} `}
                 </span>
                 <span className="font-semibold text-gray-900">
                   {deliveryInfo.fastestDeliveryDate}

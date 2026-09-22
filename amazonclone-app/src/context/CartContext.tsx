@@ -218,22 +218,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const existingItem = currentCart.items[existingIndex];
         const newTotalQty = Math.min(availableStock, existingItem.quantity + quantity);
         updatedItems = [...currentCart.items];
-        updatedItems[existingIndex] = {
+        const updatedItem: CartItem = {
           ...existingItem,
           quantity: newTotalQty,
-          stockError:
-            existingItem.quantity + quantity > availableStock
-              ? `Maximum available stock reached (${availableStock}).`
-              : undefined,
         };
+        if (existingItem.quantity + quantity > availableStock) {
+          updatedItem.stockError = `Maximum available stock reached (${availableStock}).`;
+        } else {
+          delete updatedItem.stockError;
+        }
+        updatedItems[existingIndex] = updatedItem;
       } else {
         const cappedQty = Math.min(availableStock, quantity);
         const newItem: CartItem = {
           id: itemId,
           productId: product.id,
-          variantId: variant?.id,
-          variantTitle: variant?.title,
-          selectedVariant: variant || undefined,
+          ...(variant?.id ? { variantId: variant.id } : {}),
+          ...(variant?.title ? { variantTitle: variant.title } : {}),
+          ...(variant ? { selectedVariant: variant } : {}),
           product: {
             id: product.id,
             title: itemTitle,

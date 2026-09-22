@@ -31,6 +31,11 @@ import type {
   Promotion,
   PlatformSettings,
   SellerApplication,
+  Notification,
+  SupportTicket,
+  SupportMessage,
+  SupportTicketStatus,
+  UserPreferences,
 } from '@/types';
 import { SEED_CATEGORIES, SEED_PRODUCTS } from './seedData';
 
@@ -49,9 +54,11 @@ export interface UserProfile {
   email: string;
   displayName: string;
   photoURL: string | null;
+  phoneNumber?: string | null;
   role: UserRole;
   accountStatus: 'active' | 'suspended' | 'pending';
   sellerApplication?: SellerApplication;
+  preferences?: UserPreferences;
   emailVerified: boolean;
   createdAt: string;
   updatedAt: string;
@@ -125,9 +132,12 @@ export function profileToAppUser(profile: UserProfile): AppUser {
     email: profile.email,
     displayName: profile.displayName,
     photoURL: profile.photoURL,
-    phoneNumber: null,
+    phoneNumber: profile.phoneNumber ?? null,
     emailVerified: profile.emailVerified,
     role: profile.role,
+    status: profile.accountStatus,
+    sellerApplication: profile.sellerApplication,
+    preferences: profile.preferences,
     addresses: [],
     createdAt: profile.createdAt,
     updatedAt: profile.updatedAt,
@@ -193,7 +203,24 @@ export async function getAllProducts(): Promise<Product[]> {
 
 export async function getProductsByCategory(categorySlug: string): Promise<Product[]> {
   const all = await getAllProducts();
-  return all.filter((p) => p.category === categorySlug);
+  const slug = categorySlug.toLowerCase();
+  return all.filter((p) => {
+    const pCat = p.category.toLowerCase();
+    if (pCat === slug) return true;
+    if (
+      (slug === 'home-garden' || slug === 'home-kitchen') &&
+      (pCat === 'home-garden' || pCat === 'home-kitchen')
+    ) {
+      return true;
+    }
+    if (
+      (slug === 'sports' || slug === 'fitness') &&
+      (pCat === 'sports' || pCat === 'fitness')
+    ) {
+      return true;
+    }
+    return false;
+  });
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
@@ -290,6 +317,31 @@ export async function seedCatalogData(force = false): Promise<{
 }
 
 // ============================================================================
+// Helper: Recursively clean undefined values before RTDB set/update
+// RTDB throws an uncatchable exception if any property is undefined.
+// ============================================================================
+export function cleanRTDBData<T>(obj: T): T {
+  if (obj === undefined) {
+    return null as unknown as T;
+  }
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  if (Array.isArray(obj)) {
+    return obj
+      .map(cleanRTDBData)
+      .filter((item) => item !== undefined) as unknown as T;
+  }
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+    if (value !== undefined) {
+      result[key] = cleanRTDBData(value);
+    }
+  }
+  return result as T;
+}
+
+// ============================================================================
 // User Cart Operations (RTDB)
 // Stored under users/${uid}/cart
 // ============================================================================
@@ -305,7 +357,7 @@ export async function getUserCart(uid: string): Promise<Cart | null> {
 
 export async function saveUserCart(uid: string, cart: Cart): Promise<void> {
   const db = getRTDB();
-  await set(ref(db, `users/${uid}/cart`), cart);
+  await set(ref(db, `users/${uid}/cart`), cleanRTDBData(cart));
 }
 
 // ============================================================================
@@ -323,7 +375,7 @@ export async function getUserWishlist(uid: string): Promise<Wishlist | null> {
 
 export async function saveUserWishlist(uid: string, wishlist: Wishlist): Promise<void> {
   const db = getRTDB();
-  await set(ref(db, `users/${uid}/wishlist`), wishlist);
+  await set(ref(db, `users/${uid}/wishlist`), cleanRTDBData(wishlist));
 }
 
 // ============================================================================
@@ -349,10 +401,10 @@ export async function saveUserAddress(uid: string, address: Address): Promise<vo
         updates[`users/${uid}/addresses/${addr.id}/isDefault`] = false;
       }
     });
-    updates[`users/${uid}/addresses/${address.id}`] = address;
-    await update(ref(db), updates);
+    updates[`users/${uid}/addresses/${address.id}`] = cleanRTDBData(address);
+    await update(ref(db), cleanRTDBData(updates));
   } else {
-    await set(ref(db, `users/${uid}/addresses/${address.id}`), address);
+    await set(ref(db, `users/${uid}/addresses/${address.id}`), cleanRTDBData(address));
   }
 }
 
@@ -377,6 +429,20 @@ export async function setDefaultAddress(uid: string, addressId: string): Promise
 // ============================================================================
 export async function saveOrder(order: Order): Promise<void> {
   const db = getRTDB();
+  const notifId = `notif-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+  const notifTime = new Date().toISOString();
+  const orderNotif: Notification = {
+    id: notifId,
+    userId: order.userId,
+    title: 'Order Confirmed',
+    message: `Your order #${order.id.slice(-8).toUpperCase()} for ${order.items.length} item(s) has been placed successfully.`,
+    type: 'order',
+    link: `/orders/${order.id}`,
+    read: false,
+    orderId: order.id,
+    createdAt: notifTime,
+  };
+
   const updates: Record<string, any> = {
     [`orders/${order.id}`]: order,
     [`users/${order.userId}/orders/${order.id}`]: {
@@ -386,8 +452,9 @@ export async function saveOrder(order: Order): Promise<void> {
       status: order.status,
       itemCount: order.items.reduce((sum, i) => sum + i.quantity, 0),
     },
+    [`users/${order.userId}/notifications/${notifId}`]: orderNotif,
   };
-  await update(ref(db), updates);
+  await update(ref(db), cleanRTDBData(updates));
 }
 
 export async function getOrder(orderId: string): Promise<Order | null> {
@@ -430,10 +497,36 @@ export async function updateOrderStatusInDB(orderId: string, status: OrderStatus
   const order = await getOrder(orderId);
   if (!order) return;
 
+  const now = new Date().toISOString();
+  const notifId = `notif-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+  const statusMessages: Record<string, string> = {
+    processing: `Order #${orderId.slice(-8).toUpperCase()} is now being processed and prepared for shipment.`,
+    shipped: `Great news! Order #${orderId.slice(-8).toUpperCase()} has shipped and is on its way.`,
+    out_for_delivery: `Order #${orderId.slice(-8).toUpperCase()} is out for delivery today!`,
+    delivered: `Delivered: Package for order #${orderId.slice(-8).toUpperCase()} has arrived.`,
+    cancelled: `Order #${orderId.slice(-8).toUpperCase()} has been cancelled.`,
+  };
+
+  const notifMsg =
+    statusMessages[status] ||
+    `Status updated for order #${orderId.slice(-8).toUpperCase()} to ${status}.`;
+  const orderNotif: Notification = {
+    id: notifId,
+    userId: order.userId,
+    title: `Order Status: ${status.replace(/_/g, ' ').toUpperCase()}`,
+    message: notifMsg,
+    type: 'order',
+    link: `/orders/${orderId}`,
+    read: false,
+    orderId,
+    createdAt: now,
+  };
+
   const updates: Record<string, any> = {
     [`orders/${orderId}/status`]: status,
-    [`orders/${orderId}/updatedAt`]: new Date().toISOString(),
+    [`orders/${orderId}/updatedAt`]: now,
     [`users/${order.userId}/orders/${orderId}/status`]: status,
+    [`users/${order.userId}/notifications/${notifId}`]: orderNotif,
   };
   await update(ref(db), updates);
 }
@@ -564,12 +657,28 @@ export async function addQuestionAnswer(
 // ============================================================================
 export async function saveReturnRequest(req: ReturnRequest): Promise<void> {
   const db = getRTDB();
+  const notifId = `notif-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+  const now = new Date().toISOString();
+  const returnNotif: Notification = {
+    id: notifId,
+    userId: req.userId,
+    title: 'Return Request Received',
+    message: `Return request received for "${req.itemTitle.slice(0, 35)}...". Refund amount: ₹${req.refundAmount.toLocaleString()}.`,
+    type: 'return',
+    link: `/orders?tab=returns`,
+    read: false,
+    orderId: req.orderId,
+    returnId: req.id,
+    createdAt: now,
+  };
+
   const updates: Record<string, any> = {
     [`returns/${req.id}`]: req,
     [`users/${req.userId}/returns/${req.id}`]: req,
     [`orders/${req.orderId}/returns/${req.id}`]: req,
     [`orders/${req.orderId}/status`]: req.status,
     [`users/${req.userId}/orders/${req.orderId}/status`]: req.status,
+    [`users/${req.userId}/notifications/${notifId}`]: returnNotif,
   };
   await update(ref(db), updates);
 }
@@ -600,6 +709,28 @@ export async function updateReturnStatusInDB(
 ): Promise<void> {
   const db = getRTDB();
   const now = new Date().toISOString();
+  const notifId = `notif-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+
+  const returnLabels: Record<string, string> = {
+    RETURN_APPROVED: 'Return approved! Please send the item back with original packaging.',
+    RETURNED: 'Item received by fulfillment center. Processing inspection.',
+    REFUND_PENDING: 'Refund has been initiated to your original payment method.',
+    REFUNDED: 'Refund completed successfully! Funds should appear in your account soon.',
+  };
+
+  const returnNotif: Notification = {
+    id: notifId,
+    userId,
+    title: `Return Update: ${status.replace(/_/g, ' ')}`,
+    message: returnLabels[status] || `Your return request status is now ${status}.`,
+    type: 'return',
+    link: `/orders?tab=returns`,
+    read: false,
+    orderId,
+    returnId,
+    createdAt: now,
+  };
+
   const updates: Record<string, any> = {
     [`returns/${returnId}/status`]: status,
     [`returns/${returnId}/updatedAt`]: now,
@@ -609,6 +740,7 @@ export async function updateReturnStatusInDB(
     [`orders/${orderId}/returns/${returnId}/updatedAt`]: now,
     [`orders/${orderId}/status`]: status,
     [`users/${userId}/orders/${orderId}/status`]: status,
+    [`users/${userId}/notifications/${notifId}`]: returnNotif,
   };
   await update(ref(db), updates);
 }
@@ -849,5 +981,255 @@ export async function savePlatformSettingsInDB(settings: PlatformSettings): Prom
     updatedAt: new Date().toISOString(),
   });
 }
+
+// ============================================================================
+// User Profile Preferences & Contact
+// ============================================================================
+export async function updateUserPreferencesInDB(
+  userId: string,
+  preferences: UserPreferences,
+): Promise<void> {
+  const db = getRTDB();
+  await update(ref(db, `users/${userId}`), {
+    preferences,
+    updatedAt: new Date().toISOString(),
+  });
+}
+
+export async function updateUserPhoneInDB(
+  userId: string,
+  phoneNumber: string,
+): Promise<void> {
+  const db = getRTDB();
+  await update(ref(db, `users/${userId}`), {
+    phoneNumber,
+    updatedAt: new Date().toISOString(),
+  });
+}
+
+// ============================================================================
+// Customer Notifications Operations (RTDB)
+// Stored under users/${userId}/notifications/${notificationId}
+// ============================================================================
+export async function createNotification(
+  userId: string,
+  data: Omit<Notification, 'id' | 'createdAt' | 'userId'>,
+): Promise<Notification> {
+  const db = getRTDB();
+  const id = `notif-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+  const notification: Notification = {
+    ...data,
+    id,
+    userId,
+    createdAt: new Date().toISOString(),
+  };
+  await set(ref(db, `users/${userId}/notifications/${id}`), notification);
+  return notification;
+}
+
+export async function getUserNotifications(userId: string): Promise<Notification[]> {
+  const db = getRTDB();
+  try {
+    const snap = await get(ref(db, `users/${userId}/notifications`));
+    if (!snap.exists()) return [];
+    const val = snap.val() as Record<string, Notification>;
+    const list = Object.values(val);
+    list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return list;
+  } catch (err) {
+    console.warn('[database.getUserNotifications] failed:', err);
+    return [];
+  }
+}
+
+export function subscribeToUserNotifications(
+  userId: string,
+  callback: (notifications: Notification[]) => void,
+): () => void {
+  const db = getRTDB();
+  const notifsRef = ref(db, `users/${userId}/notifications`);
+  const unsubscribe = onValue(notifsRef, (snap) => {
+    if (!snap.exists()) {
+      callback([]);
+      return;
+    }
+    const val = snap.val() as Record<string, Notification>;
+    const list = Object.values(val);
+    list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    callback(list);
+  });
+  return unsubscribe;
+}
+
+export async function markNotificationAsRead(
+  userId: string,
+  notificationId: string,
+): Promise<void> {
+  const db = getRTDB();
+  await update(ref(db, `users/${userId}/notifications/${notificationId}`), {
+    read: true,
+  });
+}
+
+export async function markAllNotificationsAsRead(userId: string): Promise<void> {
+  const db = getRTDB();
+  const notifs = await getUserNotifications(userId);
+  if (notifs.length === 0) return;
+  const updates: Record<string, any> = {};
+  notifs.forEach((n) => {
+    if (!n.read) {
+      updates[`users/${userId}/notifications/${n.id}/read`] = true;
+    }
+  });
+  if (Object.keys(updates).length > 0) {
+    await update(ref(db), updates);
+  }
+}
+
+export async function deleteNotificationFromDB(
+  userId: string,
+  notificationId: string,
+): Promise<void> {
+  const db = getRTDB();
+  await remove(ref(db, `users/${userId}/notifications/${notificationId}`));
+}
+
+// ============================================================================
+// Customer Support & Help Ticket Operations (RTDB)
+// Stored under supportTickets/${ticketId}
+// Indexed under users/${userId}/supportTickets/${ticketId}
+// ============================================================================
+export async function createSupportTicketInDB(
+  data: Omit<SupportTicket, 'id' | 'createdAt' | 'updatedAt' | 'ticketNumber'>,
+): Promise<SupportTicket> {
+  const db = getRTDB();
+  const id = `tck-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+  const ticketNumber = `CAS-${Math.floor(100000 + Math.random() * 900000)}`;
+  const now = new Date().toISOString();
+
+  const ticket: SupportTicket = {
+    ...data,
+    id,
+    ticketNumber,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  const updates: Record<string, any> = {
+    [`supportTickets/${id}`]: ticket,
+    [`users/${data.userId}/supportTickets/${id}`]: {
+      id,
+      ticketNumber,
+      subject: data.subject,
+      topic: data.topic,
+      status: data.status,
+      createdAt: now,
+      updatedAt: now,
+    },
+  };
+  await update(ref(db), updates);
+
+  // Send a confirmation notification to the customer
+  await createNotification(data.userId, {
+    title: 'Support Ticket Created',
+    message: `Your support inquiry #${ticketNumber} ("${data.subject.slice(0, 30)}...") has been submitted. Our team will review it shortly.`,
+    type: 'system',
+    link: `/help?ticket=${id}`,
+    read: false,
+  });
+
+  return ticket;
+}
+
+export async function getUserSupportTicketsFromDB(userId: string): Promise<SupportTicket[]> {
+  const db = getRTDB();
+  try {
+    const snap = await get(ref(db, `users/${userId}/supportTickets`));
+    if (!snap.exists()) return [];
+    const index = snap.val() as Record<string, any>;
+    const ticketIds = Object.keys(index);
+
+    const fullTickets: SupportTicket[] = [];
+    for (const tid of ticketIds) {
+      const tSnap = await get(ref(db, `supportTickets/${tid}`));
+      if (tSnap.exists()) {
+        const ticket = tSnap.val() as SupportTicket;
+        if (!ticket.messages) ticket.messages = [];
+        fullTickets.push(ticket);
+      }
+    }
+
+    fullTickets.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    return fullTickets;
+  } catch (err) {
+    console.warn('[database.getUserSupportTicketsFromDB] failed:', err);
+    return [];
+  }
+}
+
+export async function getSupportTicketByIdFromDB(ticketId: string): Promise<SupportTicket | null> {
+  const db = getRTDB();
+  const snap = await get(ref(db, `supportTickets/${ticketId}`));
+  if (!snap.exists()) return null;
+  const ticket = snap.val() as SupportTicket;
+  if (!ticket.messages) ticket.messages = [];
+  return ticket;
+}
+
+export async function addSupportMessageInDB(
+  ticketId: string,
+  data: Omit<SupportMessage, 'id' | 'createdAt'>,
+): Promise<SupportMessage> {
+  const db = getRTDB();
+  const ticket = await getSupportTicketByIdFromDB(ticketId);
+  if (!ticket) throw new Error('Ticket not found');
+
+  const now = new Date().toISOString();
+  const msgId = `msg-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+  const message: SupportMessage = {
+    ...data,
+    id: msgId,
+    createdAt: now,
+  };
+
+  const updatedMessages = [...(ticket.messages || []), message];
+
+  const updates: Record<string, any> = {
+    [`supportTickets/${ticketId}/messages`]: updatedMessages,
+    [`supportTickets/${ticketId}/updatedAt`]: now,
+    [`users/${ticket.userId}/supportTickets/${ticketId}/updatedAt`]: now,
+  };
+  await update(ref(db), updates);
+
+  return message;
+}
+
+export async function updateSupportTicketStatusInDB(
+  ticketId: string,
+  status: SupportTicketStatus,
+): Promise<void> {
+  const db = getRTDB();
+  const ticket = await getSupportTicketByIdFromDB(ticketId);
+  if (!ticket) return;
+
+  const now = new Date().toISOString();
+  const updates: Record<string, any> = {
+    [`supportTickets/${ticketId}/status`]: status,
+    [`supportTickets/${ticketId}/updatedAt`]: now,
+    [`users/${ticket.userId}/supportTickets/${ticketId}/status`]: status,
+    [`users/${ticket.userId}/supportTickets/${ticketId}/updatedAt`]: now,
+  };
+  await update(ref(db), updates);
+
+  // Notify customer of status change
+  await createNotification(ticket.userId, {
+    title: `Support Ticket Updated: #${ticket.ticketNumber}`,
+    message: `Your inquiry status is now ${status.replace('_', ' ').toUpperCase()}.`,
+    type: 'system',
+    link: `/help?ticket=${ticketId}`,
+    read: false,
+  });
+}
+
 
 

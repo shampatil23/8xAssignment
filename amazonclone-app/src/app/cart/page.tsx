@@ -24,15 +24,15 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/Button';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/hooks/useAuth';
+import { useLocation } from '@/context/LocationContext';
 import { getRecommendationsForCart } from '@/services/recommendationService';
 import type { CartItem, Product } from '@/types';
 import { Star } from 'lucide-react';
 
-const FREE_SHIPPING_THRESHOLD = 35.0;
-
 export default function CartPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { country, formatPrice } = useLocation();
   const {
     items,
     savedItems,
@@ -67,11 +67,12 @@ export default function CartPage() {
     };
   }, [items]);
 
+  const freeShippingThresholdUsd = country.freeShippingThreshold / country.rate;
   const amountNeededForFreeShipping = Math.max(
     0,
-    FREE_SHIPPING_THRESHOLD - subtotal,
+    freeShippingThresholdUsd - subtotal,
   );
-  const qualifiesForFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD && items.length > 0;
+  const qualifiesForFreeShipping = subtotal >= freeShippingThresholdUsd && items.length > 0;
 
   // Handle Proceed to Checkout
   const handleProceedToCheckout = () => {
@@ -332,11 +333,11 @@ export default function CartPage() {
                         {/* Line Item Price */}
                         <div className="text-right sm:pl-4">
                           <div className="text-base sm:text-lg font-bold text-gray-900">
-                            ${(item.product.price * item.quantity).toFixed(2)}
+                            {formatPrice(item.product.price * item.quantity)}
                           </div>
                           {item.quantity > 1 && (
                             <div className="text-[11px] text-gray-500">
-                              (${item.product.price.toFixed(2)} each)
+                              ({formatPrice(item.product.price)} each)
                             </div>
                           )}
                         </div>
@@ -352,7 +353,7 @@ export default function CartPage() {
                   <span>
                     Subtotal ({itemCount} {itemCount === 1 ? 'item' : 'items'}):{' '}
                     <strong className="text-lg font-bold text-gray-900">
-                      ${subtotal.toFixed(2)}
+                      {formatPrice(subtotal)}
                     </strong>
                   </span>
                 </div>
@@ -407,7 +408,7 @@ export default function CartPage() {
                               </div>
                             )}
                             <div className="text-sm font-bold text-[#b12704] mt-1">
-                              ${item.product.price.toFixed(2)}
+                              {formatPrice(item.product.price)}
                             </div>
                             <div className="text-[11px] font-medium text-gray-500">
                               {isOutOfStock ? (
@@ -462,7 +463,7 @@ export default function CartPage() {
                     <p className="text-gray-800">
                       Add{' '}
                       <strong className="text-[#b12704]">
-                        ${amountNeededForFreeShipping.toFixed(2)}
+                        {formatPrice(amountNeededForFreeShipping)}
                       </strong>{' '}
                       of eligible items to get <strong>FREE Shipping</strong>.
                     </p>
@@ -471,7 +472,7 @@ export default function CartPage() {
                       <div
                         className="h-full bg-amazon-orange transition-all duration-300"
                         style={{
-                          width: `${Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100)}%`,
+                          width: `${Math.min(100, (subtotal / freeShippingThresholdUsd) * 100)}%`,
                         }}
                       />
                     </div>
@@ -483,7 +484,7 @@ export default function CartPage() {
               <div className="text-base sm:text-lg text-gray-900">
                 Subtotal ({itemCount} {itemCount === 1 ? 'item' : 'items'}):{' '}
                 <span className="font-bold text-xl text-gray-900">
-                  ${subtotal.toFixed(2)}
+                  {formatPrice(subtotal)}
                 </span>
               </div>
 
@@ -563,7 +564,7 @@ export default function CartPage() {
                     </div>
 
                     <div className="mt-2 pt-1 border-t border-gray-100 text-sm font-bold text-gray-900">
-                      ${p.price.toFixed(2)}
+                      {formatPrice(p.price)}
                     </div>
                   </Link>
                 );

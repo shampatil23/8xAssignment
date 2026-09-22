@@ -5,6 +5,7 @@
 import React from 'react';
 import { Lock, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { useLocation } from '@/context/LocationContext';
 import type { Address, PaymentMethod } from '@/types';
 import type { CheckoutTotals } from '@/services/checkoutService';
 
@@ -34,6 +35,8 @@ export function CheckoutSummary({
   disabled = false,
   className = '',
 }: CheckoutSummaryProps) {
+  const { formatPrice } = useLocation();
+
   return (
     <div
       className={`rounded-lg border border-gray-300 bg-white p-5 shadow-xs flex flex-col gap-4 sticky top-24 ${className}`}
@@ -80,7 +83,7 @@ export function CheckoutSummary({
         <div className="flex justify-between">
           <span>Items ({totals.itemCount}):</span>
           <span className="font-medium text-gray-900">
-            ${totals.subtotal.toFixed(2)}
+            {formatPrice(totals.subtotal)}
           </span>
         </div>
 
@@ -92,7 +95,7 @@ export function CheckoutSummary({
                 FREE
               </span>
             ) : (
-              `$${totals.shippingCost.toFixed(2)}`
+              formatPrice(totals.shippingCost)
             )}
           </span>
         </div>
@@ -100,21 +103,21 @@ export function CheckoutSummary({
         {totals.discount > 0 && (
           <div className="flex justify-between text-green-700 font-semibold">
             <span>Promotion Applied:</span>
-            <span>-${totals.discount.toFixed(2)}</span>
+            <span>-{formatPrice(totals.discount)}</span>
           </div>
         )}
 
         <div className="flex justify-between">
           <span>Estimated tax:</span>
           <span className="font-medium text-gray-900">
-            ${totals.tax.toFixed(2)}
+            {formatPrice(totals.tax)}
           </span>
         </div>
 
         {/* Final Order Total */}
         <div className="border-t border-gray-200 pt-3 flex justify-between items-baseline text-base font-bold text-[#b12704]">
           <span>Order total:</span>
-          <span className="text-xl font-bold">${totals.total.toFixed(2)}</span>
+          <span className="text-xl font-bold">{formatPrice(totals.total)}</span>
         </div>
       </div>
 

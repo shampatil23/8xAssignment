@@ -115,9 +115,16 @@ export async function searchProducts(
     let matchedProducts = allProducts.filter((product) => {
       // Category filter
       if (params.category && params.category !== 'all') {
+        const target = params.category.toLowerCase();
+        const pCat = product.category.toLowerCase();
+        const pCatName = (product.categoryName ?? '').toLowerCase();
         const catMatch =
-          product.category.toLowerCase() === params.category.toLowerCase() ||
-          (product.categoryName ?? '').toLowerCase() === params.category.toLowerCase();
+          pCat === target ||
+          pCatName === target ||
+          ((target === 'home-garden' || target === 'home-kitchen') &&
+            (pCat === 'home-garden' || pCat === 'home-kitchen')) ||
+          ((target === 'sports' || target === 'fitness') &&
+            (pCat === 'sports' || pCat === 'fitness'));
         if (!catMatch) return false;
       }
 

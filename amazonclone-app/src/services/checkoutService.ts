@@ -199,13 +199,13 @@ export async function placeOrder(
     subtotal: item.product.price * item.quantity,
   }));
 
-  // Non-sensitive payment record
+  // Non-sensitive payment record (omit undefined fields)
   const sanitizedPayment: PaymentMethod = {
     type: paymentMethod.type,
     brand: paymentMethod.brand || 'Visa',
     last4: paymentMethod.last4 || '4242',
     cardHolder: paymentMethod.cardHolder || 'Customer',
-    upiId: paymentMethod.upiId,
+    ...(paymentMethod.upiId ? { upiId: paymentMethod.upiId } : {}),
   };
 
   const now = new Date();

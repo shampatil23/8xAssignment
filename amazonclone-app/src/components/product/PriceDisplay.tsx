@@ -5,6 +5,7 @@
 // and cents as superscript, with optional list price and discount badge.
 // ============================================================================
 import React from 'react';
+import { useLocation } from '@/context/LocationContext';
 
 interface PriceDisplayProps {
   price: number;
@@ -21,15 +22,22 @@ export function PriceDisplay({
   showDiscount = true,
   className = '',
 }: PriceDisplayProps) {
-  const dollars = Math.floor(price);
-  const cents = Math.round((price - dollars) * 100)
-    .toString()
-    .padStart(2, '0');
+  const { country, convertPrice } = useLocation();
 
-  const hasDiscount =
-    compareAtPrice && compareAtPrice > price;
+  const localPrice = convertPrice(price);
+  const isNoDecimalsCurrency = country.currency === 'INR' || country.currency === 'JPY';
+
+  const intPart = Math.floor(localPrice);
+  const decPart = !isNoDecimalsCurrency
+    ? Math.round((localPrice - intPart) * 100)
+        .toString()
+        .padStart(2, '0')
+    : '';
+
+  const localCompare = compareAtPrice ? convertPrice(compareAtPrice) : undefined;
+  const hasDiscount = localCompare && localCompare > localPrice;
   const discountPercent = hasDiscount
-    ? Math.round(((compareAtPrice - price) / compareAtPrice) * 100)
+    ? Math.round(((localCompare - localPrice) / localCompare) * 100)
     : 0;
 
   const sizeClasses = {
@@ -77,17 +85,26 @@ export function PriceDisplay({
 
         {/* Main price with Amazon superscript styling */}
         <div className="flex items-start text-gray-900 leading-none">
-          <span className={`relative font-medium ${sizeClasses.symbol}`}>$</span>
-          <span className={sizeClasses.dollars}>{dollars}</span>
-          <span className={`relative font-medium ${sizeClasses.cents}`}>{cents}</span>
+          <span className={`relative font-medium mr-0.5 ${sizeClasses.symbol}`}>
+            {country.symbol}
+          </span>
+          <span className={sizeClasses.dollars}>{intPart.toLocaleString(country.locale)}</span>
+          {decPart && (
+            <span className={`relative font-medium ${sizeClasses.cents}`}>{decPart}</span>
+          )}
         </div>
       </div>
 
       {/* Compare at / List price */}
-      {hasDiscount && (
+      {hasDiscount && localCompare && (
         <div className={`text-gray-500 ${sizeClasses.compare}`}>
           <span>List Price: </span>
-          <span className="line-through">${compareAtPrice.toFixed(2)}</span>
+          <span className="line-through">
+            {country.symbol}
+            {isNoDecimalsCurrency
+              ? localCompare.toLocaleString(country.locale)
+              : localCompare.toFixed(2)}
+          </span>
         </div>
       )}
     </div>
