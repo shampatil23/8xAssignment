@@ -25,8 +25,60 @@ export async function uploadToCloudinary(
   folder: UploadFolder = 'products',
   onProgress?: (pct: number) => void,
 ): Promise<CloudinaryUploadResult> {
-  const { cloudName, uploadPreset } = cloudinaryConfig;
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('folder', folder);
 
+  // Preferred & most secure method: Server-side signed upload using Cloudinary API Secret
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/cloudinary/upload');
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable && onProgress) {
+        onProgress(Math.round((event.loaded / event.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      try {
+        const res = JSON.parse(xhr.responseText);
+        if (xhr.status >= 200 && xhr.status < 300 && res.success && res.data) {
+          resolve({
+            publicId: res.data.publicId,
+            url: res.data.url,
+            secureUrl: res.data.secureUrl,
+            width: res.data.width,
+            height: res.data.height,
+            format: res.data.format,
+            bytes: res.data.bytes,
+          });
+        } else {
+          // Fallback to direct client-side upload if route failed
+          fallbackDirectUpload(file, folder, onProgress).then(resolve).catch(reject);
+        }
+      } catch {
+        fallbackDirectUpload(file, folder, onProgress).then(resolve).catch(reject);
+      }
+    };
+
+    xhr.onerror = () => {
+      fallbackDirectUpload(file, folder, onProgress).then(resolve).catch(reject);
+    };
+
+    xhr.send(formData);
+  });
+}
+
+/**
+ * Fallback direct client-side unsigned upload
+ */
+async function fallbackDirectUpload(
+  file: File,
+  folder: UploadFolder,
+  onProgress?: (pct: number) => void,
+): Promise<CloudinaryUploadResult> {
+  const { cloudName, uploadPreset } = cloudinaryConfig;
   if (!cloudName) {
     throw new Error('Cloudinary cloud name is not configured.');
   }
@@ -38,7 +90,6 @@ export async function uploadToCloudinary(
 
   const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
 
-  // Use XMLHttpRequest for progress tracking
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', url);
@@ -62,7 +113,7 @@ export async function uploadToCloudinary(
           bytes: result.bytes,
         });
       } else {
-        reject(new Error(`Upload failed: ${xhr.statusText}`));
+        reject(new Error(`Upload failed: ${xhr.statusText || 'Cloudinary rejection'}`));
       }
     };
 

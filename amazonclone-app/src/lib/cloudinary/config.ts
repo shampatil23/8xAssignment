@@ -3,9 +3,9 @@
 // ============================================================================
 
 export const cloudinaryConfig = {
-  cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? '',
-  apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY ?? '',
-  uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ?? 'amazon_clone_products',
+  cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'djaieji0g',
+  apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY || '625284495946884',
+  uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'amazon_clone_products',
 } as const;
 
 /**
