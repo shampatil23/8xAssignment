@@ -155,41 +155,28 @@ export function HeroSlideshow() {
         ))}
       </div>
 
-      {/* Navigation Buttons (Matching home1.png vertical pill arrow on edges) */}
-      <button
-        type="button"
-        onClick={handlePrev}
-        aria-label="Previous slide"
-        className="absolute left-2 top-1/2 -translate-y-1/2 z-20 flex h-20 w-10 sm:w-11 items-center justify-center rounded-r-md bg-white/85 hover:bg-white text-gray-800 hover:text-black shadow-lg border-y border-r border-gray-300 backdrop-blur-xs transition-all opacity-80 hover:opacity-100 cursor-pointer"
-      >
-        <ChevronLeft size={26} />
-      </button>
+      {/* Navigation Buttons (Authentic pure white pill matching home1.png) */}
+      {currentSlideIndex > 0 && (
+        <button
+          type="button"
+          onClick={handlePrev}
+          aria-label="Previous slide"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 flex h-24 w-10 sm:w-12 items-center justify-center rounded-r-lg bg-white hover:bg-[#f7fafa] text-[#0f1111] shadow-[0_2px_12px_rgba(0,0,0,0.18)] hover:shadow-[0_4px_18px_rgba(0,0,0,0.25)] border-y border-r border-[#d5d9d9] hover:border-[#a6a6a6] transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#007185]"
+        >
+          <ChevronLeft size={28} strokeWidth={2.5} />
+        </button>
+      )}
 
-      <button
-        type="button"
-        onClick={handleNext}
-        aria-label="Next slide"
-        className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex h-20 w-10 sm:w-11 items-center justify-center rounded-l-md bg-white/85 hover:bg-white text-gray-800 hover:text-black shadow-lg border-y border-l border-gray-300 backdrop-blur-xs transition-all opacity-80 hover:opacity-100 cursor-pointer"
-      >
-        <ChevronRight size={26} />
-      </button>
-
-      {/* Slide Indicators / Dots */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
-        {SLIDES.map((_, idx) => (
-          <button
-            key={idx}
-            type="button"
-            onClick={() => setCurrentSlideIndex(idx)}
-            aria-label={`Go to slide ${idx + 1}`}
-            className={`h-2 transition-all rounded-full cursor-pointer ${
-              currentSlideIndex === idx
-                ? 'w-6 bg-amazon-orange'
-                : 'w-2 bg-gray-400/60 hover:bg-gray-600'
-            }`}
-          />
-        ))}
-      </div>
+      {currentSlideIndex < totalSlides - 1 && (
+        <button
+          type="button"
+          onClick={handleNext}
+          aria-label="Next slide"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 flex h-24 w-10 sm:w-12 items-center justify-center rounded-l-lg bg-white hover:bg-[#f7fafa] text-[#0f1111] shadow-[0_2px_12px_rgba(0,0,0,0.18)] hover:shadow-[0_4px_18px_rgba(0,0,0,0.25)] border-y border-l border-[#d5d9d9] hover:border-[#a6a6a6] transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#007185]"
+        >
+          <ChevronRight size={28} strokeWidth={2.5} />
+        </button>
+      )}
     </div>
   );
 }

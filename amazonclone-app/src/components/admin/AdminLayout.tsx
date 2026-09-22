@@ -145,11 +145,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     <span className="font-bold text-sm leading-none tracking-tight">
                       amazon <span className="text-amazon-orange text-xs font-semibold">admin central</span>
                     </span>
-                    <span className="hidden sm:inline-block rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-400 border border-amber-500/30 uppercase tracking-wider">
+                    <span className="hidden sm:inline-block rounded bg-[#febd69] px-2 py-0.5 text-[10px] font-extrabold text-[#111827] uppercase tracking-wider shadow-2xs">
                       Console
                     </span>
                   </div>
-                  <span className="text-[10px] text-gray-400 truncate max-w-[200px]">
+                  <span className="text-[10px] text-gray-300 truncate max-w-[200px]">
                     {user?.email}
                   </span>
                 </div>
@@ -157,34 +157,34 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             </div>
 
             {/* Right: Actions */}
-            <div className="flex items-center gap-3 text-xs">
+            <div className="flex items-center gap-2.5 text-xs">
               <Link
                 href="/seller"
                 target="_blank"
-                className="hidden md:flex items-center gap-1 text-gray-200 hover:text-white px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 transition-colors"
+                className="hidden md:flex items-center gap-1.5 text-gray-200 hover:text-white px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/15 border border-white/10 transition-colors font-medium"
                 title="Open Seller Central"
               >
-                <Store size={13} />
+                <Store size={14} className="text-[#febd69]" />
                 <span>Seller Portal</span>
               </Link>
 
               <Link
                 href="/"
                 target="_blank"
-                className="hidden sm:flex items-center gap-1 text-gray-200 hover:text-white px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 transition-colors"
+                className="hidden sm:flex items-center gap-1.5 text-gray-200 hover:text-white px-3 py-1.5 rounded-md bg-white/10 hover:bg-white/15 border border-white/10 transition-colors font-medium"
                 title="Open Storefront"
               >
                 <span>Storefront</span>
-                <ExternalLink size={12} />
+                <ExternalLink size={12} className="text-gray-400" />
               </Link>
 
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="flex items-center gap-1.5 text-red-300 hover:text-white px-2.5 py-1 rounded bg-red-500/20 hover:bg-red-600/30 border border-red-500/30 transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 text-gray-300 hover:text-red-300 px-3 py-1.5 rounded-md bg-white/5 hover:bg-red-950/40 border border-white/10 hover:border-red-500/30 transition-all cursor-pointer font-medium"
                 title="Sign out of Admin Console"
               >
-                <LogOut size={13} />
+                <LogOut size={14} />
                 <span className="hidden sm:inline">Sign Out</span>
               </button>
             </div>
@@ -195,8 +195,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <div className="mx-auto flex max-w-7xl flex-1 w-full px-4 sm:px-6 py-6 gap-6">
           {/* ── Desktop Sidebar ── */}
           <aside className="hidden lg:block w-64 flex-shrink-0">
-            <div className="sticky top-20 rounded-lg border border-[#d5d9d9] bg-white p-3 shadow-xs">
-              <div className="px-3 py-2 border-b border-gray-100 mb-2 flex items-center justify-between">
+            <div className="sticky top-20 rounded-xl border border-[#d5d9d9] bg-white p-3.5 shadow-xs">
+              <div className="px-3 py-2 border-b border-gray-100 mb-2.5 flex items-center justify-between">
                 <p className="text-[11px] font-bold uppercase tracking-wider text-[#565959]">
                   Administration
                 </p>
@@ -210,13 +210,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`flex items-center gap-3 rounded px-3 py-2 text-xs font-semibold transition-colors ${
+                      className={`group flex items-center gap-3 rounded-md px-3 py-2.5 text-xs transition-all ${
                         active
-                          ? 'bg-[#232f3e] text-white shadow-xs border-l-4 border-amazon-orange pl-2'
-                          : 'text-[#0f1111] hover:bg-[#f0f2f2] hover:text-[#0f1111]'
+                          ? 'bg-[#ebf8fa] text-[#007185] font-bold border-l-4 border-[#007185] pl-2.5 shadow-2xs'
+                          : 'text-[#0f1111] hover:bg-[#f7fafa] hover:text-[#007185] font-medium'
                       }`}
                     >
-                      <span className={active ? 'text-amazon-orange' : 'text-gray-500'}>
+                      <span className={`transition-colors ${active ? 'text-[#007185]' : 'text-gray-500 group-hover:text-[#007185]'}`}>
                         {item.icon}
                       </span>
                       <span>{item.name}</span>
@@ -270,13 +270,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                           key={item.href}
                           href={item.href}
                           onClick={() => setMobileMenuOpen(false)}
-                          className={`flex items-center gap-3 rounded px-3 py-2 text-xs font-semibold ${
+                          className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-xs font-semibold ${
                             active
-                              ? 'bg-[#232f3e] text-white border-l-4 border-amazon-orange pl-2'
-                              : 'text-[#0f1111] hover:bg-gray-100'
+                              ? 'bg-[#ebf8fa] text-[#007185] border-l-4 border-[#007185] pl-2.5 shadow-2xs'
+                              : 'text-[#0f1111] hover:bg-gray-100 hover:text-[#007185]'
                           }`}
                         >
-                          <span className={active ? 'text-amazon-orange' : 'text-gray-500'}>
+                          <span className={active ? 'text-[#007185]' : 'text-gray-500'}>
                             {item.icon}
                           </span>
                           <span>{item.name}</span>
