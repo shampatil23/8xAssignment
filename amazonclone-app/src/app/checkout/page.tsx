@@ -300,6 +300,11 @@ export default function CheckoutPage() {
                     {confirmedOrder.paymentMethod.brand} ending in {confirmedOrder.paymentMethod.last4}
                   </p>
                 )}
+                {confirmedOrder.paymentMethod.type === 'razorpay' && (
+                  <p className="text-gray-700">
+                    Razorpay Test Mode ({confirmedOrder.paymentMethod.razorpayPaymentId || 'Authorized'})
+                  </p>
+                )}
                 {confirmedOrder.paymentMethod.type === 'upi' && (
                   <p className="text-gray-700">UPI: {confirmedOrder.paymentMethod.upiId}</p>
                 )}
@@ -680,6 +685,7 @@ export default function CheckoutPage() {
                   <PaymentMethodSelector
                     selectedPayment={selectedPayment}
                     onSelectPayment={(p) => setSelectedPayment(p)}
+                    orderAmount={totals.total}
                   />
 
                   <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end">
@@ -702,6 +708,12 @@ export default function CheckoutPage() {
                     <span className="text-gray-600">
                       {' '}
                       ({selectedPayment.brand} ending in {selectedPayment.last4})
+                    </span>
+                  )}
+                  {selectedPayment.type === 'razorpay' && (
+                    <span className="text-[#0066cc] font-semibold">
+                      {' '}
+                      (Razorpay Test Mode • ID: {selectedPayment.razorpayPaymentId || 'Authorized'})
                     </span>
                   )}
                   {selectedPayment.type === 'upi' && (

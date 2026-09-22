@@ -290,13 +290,16 @@ export interface ProductQuestion {
 }
 
 export interface PaymentMethod {
-  type: 'card' | 'upi' | 'netbanking' | 'cod';
+  type: 'card' | 'upi' | 'netbanking' | 'cod' | 'razorpay';
   last4?: string;
   brand?: string;
   cardHolder?: string;
   expMonth?: string;
   expYear?: string;
   upiId?: string;
+  razorpayPaymentId?: string;
+  razorpayOrderId?: string;
+  razorpaySignature?: string;
 }
 
 export interface ShippingOption {
