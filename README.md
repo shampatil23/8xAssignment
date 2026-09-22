@@ -10,7 +10,7 @@ Built as part of the **8x Engineering 24-Hour Build Challenge** — capturing th
 
 | Deliverable | Details & Status |
 | :--- | :--- |
-| **🌐 Live Application** | [Deployed Live on Vercel / Cloud](#-live-deployment--demo-access) *(Open to all unauthenticated & authenticated visitors)* |
+| **🌐 Live Application** | [Deployed Live on Vercel / Cloud](https://amazonclone-app.vercel.app/) *(Open to all unauthenticated & authenticated visitors)* |
 | **📦 Public Repository** | [GitHub Repository — shampatil23/8xAssignment](https://github.com/shampatil23/8xAssignment) |
 | **📹 Video Walkthrough** | [5-Minute Loom Video Walkthrough](#-walkthrough-video) *(Camera on, covering end-to-end user & merchant flows)* |
 | **🤖 8x Agent Logs** | [`.agent-logs/`](./.agent-logs/) *(Full transcript history synchronized with every step)* |
