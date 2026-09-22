@@ -23,6 +23,7 @@ import {
   updateOrderStatusInDB,
   updateUserProfile,
   getUserProfile,
+  saveOrder,
 } from '@/lib/firebase/database';
 import { slugify } from '@/lib/utils';
 
@@ -496,3 +497,117 @@ export async function updateSellerSettings(
     };
   }
 }
+
+// ── Demo & Order Simulation ──────────────────────────────────────────────
+
+export async function createSampleSellerOrder(
+  sellerId: string,
+  sellerName: string,
+): Promise<ApiResponse<Order>> {
+  try {
+    let products = await getProductsBySellerFromDB(sellerId);
+
+    // If seller has no products yet, automatically create an authentic starter listing
+    if (!products || products.length === 0) {
+      const starterRes = await createSellerProduct(sellerId, sellerName, {
+        title: 'Echo Dot (5th Gen) | Smart speaker with bigger vibrant sound and Alexa',
+        description: 'Our best sounding Echo Dot yet – Enjoy an improved audio experience compared to any previous Echo Dot with Alexa for clearer vocals, deeper bass and vibrant sound in any room.',
+        price: 49.99,
+        compareAtPrice: 59.99,
+        category: 'electronics',
+        brand: 'Amazon',
+        stock: 25,
+        status: 'active',
+        images: [
+          {
+            url: 'https://images.unsplash.com/photo-1543512214-318c7553f230?w=600&auto=format&fit=crop&q=80',
+            alt: 'Echo Dot 5th Gen Speaker',
+            isPrimary: true,
+          },
+        ],
+      });
+
+      if (starterRes.success && starterRes.data) {
+        products = [starterRes.data];
+      } else {
+        return {
+          success: false,
+          error: starterRes.error || 'Failed to initialize sample product for order simulation.',
+        };
+      }
+    }
+
+    const selectedProduct = products[0];
+    const qty = Math.floor(Math.random() * 2) + 1;
+    const subtotal = Number((selectedProduct.price * qty).toFixed(2));
+    const tax = Number((subtotal * 0.05).toFixed(2));
+    const total = Number((subtotal + tax).toFixed(2));
+
+    const now = new Date();
+    const orderId = `ord-${now.getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    const demoBuyers = [
+      { name: 'Rahul Sharma', city: 'Mumbai', state: 'Maharashtra', zip: '400001' },
+      { name: 'Ananya Verma', city: 'Bengaluru', state: 'Karnataka', zip: '560001' },
+      { name: 'Kavita Reddy', city: 'Hyderabad', state: 'Telangana', zip: '500001' },
+      { name: 'Vikram Malhotra', city: 'New Delhi', state: 'Delhi', zip: '110001' },
+    ];
+    const buyer = demoBuyers[Math.floor(Math.random() * demoBuyers.length)];
+
+    const orderItem: OrderItem = {
+      productId: selectedProduct.id,
+      sellerId: sellerId,
+      title: selectedProduct.title,
+      image:
+        selectedProduct.images?.[0]?.url ||
+        'https://images.unsplash.com/photo-1543512214-318c7553f230?w=600&auto=format&fit=crop&q=80',
+      price: selectedProduct.price,
+      quantity: qty,
+      subtotal: subtotal,
+    };
+
+    const newOrder: Order = {
+      id: orderId,
+      userId: `buyer-demo-${Math.random().toString(36).substring(2, 7)}`,
+      items: [orderItem],
+      shippingAddress: {
+        id: `addr-${Date.now()}`,
+        fullName: buyer.name,
+        street: 'Flat 402, Green Valley Apartments, MG Road',
+        city: buyer.city,
+        state: buyer.state,
+        postalCode: buyer.zip,
+        country: 'India',
+        phone: '9876543210',
+        isDefault: true,
+      },
+      paymentMethod: {
+        type: 'upi',
+        upiId: `${buyer.name.toLowerCase().replace(/\s+/g, '')}@okaxis`,
+      },
+      status: 'confirmed',
+      subtotal,
+      shippingCost: 0,
+      tax,
+      total,
+      estimatedDelivery: 'Two-Day Delivery (Guaranteed)',
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+    };
+
+    await saveOrder(newOrder);
+
+    return {
+      success: true,
+      data: newOrder,
+      message: `Sample customer order #${orderId} generated successfully!`,
+    };
+  } catch (error) {
+    console.error('[sellerService.createSampleSellerOrder] error:', error);
+    return {
+      success: false,
+      error: 'Failed to create sample customer order.',
+    };
+  }
+}
+
