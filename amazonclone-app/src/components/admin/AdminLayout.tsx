@@ -3,7 +3,7 @@
 // AdminLayout — Amazon Admin Console Shell & Sidebar
 // Protected by AuthGuard for 'admin' role only
 // ============================================================================
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { useAuth } from '@/hooks/useAuth';
+import { fetchAdminSettings } from '@/services/adminService';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -37,6 +38,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    fetchAdminSettings().then((res) => {
+      if (res.success && res.data?.currency && typeof window !== 'undefined') {
+        localStorage.setItem('amazon_clone_platform_currency', res.data.currency);
+      }
+    }).catch(() => {});
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();

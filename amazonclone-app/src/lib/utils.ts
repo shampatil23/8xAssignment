@@ -27,29 +27,48 @@ export function formatPrice(
   },
 ): string {
   if (typeof amount !== 'number' || isNaN(amount)) {
-    return currency === 'USD' ? '$0.00' : '₹0';
+    return '$0.00';
   }
 
-  // Detect active currency: parameter -> localStorage -> default 'INR'
+  // Detect active currency:
+  // 1. Explicit parameter
   let activeCurrency = currency;
+
   if (!activeCurrency && typeof window !== 'undefined') {
     try {
-      const savedCountry = localStorage.getItem('amazon_clone_delivery_country');
-      if (savedCountry === 'US') activeCurrency = 'USD';
-      else if (savedCountry === 'GB') activeCurrency = 'GBP';
-      else if (savedCountry === 'CA') activeCurrency = 'CAD';
-      else if (savedCountry === 'EU' || savedCountry === 'DE') activeCurrency = 'EUR';
-      else if (savedCountry === 'JP') activeCurrency = 'JPY';
-      else if (savedCountry === 'AE') activeCurrency = 'AED';
-      else if (savedCountry === 'AU') activeCurrency = 'AUD';
-      else activeCurrency = 'INR';
+      const isConsoleRoute =
+        window.location.pathname.startsWith('/admin') ||
+        window.location.pathname.startsWith('/seller');
+
+      const platformCurrency = localStorage.getItem('amazon_clone_platform_currency');
+
+      if (isConsoleRoute) {
+        // Admin and Seller consoles strictly follow Marketplace Platform Settings
+        activeCurrency = platformCurrency || 'USD';
+      } else {
+        // If platform currency is explicitly configured, default to it
+        const savedCountry = localStorage.getItem('amazon_clone_delivery_country');
+        if (savedCountry === 'US') activeCurrency = 'USD';
+        else if (savedCountry === 'GB') activeCurrency = 'GBP';
+        else if (savedCountry === 'CA') activeCurrency = 'CAD';
+        else if (savedCountry === 'EU' || savedCountry === 'DE') activeCurrency = 'EUR';
+        else if (savedCountry === 'JP') activeCurrency = 'JPY';
+        else if (savedCountry === 'AE') activeCurrency = 'AED';
+        else if (savedCountry === 'AU') activeCurrency = 'AUD';
+        else if (savedCountry === 'IN') activeCurrency = 'INR';
+        else if (platformCurrency) activeCurrency = platformCurrency;
+        else activeCurrency = 'USD';
+      }
     } catch {
-      activeCurrency = 'INR';
+      activeCurrency = 'USD';
     }
   }
-  if (!activeCurrency) activeCurrency = 'INR';
 
-  const config = CURRENCY_RATES[activeCurrency] || CURRENCY_RATES.INR;
+  if (!activeCurrency) {
+    activeCurrency = 'USD';
+  }
+
+  const config = CURRENCY_RATES[activeCurrency] || CURRENCY_RATES.USD;
   const targetLocale = locale || config.locale;
 
   // Convert base USD amount to target currency if not already converted
@@ -70,7 +89,7 @@ export function formatPrice(
     }
     return formatted;
   } catch {
-    return `${config.symbol}${Math.round(converted).toLocaleString(targetLocale)}`;
+    return `${config.symbol}${converted.toFixed(isZeroDecimal ? 0 : 2)}`;
   }
 }
 

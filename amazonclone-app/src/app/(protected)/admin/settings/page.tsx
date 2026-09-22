@@ -22,6 +22,8 @@ import { fetchAdminSettings, saveAdminSettings } from '@/services/adminService';
 import type { PlatformSettings } from '@/types';
 import { Button } from '@/components/ui/Button';
 
+import { CURRENCY_RATES } from '@/lib/utils';
+
 export default function AdminSettingsPage() {
   const { user } = useAuth();
 
@@ -31,12 +33,23 @@ export default function AdminSettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  const syncCurrencyLocally = (curr: string) => {
+    if (typeof window !== 'undefined' && curr) {
+      localStorage.setItem('amazon_clone_platform_currency', curr);
+      window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new CustomEvent('platform-currency-changed', { detail: curr }));
+    }
+  };
+
   const loadSettings = async () => {
     setLoading(true);
     setError(null);
     const res = await fetchAdminSettings();
     if (res.success && res.data) {
       setSettings(res.data);
+      if (res.data.currency) {
+        syncCurrencyLocally(res.data.currency);
+      }
     } else {
       setError(res.error || 'Failed to load platform settings.');
     }
@@ -55,6 +68,7 @@ export default function AdminSettingsPage() {
 
     const res = await saveAdminSettings(settings);
     if (res.success) {
+      syncCurrencyLocally(settings.currency);
       setSuccessMessage('Platform settings have been saved successfully.');
     } else {
       setError(res.error || 'Failed to update platform settings.');
@@ -157,7 +171,11 @@ export default function AdminSettingsPage() {
                   <label className="font-bold text-[#0f1111] block mb-1">Platform Currency</label>
                   <select
                     value={settings.currency}
-                    onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
+                    onChange={(e) => {
+                      const newCurr = e.target.value;
+                      setSettings({ ...settings, currency: newCurr });
+                      syncCurrencyLocally(newCurr);
+                    }}
                     className="w-full px-3 py-2 rounded border border-[#d5d9d9] bg-white text-[#0f1111] focus:border-[#e77600] focus:outline-hidden"
                   >
                     <option value="USD">USD ($)</option>
@@ -179,7 +197,7 @@ export default function AdminSettingsPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                 <div>
                   <label className="font-bold text-[#0f1111] block mb-1">
-                    Free Shipping Threshold ($)
+                    Free Shipping Threshold ({CURRENCY_RATES[settings.currency]?.symbol || '$'})
                   </label>
                   <input
                     type="number"
@@ -199,7 +217,7 @@ export default function AdminSettingsPage() {
 
                 <div>
                   <label className="font-bold text-[#0f1111] block mb-1">
-                    Standard Shipping Fee ($)
+                    Standard Shipping Fee ({CURRENCY_RATES[settings.currency]?.symbol || '$'})
                   </label>
                   <input
                     type="number"

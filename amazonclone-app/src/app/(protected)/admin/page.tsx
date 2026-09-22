@@ -21,7 +21,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
-import { fetchAdminDashboardStats } from '@/services/adminService';
+import { fetchAdminDashboardStats, fetchAdminSettings } from '@/services/adminService';
 import type { AdminDashboardStats } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { formatPrice } from '@/lib/utils';
@@ -30,11 +30,28 @@ export default function AdminDashboardPage() {
   const [stats, setStats] = useState<AdminDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [platformCurrency, setPlatformCurrency] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('amazon_clone_platform_currency') || 'USD';
+    }
+    return 'USD';
+  });
 
   const loadStats = async () => {
     setLoading(true);
     setError(null);
-    const res = await fetchAdminDashboardStats();
+    const [res, settingsRes] = await Promise.all([
+      fetchAdminDashboardStats(),
+      fetchAdminSettings(),
+    ]);
+
+    if (settingsRes.success && settingsRes.data?.currency) {
+      setPlatformCurrency(settingsRes.data.currency);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('amazon_clone_platform_currency', settingsRes.data.currency);
+      }
+    }
+
     if (res.success && res.data) {
       setStats(res.data);
     } else {
@@ -45,6 +62,23 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     loadStats();
+
+    const handleCurrencyChange = (e: Event) => {
+      const customEvent = e as CustomEvent<string>;
+      if (customEvent.detail) {
+        setPlatformCurrency(customEvent.detail);
+      } else if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('amazon_clone_platform_currency');
+        if (saved) setPlatformCurrency(saved);
+      }
+    };
+
+    window.addEventListener('platform-currency-changed', handleCurrencyChange);
+    window.addEventListener('storage', handleCurrencyChange);
+    return () => {
+      window.removeEventListener('platform-currency-changed', handleCurrencyChange);
+      window.removeEventListener('storage', handleCurrencyChange);
+    };
   }, []);
 
   return (
@@ -151,7 +185,7 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             <p className="mt-2.5 text-2xl font-black text-[#007600]">
-              {loading ? '—' : formatPrice(stats?.platformGMV ?? 0)}
+              {loading ? '—' : formatPrice(stats?.platformGMV ?? 0, platformCurrency)}
             </p>
             <div className="mt-1.5 flex items-center justify-between text-[11px] text-[#565959]">
               <span>Returns: {stats?.totalReturns ?? 0}</span>
@@ -284,7 +318,7 @@ export default function AdminDashboardPage() {
                       </div>
 
                       <div className="text-right shrink-0">
-                        <p className="font-bold text-[#0f1111]">{formatPrice(order.total)}</p>
+                        <p className="font-bold text-[#0f1111]">{formatPrice(order.total, platformCurrency)}</p>
                         <p className="text-[10px] text-[#565959]">
                           {new Date(order.createdAt).toLocaleDateString()}
                         </p>
@@ -358,7 +392,7 @@ export default function AdminDashboardPage() {
                     </div>
 
                     <div className="text-right shrink-0">
-                      <p className="font-bold text-[#0f1111]">{formatPrice(req.refundAmount)}</p>
+                      <p className="font-bold text-[#0f1111]">{formatPrice(req.refundAmount, platformCurrency)}</p>
                       <Link
                         href="/admin/returns"
                         className="text-[10px] text-[#007185] hover:text-[#c7511f] hover:underline font-semibold"

@@ -3,7 +3,7 @@
 // SellerLayout — Amazon Seller Central Dashboard Shell & Sidebar
 // Protected by AuthGuard for 'seller' and 'admin' roles
 // ============================================================================
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -26,6 +26,7 @@ import {
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
+import { fetchAdminSettings } from '@/services/adminService';
 
 interface SellerLayoutProps {
   children: React.ReactNode;
@@ -36,6 +37,14 @@ export function SellerLayout({ children }: SellerLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    fetchAdminSettings().then((res) => {
+      if (res.success && res.data?.currency && typeof window !== 'undefined') {
+        localStorage.setItem('amazon_clone_platform_currency', res.data.currency);
+      }
+    }).catch(() => {});
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
