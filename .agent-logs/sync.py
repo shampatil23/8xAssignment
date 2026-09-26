@@ -14,7 +14,8 @@ KNOWN_8X_SESSIONS = [
     "4f7a7188-5492-4fc7-a944-c539b08b940a",
     "3c2407a8-e998-4eb3-b20e-168a257143d0",
     "1eea34b9-4a9b-439a-8c46-da2b19cd9ad4",
-    "a7c9ada0-1511-46fb-8860-7255b918ed0b"
+    "a7c9ada0-1511-46fb-8860-7255b918ed0b",
+    "c4175d9a-14c4-4a76-b7b6-b1dc0f646bd1"
 ]
 
 SECRET_PATTERNS = [

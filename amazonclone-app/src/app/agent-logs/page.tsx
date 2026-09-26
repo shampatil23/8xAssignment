@@ -183,6 +183,23 @@ const SESSIONS: SessionData[] = [
       'Render deployment compatibility (root package.json & render.yaml)',
     ],
   },
+  {
+    id: 'c4175d9a',
+    filename: '2026-09-26_18-26-09_c4175d9a-14c4-4a76-b7b6-b1dc0f646bd1.md',
+    title: 'Session 10: Agent Logs Section & High-Res Showcase',
+    timestamp: '2026-09-26 18:26:09',
+    model: 'gemini-3.8-flash',
+    tool: 'Google Antigravity IDE',
+    exchanges: 1,
+    size: '1.1 KB',
+    scope: 'Added dedicated in-app /agent-logs visual browser, integrated high-resolution redmedata screenshots into README.md, and synchronized GitHub repository.',
+    highlights: [
+      'In-app Agent Logs Explorer with interactive session cards and timeline',
+      'Integration of high-resolution redmedata screenshots into README.md',
+      'Header and Footer navigation links for direct agent audit access',
+      'Full synchronization across .agent-logs directories and GitHub origin',
+    ],
+  },
 ];
 
 export default function AgentLogsPage() {

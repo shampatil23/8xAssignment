@@ -20,7 +20,7 @@ Valenza Haute Maison reimagines global marketplace architecture with the operati
 | **🌐 Live Application** | [Deployed Live on Vercel](https://amazonclone-app.vercel.app/) *(Accessible to all visitors & test accounts)* |
 | **📦 GitHub Repository** | [shampatil23/8xAssignment](https://github.com/shampatil23/8xAssignment) *(Complete source code & commit history)* |
 | **📹 Walkthrough Video** | [5-Minute Loom Video Walkthrough](#-video-walkthrough--demo) *(Full customer, merchant, and admin workflow)* |
-| **🤖 8x Agent Logs** | [`.agent-logs/`](./.agent-logs/) *(9 fully synchronized AI development session logs & audit trails)* |
+| **🤖 8x Agent Logs** | [`.agent-logs/`](./.agent-logs/) *(10 fully synchronized AI development session logs & audit trails)* |
 | **📑 Technical Specs** | [Architecture Reference](./.agents/AMAZON-TECH-ARCHITECTURE.md) |
 
 ---
@@ -76,7 +76,7 @@ Every prompt, decision, thinking trace, and system response throughout this buil
 python .agent-logs/sync.py
 
 # Expected output:
-# Log sync completed successfully: 9 sessions synchronized.
+# Log sync completed successfully: 10 sessions synchronized.
 ```
 
 ---
@@ -225,15 +225,18 @@ Valenza is built on an event-driven, reactive cloud architecture separating pres
 │   ├── 2026-09-25_13-45-55_...md  # Session 7: Marketplace overhaul
 │   ├── 2026-09-25_18-45-42_...md  # Session 8: Testing & validation
 │   ├── 2026-09-26_04-55-14_...md  # Session 9: Luxury ateliers & AI Concierge
+│   ├── 2026-09-26_18-26-09_...md  # Session 10: Agent logs UI & high-res redmedata screenshots
 │   └── sync.py                    # Automated log synchronization script with secret redaction
 ├── .agents/                       # Agent rules, architecture specs, and reference media
 │   ├── AGENTS.md                  # Autonomous agent execution rules & logging directives
 │   ├── hooks.json                 # Antigravity IDE lifecycle hooks for log sync
 │   └── references/readmeref/      # Visual architecture & screenshot assets
 ├── amazonclone-app/               # 🚀 Next.js 16 Web Application
+│   ├── redmedata/                 # 📸 High-resolution showcase screenshots
 │   ├── src/
 │   │   ├── app/                   # App Router pages & API routes
 │   │   │   ├── (protected)/       # Route-guarded portals (/admin, /seller, /account)
+│   │   │   ├── agent-logs/        # 🤖 Interactive 8x Agent Logs Explorer & audit UI
 │   │   │   ├── api/ai/assistant/  # Groq AI Concierge streaming endpoint
 │   │   │   ├── api/cloudinary/    # Signed asset upload & deletion endpoints
 │   │   │   ├── cart/ & checkout/  # Cart drawer & 4-step accordion checkout
@@ -351,7 +354,7 @@ The 5-minute walkthrough video covers:
 | **Speed & Velocity** | ✅ Complete | Full 3-tier marketplace, 6 ateliers, 24 verified products, AI Concierge, and 4-step checkout delivered within challenge timeframe. |
 | **Product Judgement** | ✅ Complete | Zero empty placeholders; atomic inventory decrement; real-time dispute & return lifecycles; verified Razorpay modal; multi-currency support. |
 | **UX & UI Fidelity** | ✅ Complete | Bespoke luxury aesthetic; responsive desktop/mobile layouts; micro-interactions; high-res hover zoom; dark mode elegance. |
-| **Agent Capture Framework** | ✅ Complete | 9 distinct development session transcripts synced to `.agent-logs/` with automated secret redaction. |
+| **Agent Capture Framework** | ✅ Complete | 10 distinct development session transcripts synced to `.agent-logs/` with automated secret redaction. |
 | **Security & Push Compliance** | ✅ Complete | RBAC route guards, signed Cloudinary endpoints, environment variable isolation, and GitHub push protection compliance. |
 
 ---
