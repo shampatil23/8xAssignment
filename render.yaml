@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: valenza-marketplace
+    runtime: node
+    rootDir: amazonclone-app
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
