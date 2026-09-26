@@ -15,6 +15,7 @@ export const NAV_LINKS = [
   { label: 'Audio & Tech', href: '/category/computers' },
   { label: 'Bespoke Concierge', href: '/customer-service' },
   { label: 'Atelier Registry', href: '/registry' },
+  { label: '🤖 Agent Logs', href: '/agent-logs' },
 ] as const;
 
 // Product categories for search dropdown and mobile salon menu (clear & luxurious)
@@ -37,6 +38,7 @@ export const FOOTER_SECTIONS = [
     title: 'Get to Know Us',
     links: [
       { label: 'About Us', href: '/about' },
+      { label: '🤖 8x Agent Logs', href: '/agent-logs' },
       { label: 'Careers', href: '/careers' },
       { label: 'Press Releases', href: '/press' },
       { label: 'Amazon Science', href: '/science' },

@@ -39,6 +39,48 @@ Valenza Haute Maison reimagines global marketplace architecture with the operati
 
 ---
 
+## 🤖 8x Autonomous Agent Logs & Trajectory Audit
+
+Every prompt, decision, thinking trace, and system response throughout this build challenge was captured autonomously without manual alteration using the **8x Engineering Agent Capture Specification**.
+
+<div align="center">
+  <img src="./amazonclone-app/redmedata/AGENT.png" alt="8x Autonomous Agent Logs & Audit Interface" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
+  <p><em>Figure: 8x Autonomous Agent Trajectory Audit — Complete turn-by-turn prompt, reasoning, and response logs.</em></p>
+</div>
+
+### System Capture Mechanism
+- **Agent Assistant**: Google Antigravity IDE (DeepMind Agentic Assistant)
+- **Native Transcripts**: `C:\Users\bavis\.gemini\antigravity-ide\brain\<session-id>\.system_generated\logs\transcript_full.jsonl`
+- **Automated Lifecycle Hooks**: [`.agents/hooks.json`](./.agents/hooks.json) configured on `Stop` and `PostInvocation`
+- **Synchronization Engine**: [`.agent-logs/sync.py`](./.agent-logs/sync.py) with automated regex security redaction filter
+- **Format Standard**: `.agent-logs/YYYY-MM-DD_HH-MM-SS_<session-id>.md` matching the 8x assignment specification
+
+### Synchronized Session Index
+
+| # | Session Log File | Start Timestamp | Model / Tool | Total Exchanges | Milestone & Architectural Scope |
+| :-: | :--- | :--- | :--- | :-: | :--- |
+| **01** | [`2026-09-21_11-05-07_1153c1cf...md`](./.agent-logs/2026-09-21_11-05-07_1153c1cf-5971-4d84-9186-130d5306a624.md) | 2026-09-21 11:05 | `gemini-3.6-flash` / Antigravity | 6 | **Foundation**: Next.js 16 App Router scaffold, Tailwind CSS v4 design system, Firebase RTDB connection, root layout. |
+| **02** | [`2026-09-21_11-48-19_02d78a3d...md`](./.agent-logs/2026-09-21_11-48-19_02d78a3d-c79f-4316-95ef-c5cf7a893144.md) | 2026-09-21 11:48 | `gemini-3.6-flash` / Antigravity | 2 | **Authentication**: Firebase Auth integration, user state persistence, RBAC route protection wrappers. |
+| **03** | [`2026-09-21_12-04-28_2ad16e77...md`](./.agent-logs/2026-09-21_12-04-28_2ad16e77-2edb-49c9-9f08-8c8d0c6f5f5f.md) | 2026-09-21 12:04 | `gemini-3.6-flash` / Antigravity | 1 | **Data Architecture**: RTDB schema definitions, catalog seeding data, indexing rules, category hierarchy. |
+| **04** | [`2026-09-21_14-39-36_51531d7c...md`](./.agent-logs/2026-09-21_14-39-36_51531d7c-42e8-4803-b06c-d00adf923a4e.md) | 2026-09-21 14:39 | `gemini-3.6-flash` / Antigravity | 48 | **Media & Storefront**: Signed Cloudinary upload pipeline, Product Detail Page (PDP), multi-angle gallery, Buy Box. |
+| **05** | [`2026-09-25_11-08-23_f5e41dbe...md`](./.agent-logs/2026-09-25_11-08-23_f5e41dbe-1968-4ec7-b257-aa64705bfdd7.md) | 2026-09-25 11:08 | `gemini-3.6-flash` / Antigravity | 50 | **Merchant Central (`/seller`)**: Real-time sales telemetry, inventory management, 4-stage fulfillment stepper, test order simulation. |
+| **06** | [`2026-09-25_12-57-05_4f7a7188...md`](./.agent-logs/2026-09-25_12-57-05_4f7a7188-5492-4fc7-a944-c539b08b940a.md) | 2026-09-25 12:57 | `gemini-3.6-flash` / Antigravity | 4 | **Capture Infrastructure**: Automated lifecycle hooks (`.agents/hooks.json`), sync script, transcript parsing verification. |
+| **07** | [`2026-09-25_13-45-55_3c2407a8...md`](./.agent-logs/2026-09-25_13-45-55_3c2407a8-e998-4eb3-b20e-168a257143d0.md) | 2026-09-25 13:45 | `gemini-3.6-flash` / Antigravity | 46 | **Admin Central (`/admin`)**: Marketplace GMV tracking, user ban/unban governance, return dispute approval workflow. |
+| **08** | [`2026-09-25_18-45-42_1eea34b9...md`](./.agent-logs/2026-09-25_18-45-42_1eea34b9-4a9b-439a-8c46-da2b19cd9ad4.md) | 2026-09-25 18:45 | `gemini-3.6-flash` / Antigravity | 12 | **Checkout & Payments**: 4-step checkout accordion, Razorpay test mode modal (cards, UPI, 3D secure OTP simulation), order review. |
+| **09** | [`2026-09-26_04-55-14_a7c9ada0...md`](./.agent-logs/2026-09-26_04-55-14_a7c9ada0-1511-46fb-8860-7255b918ed0b.md) | 2026-09-26 04:55 | `gemini-3.6-flash` / Antigravity | 75+ | **Luxury Overhaul & AI Assistant**: Valenza elevation, 6 curated Ateliers, Groq AI Concierge streaming assistant, secret redaction, Render deployment compatibility. |
+| **10** | [`2026-09-26_18-26-09_c4175d9a...md`](./.agent-logs/2026-09-26_18-26-09_c4175d9a-14c4-4a76-b7b6-b1dc0f646bd1.md) | 2026-09-26 18:26 | `gemini-3.6-flash` / Antigravity | 1 | **Audit Documentation**: Added dedicated agent log section, high-resolution redmedata screenshots, and finalized push trajectory. |
+
+### How to Regenerate & Verify Logs Locally
+```bash
+# From workspace root
+python .agent-logs/sync.py
+
+# Expected output:
+# Log sync completed successfully: 9 sessions synchronized.
+```
+
+---
+
 ## 🏗️ System Architecture & Data Topology
 
 Valenza is built on an event-driven, reactive cloud architecture separating presentation, edge caching, real-time persistence, and secure serverless operations.
@@ -62,7 +104,7 @@ Valenza is built on an event-driven, reactive cloud architecture separating pres
 
 ### 1. Storefront & Curated Luxury Ateliers
 <div align="center">
-  <img src="./.agents/references/readmeref/home.png" alt="Storefront Home" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
+  <img src="./amazonclone-app/redmedata/HOME.png" alt="Storefront Home" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
   <p><em>Figure 2: Valenza storefront with dynamic hero carousel, localized delivery header, and 6 curated luxury ateliers.</em></p>
 </div>
 
@@ -79,7 +121,7 @@ Valenza is built on an event-driven, reactive cloud architecture separating pres
 
 ### 2. Search, Faceted Filtering & Catalog Navigation
 <div align="center">
-  <img src="./.agents/references/readmeref/items.png" alt="Catalog Search & Filters" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
+  <img src="./amazonclone-app/redmedata/ITEMS.png" alt="Catalog Search & Filters" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
   <p><em>Figure 3: Faceted catalog search with predictive keyword matching, atelier filters, price range sliders, and rating stars.</em></p>
 </div>
 
@@ -91,7 +133,7 @@ Valenza is built on an event-driven, reactive cloud architecture separating pres
 
 ### 3. Product Detail Page (PDP) & Buying Experience
 <div align="center">
-  <img src="./.agents/references/readmeref/product%20details.png" alt="Product Detail Page" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
+  <img src="./amazonclone-app/redmedata/DETAILS.png" alt="Product Detail Page" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
   <p><em>Figure 4: Product detail page with multi-angle gallery, high-res hover zoom, variant selectors, and the iconic Amazon Buy Box.</em></p>
 </div>
 
@@ -104,7 +146,7 @@ Valenza is built on an event-driven, reactive cloud architecture separating pres
 
 ### 4. 4-Step Checkout & Payment Orchestration
 <div align="center">
-  <img src="./.agents/references/readmeref/checkout.png" alt="Checkout Flow" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
+  <img src="./amazonclone-app/redmedata/ORDER%20SUMMARY.png" alt="Checkout Flow" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
   <p><em>Figure 5: Streamlined 4-step accordion checkout supporting Credit Cards, Razorpay Gateway, UPI / QR, and Cash on Delivery.</em></p>
 </div>
 
@@ -121,7 +163,7 @@ Valenza is built on an event-driven, reactive cloud architecture separating pres
 
 ### 5. Seller Central — Merchant Hub & Inventory Management
 <div align="center">
-  <img src="./.agents/references/readmeref/sellerDashboard.png" alt="Seller Central Dashboard" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
+  <img src="./amazonclone-app/redmedata/seller.png" alt="Seller Central Dashboard" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
   <p><em>Figure 6: Seller Central — Real-time revenue metrics, product listing manager, and 4-stage order fulfillment stepper.</em></p>
 </div>
 
@@ -134,7 +176,7 @@ Valenza is built on an event-driven, reactive cloud architecture separating pres
 
 ### 6. Admin Central — Marketplace Command Center
 <div align="center">
-  <img src="./.agents/references/readmeref/admin%20dashboard.png" alt="Admin Central Console" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
+  <img src="./amazonclone-app/redmedata/admin.png" alt="Admin Central Console" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
   <p><em>Figure 7: Admin Central — Marketplace Gross Merchandise Value (GMV), user governance, and return approval workflows.</em></p>
 </div>
 
