@@ -516,3 +516,13 @@ export async function fetchPlatformAnalytics(): Promise<ApiResponse<PlatformAnal
     return { success: false, error: 'Failed to aggregate platform analytics.' };
   }
 }
+
+// ── Hero Banners & Promotional Offers Re-exports ───────────────────────────
+export {
+  fetchHeroBanners,
+  saveHeroBanner,
+  deleteHeroBanner,
+  reorderHeroBanners,
+  uploadHeroBannerImage,
+} from './bannerService';
+

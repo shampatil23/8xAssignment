@@ -11,24 +11,28 @@ import { NotificationProvider } from '@/context/NotificationContext';
 import { LocationProvider } from '@/context/LocationContext';
 import { LocationModal } from '@/components/layout/LocationModal';
 
+import { ThemeProvider } from '@/context/ThemeContext';
+
 interface ProvidersProps {
   children: React.ReactNode;
 }
 
 export function Providers({ children }: ProvidersProps) {
   return (
-    <AuthProvider>
-      <LocationProvider>
-        <NotificationProvider>
-          <CartProvider>
-            <WishlistProvider>
-              {children}
-              <LocationModal />
-            </WishlistProvider>
-          </CartProvider>
-        </NotificationProvider>
-      </LocationProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <LocationProvider>
+          <NotificationProvider>
+            <CartProvider>
+              <WishlistProvider>
+                {children}
+                <LocationModal />
+              </WishlistProvider>
+            </CartProvider>
+          </NotificationProvider>
+        </LocationProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

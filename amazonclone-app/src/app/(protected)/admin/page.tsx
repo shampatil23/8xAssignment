@@ -15,6 +15,7 @@ import {
   RefreshCw,
   AlertCircle,
   Tag,
+  Sparkles,
   ShieldCheck,
   CheckCircle2,
   Clock,
@@ -195,7 +196,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* ── Quick Administrative Shortcuts ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           <Link
             href="/admin/users"
             className="flex items-center gap-3 rounded-xl border border-[#d5d9d9] bg-white p-3.5 hover:border-[#007185] hover:shadow-xs transition-all group"
@@ -206,6 +207,19 @@ export default function AdminDashboardPage() {
             <div>
               <p className="text-xs font-bold text-[#0f1111] group-hover:text-[#007185] transition-colors">Manage Users</p>
               <p className="text-[10px] text-[#565959]">Account status & roles</p>
+            </div>
+          </Link>
+
+          <Link
+            href="/admin/banners"
+            className="flex items-center gap-3 rounded-xl border border-[#d5d9d9] bg-white p-3.5 hover:border-amber-500 hover:shadow-xs transition-all group"
+          >
+            <div className="rounded-lg bg-amber-50 p-2 text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+              <Sparkles size={16} />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-[#0f1111] group-hover:text-amber-600 transition-colors">Hero Banners</p>
+              <p className="text-[10px] text-[#565959]">Dynamic slides & offers</p>
             </div>
           </Link>
 

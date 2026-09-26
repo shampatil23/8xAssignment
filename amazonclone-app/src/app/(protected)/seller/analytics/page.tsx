@@ -1,7 +1,7 @@
 'use client';
 // ============================================================================
 // Seller Analytics Page — /seller/analytics
-// Performance metrics, revenue, unit sales, and top selling products
+// Valenza Maison Partner Atelier Performance & Financial Valuation Analytics
 // ============================================================================
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -15,6 +15,8 @@ import {
   Boxes,
   Clock,
   ArrowUpRight,
+  Crown,
+  Gem,
 } from 'lucide-react';
 import { SellerLayout } from '@/components/seller/SellerLayout';
 import { useAuth } from '@/hooks/useAuth';
@@ -52,154 +54,136 @@ export default function SellerAnalyticsPage() {
 
   return (
     <SellerLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 text-[#141312] dark:text-[#f8f5ee]">
+        
         {/* ── Page Header ── */}
-        <div className="border-b border-gray-200 pb-4">
-          <h1 className="text-2xl font-bold text-gray-900">Sales &amp; Performance Analytics</h1>
-          <p className="text-xs text-gray-500 mt-0.5">
-            Real-time financial performance, product sales velocity, and inventory statistics
+        <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/90 dark:bg-[#121620]/90 backdrop-blur-xl p-6 sm:p-8 shadow-[0_10px_35px_rgba(26,23,20,0.03)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.4)]">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f6f1e6] dark:bg-[#1c2333] border border-[#d6be90]/40 dark:border-[#c5a059]/30 text-[10px] font-serif font-bold uppercase tracking-[0.24em] text-[#8a6827] dark:text-[#dfba73] mb-2.5 shadow-2xs">
+            <Crown size={11} className="text-[#c5a059]" />
+            <span>Valuation &amp; Velocity</span>
+          </div>
+          <h1 className="font-serif text-2xl sm:text-3xl font-light tracking-tight text-[#141312] dark:text-[#f8f5ee]">
+            Sales &amp; Performance Analytics
+          </h1>
+          <p className="mt-1 text-xs sm:text-sm text-[#786b58] dark:text-[#9e978b] leading-relaxed max-w-2xl">
+            Real-time financial performance, product sales velocity, and inventory statistics across Valenza salons.
           </p>
         </div>
 
         {/* ── Core KPI Cards ── */}
         {loading ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 animate-pulse">
             {[1, 2, 3, 4].map((n) => (
-              <div key={n} className="h-28 bg-white rounded-xl border border-gray-200" />
+              <div key={n} className="h-32 bg-white dark:bg-[#121620] rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d]" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {/* Total Sales Revenue */}
-            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-xs">
-              <div className="flex items-center justify-between text-gray-500 mb-2">
-                <span className="text-xs font-semibold uppercase">Total Sales</span>
-                <DollarSign size={18} className="text-green-600" />
+            <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/90 dark:bg-[#121620]/90 p-5 shadow-xs">
+              <div className="flex items-center justify-between text-[#8a7b68] dark:text-[#8e98ac] mb-2">
+                <span className="text-[10px] font-serif font-bold uppercase tracking-wider">Gross Valuation</span>
+                <DollarSign size={16} className="text-[#8a6827] dark:text-[#dfba73]" />
               </div>
-              <p className="text-2xl font-extrabold text-gray-900">
+              <p className="text-2xl font-serif font-bold text-[#141312] dark:text-[#f8f5ee]">
                 {formatPrice(metrics?.totalRevenue || 0)}
               </p>
-              <p className="text-[11px] text-green-700 font-semibold mt-1 flex items-center gap-0.5">
-                <ArrowUpRight size={13} />
-                <span>Gross marketplace revenue</span>
+              <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-serif font-semibold mt-1 flex items-center gap-0.5">
+                <ArrowUpRight size={12} />
+                <span>Gross marketplace acquisitions</span>
               </p>
             </div>
 
             {/* Total Units Sold */}
-            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-xs">
-              <div className="flex items-center justify-between text-gray-500 mb-2">
-                <span className="text-xs font-semibold uppercase">Units Sold</span>
-                <ShoppingBag size={18} className="text-blue-600" />
+            <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/90 dark:bg-[#121620]/90 p-5 shadow-xs">
+              <div className="flex items-center justify-between text-[#8a7b68] dark:text-[#8e98ac] mb-2">
+                <span className="text-[10px] font-serif font-bold uppercase tracking-wider">Commissions Sold</span>
+                <ShoppingBag size={16} className="text-[#8a6827] dark:text-[#dfba73]" />
               </div>
-              <p className="text-2xl font-extrabold text-gray-900">
+              <p className="text-2xl font-serif font-bold text-[#141312] dark:text-[#f8f5ee]">
                 {metrics?.totalUnitsSold || 0}
               </p>
-              <p className="text-[11px] text-gray-500 mt-1">
-                Across {metrics?.totalOrders || 0} orders
+              <p className="text-[10px] text-[#786b58] dark:text-[#9e978b] mt-1 font-sans">
+                Across {metrics?.totalOrders || 0} client purchases
               </p>
             </div>
 
             {/* Average Order Value */}
-            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-xs">
-              <div className="flex items-center justify-between text-gray-500 mb-2">
-                <span className="text-xs font-semibold uppercase">Avg Order Value</span>
-                <TrendingUp size={18} className="text-amazon-orange" />
+            <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/90 dark:bg-[#121620]/90 p-5 shadow-xs">
+              <div className="flex items-center justify-between text-[#8a7b68] dark:text-[#8e98ac] mb-2">
+                <span className="text-[10px] font-serif font-bold uppercase tracking-wider">Average Commission</span>
+                <TrendingUp size={16} className="text-[#8a6827] dark:text-[#dfba73]" />
               </div>
-              <p className="text-2xl font-extrabold text-gray-900">
+              <p className="text-2xl font-serif font-bold text-[#141312] dark:text-[#f8f5ee]">
                 {formatPrice(avgOrderValue)}
               </p>
-              <p className="text-[11px] text-gray-500 mt-1">
-                Per customer transaction
+              <p className="text-[10px] text-[#786b58] dark:text-[#9e978b] mt-1 font-sans">
+                Per checkout transaction
               </p>
             </div>
 
-            {/* Active Products */}
-            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-xs">
-              <div className="flex items-center justify-between text-gray-500 mb-2">
-                <span className="text-xs font-semibold uppercase">Catalog Health</span>
-                <Package size={18} className="text-amber-500" />
+            {/* Active Vault Listings */}
+            <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/90 dark:bg-[#121620]/90 p-5 shadow-xs">
+              <div className="flex items-center justify-between text-[#8a7b68] dark:text-[#8e98ac] mb-2">
+                <span className="text-[10px] font-serif font-bold uppercase tracking-wider">Active Portfolio</span>
+                <Package size={16} className="text-[#8a6827] dark:text-[#dfba73]" />
               </div>
-              <p className="text-2xl font-extrabold text-gray-900">
+              <p className="text-2xl font-serif font-bold text-[#141312] dark:text-[#f8f5ee]">
                 {metrics?.activeProducts || 0}
               </p>
-              <p className="text-[11px] text-gray-500 mt-1">
-                {metrics?.outOfStockProducts || 0} out of stock · {metrics?.lowStockProducts || 0} low stock
+              <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-serif font-medium mt-1">
+                Allocated masterworks
               </p>
             </div>
           </div>
         )}
 
-        {/* ── Top Selling Products Leaderboard ── */}
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-xs">
-          <div className="flex items-center gap-2 border-b border-gray-100 pb-3 mb-4">
-            <Award size={18} className="text-amazon-orange" />
+        {/* ── Top Performing Masterpieces ── */}
+        <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/90 dark:bg-[#121620]/90 p-6 sm:p-8 shadow-xs space-y-5">
+          <div className="flex items-center justify-between border-b border-[#f0eae0] dark:border-[#1e2433] pb-4">
             <div>
-              <h2 className="text-base font-bold text-gray-900">Top Performing Products</h2>
-              <p className="text-xs text-gray-500">Ranked by unit sales volume and generated revenue</p>
+              <h2 className="font-serif text-xl font-light text-[#141312] dark:text-[#f8f5ee] tracking-tight">
+                Top Performing Atelier Pieces
+              </h2>
+              <p className="text-xs text-[#786b58] dark:text-[#9e978b] mt-0.5">
+                Masterworks ranked by client demand and gross acquisition volume
+              </p>
             </div>
+            <Award size={18} className="text-[#c5a059]" />
           </div>
 
-          {!metrics || metrics.topProducts.length === 0 ? (
-            <div className="py-8 text-center text-xs text-gray-500">
-              No sales data recorded yet. Once orders are placed, product performance rankings will be visualized here.
+          {loading ? (
+            <div className="py-8 text-center text-xs text-[#786b58] font-serif animate-pulse">
+              Aggregating portfolio performance...
+            </div>
+          ) : !metrics?.topProducts || metrics.topProducts.length === 0 ? (
+            <div className="py-8 text-center text-xs text-[#786b58] dark:text-[#8e98ac]">
+              Sales velocity data will populate here as client orders are fulfilled.
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 text-xs">
-                <thead className="bg-gray-50 text-gray-600 font-semibold uppercase text-[11px]">
-                  <tr>
-                    <th className="px-4 py-2.5 text-left">Rank</th>
-                    <th className="px-4 py-2.5 text-left">Product</th>
-                    <th className="px-4 py-2.5 text-center">Units Sold</th>
-                    <th className="px-4 py-2.5 text-right">Revenue Generated</th>
-                    <th className="px-4 py-2.5 text-center">Stock Remaining</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 bg-white">
-                  {metrics.topProducts.map((prod, idx) => (
-                    <tr key={prod.id} className="hover:bg-gray-50/60">
-                      <td className="px-4 py-3 font-bold text-gray-700">
-                        #{idx + 1}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="relative h-10 w-10 rounded border bg-white p-0.5 flex-shrink-0">
-                            <Image
-                              src={prod.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100'}
-                              alt={prod.title}
-                              fill
-                              sizes="40px"
-                              className="object-contain"
-                            />
-                          </div>
-                          <span className="font-semibold text-gray-900 line-clamp-1 max-w-sm">
-                            {prod.title}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-center font-bold text-gray-900">
-                        {prod.unitsSold}
-                      </td>
-                      <td className="px-4 py-3 text-right font-bold text-gray-900">
-                        {formatPrice(prod.revenue)}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span
-                          className={`inline-block px-2 py-0.5 rounded-full font-bold text-[10px] ${
-                            prod.stock <= 0
-                              ? 'bg-red-100 text-red-700'
-                              : prod.stock <= 5
-                              ? 'bg-amber-100 text-amber-800'
-                              : 'bg-green-100 text-green-800'
-                          }`}
-                        >
-                          {prod.stock} left
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="divide-y divide-[#f5efe5] dark:divide-[#1a202c]">
+              {metrics.topProducts.map((p, idx) => (
+                <div key={p.id} className="py-4 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3.5">
+                    <span className="w-6 text-center font-serif font-bold text-xs text-[#8a6827] dark:text-[#dfba73]">
+                      #{idx + 1}
+                    </span>
+                    <div>
+                      <p className="font-serif font-medium text-xs text-[#141312] dark:text-[#f8f5ee]">
+                        {p.title}
+                      </p>
+                      <p className="text-[11px] text-[#786b58] dark:text-[#9e978b] mt-0.5">
+                        {p.unitsSold} units commissioned
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-serif font-bold text-xs text-[#141312] dark:text-[#f8f5ee]">
+                      {formatPrice(p.revenue)}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>

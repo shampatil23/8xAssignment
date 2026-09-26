@@ -1,8 +1,7 @@
 'use client';
 // ============================================================================
-// Your Orders & Returns Page — /orders
-// Authentic Amazon layout: Order History, Return Initiation, Invoice Modal,
-// Buy Again, Delivery Steppers, Address Popover, and Time Period Filters.
+// Your Orders & Acquisitions Page — /orders
+// Valenza Maison Haute Horlogerie & Joaillerie Private Client Allocations
 // ============================================================================
 import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
@@ -24,17 +23,15 @@ import {
   RefreshCw,
   FileText,
   Share2,
-  HelpCircle,
   Archive,
   ChevronRight,
   Printer,
-  ExternalLink,
-  MapPin,
-  CreditCard,
-  ShoppingCart,
+  Sparkles,
+  Award,
+  Crown,
+  Lock,
 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
 import { getUserOrders, cancelOrder } from '@/services/orderService';
@@ -77,7 +74,7 @@ export default function OrdersPage() {
   const [returnError, setReturnError] = useState<string | null>(null);
   const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
 
-  // Load orders and returns from RTDB
+  // Load orders and returns
   const loadData = async () => {
     if (!user) {
       setLoading(false);
@@ -108,7 +105,7 @@ export default function OrdersPage() {
   const handleStartReturnModal = (order: Order, item: OrderItem) => {
     const eligibility = checkReturnEligibility(order, item.productId);
     if (!eligibility.isEligible) {
-      alert(eligibility.reason || 'This item is not eligible for return.');
+      alert(eligibility.reason || 'This piece is not eligible for salon return.');
       return;
     }
     setSelectedOrderForReturn(order);
@@ -136,7 +133,7 @@ export default function OrdersPage() {
       if (res.success && res.data) {
         setSelectedOrderForReturn(null);
         setSelectedItemForReturn(null);
-        setNoticeMessage('Your return request has been placed! Track its progress below.');
+        setNoticeMessage('Your salon exchange/return request has been submitted to the Atelier Concierge.');
         setTimeout(() => setNoticeMessage(null), 4000);
         await loadData();
       } else {
@@ -147,7 +144,7 @@ export default function OrdersPage() {
     }
   };
 
-  // Status progression helper for evaluation / demo
+  // Status progression helper for evaluation
   const handleAdvanceReturn = async (ret: ReturnRequest) => {
     if (!user) return;
     const stages: ReturnRequest['status'][] = [
@@ -161,86 +158,82 @@ export default function OrdersPage() {
     if (currentIndex < stages.length - 1) {
       const nextStage = stages[currentIndex + 1];
       await progressReturnState(ret.id, ret.orderId, user.uid, nextStage);
-      setNoticeMessage(`Return status updated to ${nextStage.replace(/_/g, ' ')}!`);
+      setNoticeMessage(`Return status updated to ${nextStage}!`);
       setTimeout(() => setNoticeMessage(null), 3000);
       await loadData();
     }
   };
 
-  // Cancel order handler
+  // Handle cancel order
   const handleCancelOrder = async (orderId: string) => {
-    if (!confirm('Are you sure you want to cancel this order?')) return;
-    try {
-      const res = await cancelOrder(orderId);
-      if (res.success) {
-        setNoticeMessage('Order has been cancelled successfully.');
-        setTimeout(() => setNoticeMessage(null), 4000);
-        await loadData();
-      } else {
-        alert(res.error || 'Failed to cancel order.');
-      }
-    } catch (err) {
-      alert('Failed to cancel order.');
+    if (!window.confirm('Are you sure you wish to cancel this private allocation?')) return;
+    const res = await cancelOrder(orderId);
+    if (res.success) {
+      setNoticeMessage('Allocation successfully cancelled.');
+      setTimeout(() => setNoticeMessage(null), 3000);
+      await loadData();
+    } else {
+      alert(res.error || 'Failed to cancel allocation.');
     }
   };
 
-  // Archive order handler
+  // Archive order toggle
   const handleArchiveOrder = (orderId: string) => {
     setArchivedOrderIds((prev) => {
       const next = new Set(prev);
-      if (next.has(orderId)) next.delete(orderId);
-      else next.add(orderId);
+      if (next.has(orderId)) {
+        next.delete(orderId);
+        setNoticeMessage('Allocation restored to active records.');
+      } else {
+        next.add(orderId);
+        setNoticeMessage('Allocation archived to private records.');
+      }
+      setTimeout(() => setNoticeMessage(null), 2500);
       return next;
     });
-    setNoticeMessage('Order archived status updated.');
+  };
+
+  // Buy again handler
+  const handleBuyAgain = (item: OrderItem) => {
+    const productLike: Product = {
+      id: item.productId,
+      sku: item.productId,
+      title: item.title,
+      slug: item.productId,
+      description: item.title,
+      category: 'horlogerie',
+      price: item.price,
+      stock: 10,
+      images: [{ url: item.image, alt: item.title, isPrimary: true }],
+      status: 'active',
+      rating: 5.0,
+      reviewCount: 42,
+      isPrimeEligible: true,
+      tags: ['luxury', 'vault'],
+      deliveryInfo: {
+        isFreeDelivery: true,
+        estimatedDays: 2,
+        fastestDeliveryDate: 'Tomorrow, by 2 PM',
+        standardDeliveryDate: 'in 2 days',
+        shippingFee: 0,
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    addItem(productLike, 1);
+    setNoticeMessage(`Added "${item.title}" to your Private Vault.`);
     setTimeout(() => setNoticeMessage(null), 3000);
   };
 
-  // Buy item again
-  const handleBuyAgain = async (item: OrderItem) => {
-    try {
-      const mockProduct: Product = {
-        id: item.productId,
-        title: item.title,
-        sku: `SKU-${item.productId}`,
-        slug: item.productId,
-        status: 'active',
-        price: item.price,
-        images: [{ url: item.image, alt: item.title, isPrimary: true }],
-        description: item.title,
-        category: 'general',
-        tags: ['order'],
-        rating: 4.5,
-        reviewCount: 10,
-        stock: 99,
-        brand: 'Amazon Clone',
-        deliveryInfo: {
-          isFreeDelivery: true,
-          estimatedDays: 2,
-          fastestDeliveryDate: 'Tomorrow',
-          standardDeliveryDate: 'In 2-3 business days',
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      await addItem(mockProduct, 1);
-      setNoticeMessage(`Added "${item.title.slice(0, 30)}..." to cart.`);
-      setTimeout(() => setNoticeMessage(null), 3000);
-    } catch {
-      alert('Could not add item to cart.');
-    }
-  };
-
-  // Filtered orders list calculation
+  // Filtered orders computation
   const filteredOrders = useMemo(() => {
     let list = [...orders];
 
-    // Tab Filtering
+    // Tab filter
     if (activeTab === 'buy-again') {
-      // Returns all completed/confirmed orders with items
-      list = list.filter((o) => o.status !== 'cancelled');
+      list = list.filter((o) => o.status === 'delivered');
     } else if (activeTab === 'not-shipped') {
-      list = list.filter((o) => o.status === 'pending' || o.status === 'confirmed' || o.status === 'processing');
+      list = list.filter((o) => o.status === 'pending' || o.status === 'confirmed');
     } else if (activeTab === 'cancelled') {
       list = list.filter((o) => o.status === 'cancelled');
     } else if (activeTab === 'returns') {
@@ -295,20 +288,23 @@ export default function OrdersPage() {
   if (!authLoading && !user) {
     return (
       <MainLayout>
-        <div className="mx-auto max-w-screen-md px-4 py-16 text-center">
-          <Package size={48} className="text-gray-400 mx-auto mb-3" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Your Orders</h1>
-          <p className="text-xs text-gray-600 mb-6">
-            Please sign in to view your order history, track deliveries, and manage returns.
+        <div className="mx-auto max-w-screen-md px-4 py-20 text-center">
+          <div className="w-16 h-16 rounded-full border border-[#d6be90] dark:border-[#c5a059]/40 bg-[#ffffff] dark:bg-[#151922] flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <Crown size={28} className="text-[#c5a059]" />
+          </div>
+          <h1 className="font-serif text-2xl sm:text-3xl font-light text-[#141312] dark:text-[#f8f5ee] mb-2">
+            Client Allocations &amp; Order Vault
+          </h1>
+          <p className="text-xs text-[#786b58] dark:text-[#9e978b] max-w-md mx-auto mb-6 leading-relaxed">
+            Please sign in with your Maison credentials to review your acquisitions, track armored dispatches, and manage salon appraisals.
           </p>
-          <Button
+          <button
             type="button"
-            variant="buy-now"
             onClick={() => router.push('/auth/sign-in?redirect=/orders')}
-            className="px-8 py-2 font-bold"
+            className="px-8 py-3.5 rounded-xl font-sans text-xs uppercase tracking-[0.18em] font-semibold text-[#12110f] bg-gradient-to-r from-[#c5a059] via-[#d6be90] to-[#b89548] hover:brightness-105 transition-all shadow-md cursor-pointer"
           >
-            Sign in to your account
-          </Button>
+            Access Client Portal
+          </button>
         </div>
       </MainLayout>
     );
@@ -316,45 +312,50 @@ export default function OrdersPage() {
 
   return (
     <MainLayout>
-      <div className="mx-auto max-w-screen-xl px-4 py-5 font-sans text-[#0f1111]">
+      <div className="mx-auto max-w-screen-xl px-4 sm:px-6 py-6 sm:py-8 font-sans text-[#141312] dark:text-[#f8f5ee]">
         {/* Notice alert */}
         {noticeMessage && (
-          <div className="fixed top-20 right-4 z-50 flex items-center gap-2 rounded-md bg-[#007600] px-4 py-3 text-xs font-bold text-white shadow-xl animate-in fade-in">
-            <CheckCircle2 size={18} />
+          <div className="fixed top-24 right-6 z-50 flex items-center gap-2.5 rounded-2xl bg-[#141312]/95 dark:bg-[#1f2533]/95 border border-[#c5a059]/40 backdrop-blur-md px-5 py-3.5 text-xs uppercase tracking-widest font-semibold text-[#f8f5ee] shadow-2xl transition-all animate-bounce">
+            <Sparkles size={16} className="text-[#c5a059]" />
             <span>{noticeMessage}</span>
           </div>
         )}
 
-        {/* Amazon Breadcrumbs */}
-        <div className="text-xs text-[#565959] mb-3 flex items-center gap-1">
-          <Link href="/account" className="hover:text-[#c7511f] hover:underline">
-            Your Account
+        {/* Luxury Breadcrumbs */}
+        <div className="text-[11px] uppercase tracking-[0.16em] font-medium text-[#786b58] dark:text-[#9e978b] mb-4 flex items-center gap-2">
+          <Link href="/account" className="hover:text-[#c5a059] dark:hover:text-[#d6be90] transition-colors">
+            Client Account
           </Link>
-          <ChevronRight size={12} className="text-gray-400" />
-          <span className="text-[#c7511f] font-bold">Your Orders</span>
+          <span className="text-[#dfd6c5] dark:text-[#2c3242]">◆</span>
+          <span className="text-[#141312] dark:text-[#f8f5ee] font-semibold">Allocations &amp; Orders</span>
         </div>
 
         {/* Top Title & Search Controls Bar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl font-normal text-[#0f1111]">Your Orders</h1>
+            <span className="text-[10px] uppercase font-semibold tracking-[0.25em] text-[#9b8353] dark:text-[#d6be90] block mb-1">
+              Valenza Maison Archives
+            </span>
+            <h1 className="font-serif text-2xl sm:text-3xl font-light tracking-tight text-[#141312] dark:text-[#f8f5ee]">
+              Client Allocations
+            </h1>
           </div>
 
           {/* Search Box */}
-          <div className="flex items-center gap-2 w-full md:w-auto">
+          <div className="flex items-center gap-2.5 w-full md:w-auto">
             <div className="relative flex-1 md:w-80">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9a8d7a] dark:text-[#6e778b]" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search all orders by item or ID"
-                className="w-full rounded-md border border-[#888c8c] pl-9 pr-3 py-1.5 text-xs text-[#0f1111] focus:outline-none focus:ring-1 focus:ring-[#e77600] focus:border-[#e77600]"
+                placeholder="Search allocations by piece or ID..."
+                className="w-full rounded-xl border border-[#dfd6c5] dark:border-[#272d3e] bg-white/90 dark:bg-[#161a25] pl-10 pr-8 py-2.5 text-xs text-[#141312] dark:text-[#f8f5ee] placeholder:text-[#a09585] dark:placeholder:text-[#525d75] focus:outline-none focus:border-[#c5a059] focus:ring-2 focus:ring-[#c5a059]/20 transition-all"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#9a8d7a] hover:text-[#141312]"
                 >
                   <X size={14} />
                 </button>
@@ -362,88 +363,88 @@ export default function OrdersPage() {
             </div>
             <button
               type="button"
-              className="px-4 py-1.5 rounded-md bg-[#303538] hover:bg-[#23272a] text-white text-xs font-bold shadow-xs cursor-pointer transition-colors"
+              className="px-5 py-2.5 rounded-xl font-sans text-xs uppercase tracking-[0.14em] font-semibold text-[#12110f] bg-gradient-to-r from-[#c5a059] to-[#b89548] hover:brightness-105 shadow-xs cursor-pointer transition-all"
             >
-              Search Orders
+              Filter
             </button>
           </div>
         </div>
 
         {/* Sub Navigation Tabs */}
-        <div className="flex items-center border-b border-[#d5d9d9] mb-4 text-xs font-medium gap-8 overflow-x-auto scrollbar-hide">
+        <div className="flex items-center border-b border-[#ebe2d1] dark:border-[#1e2433] mb-6 text-xs font-medium gap-6 sm:gap-8 overflow-x-auto scrollbar-hide">
           <button
             type="button"
             onClick={() => setActiveTab('all')}
-            className={`pb-2.5 transition-all cursor-pointer whitespace-nowrap border-b-2 ${
+            className={`pb-3 transition-all cursor-pointer whitespace-nowrap text-xs uppercase tracking-wider font-semibold border-b-2 ${
               activeTab === 'all'
-                ? 'border-[#e77600] font-bold text-[#0f1111]'
-                : 'border-transparent text-[#565959] hover:text-[#0f1111] hover:border-gray-400'
+                ? 'border-[#c5a059] text-[#9b8353] dark:text-[#e8d5b5]'
+                : 'border-transparent text-[#786b58] dark:text-[#9e978b] hover:text-[#141312] dark:hover:text-[#f8f5ee]'
             }`}
           >
-            Orders ({orders.length})
+            All Acquisitions ({orders.length})
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('buy-again')}
-            className={`pb-2.5 transition-all cursor-pointer whitespace-nowrap border-b-2 ${
+            className={`pb-3 transition-all cursor-pointer whitespace-nowrap text-xs uppercase tracking-wider font-semibold border-b-2 ${
               activeTab === 'buy-again'
-                ? 'border-[#e77600] font-bold text-[#0f1111]'
-                : 'border-transparent text-[#565959] hover:text-[#0f1111] hover:border-gray-400'
+                ? 'border-[#c5a059] text-[#9b8353] dark:text-[#e8d5b5]'
+                : 'border-transparent text-[#786b58] dark:text-[#9e978b] hover:text-[#141312] dark:hover:text-[#f8f5ee]'
             }`}
           >
-            Buy Again
+            Re-Acquire Piece
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('not-shipped')}
-            className={`pb-2.5 transition-all cursor-pointer whitespace-nowrap border-b-2 ${
+            className={`pb-3 transition-all cursor-pointer whitespace-nowrap text-xs uppercase tracking-wider font-semibold border-b-2 ${
               activeTab === 'not-shipped'
-                ? 'border-[#e77600] font-bold text-[#0f1111]'
-                : 'border-transparent text-[#565959] hover:text-[#0f1111] hover:border-gray-400'
+                ? 'border-[#c5a059] text-[#9b8353] dark:text-[#e8d5b5]'
+                : 'border-transparent text-[#786b58] dark:text-[#9e978b] hover:text-[#141312] dark:hover:text-[#f8f5ee]'
             }`}
           >
-            Not Yet Shipped
+            In Atelier Transit
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('cancelled')}
-            className={`pb-2.5 transition-all cursor-pointer whitespace-nowrap border-b-2 ${
+            className={`pb-3 transition-all cursor-pointer whitespace-nowrap text-xs uppercase tracking-wider font-semibold border-b-2 ${
               activeTab === 'cancelled'
-                ? 'border-[#e77600] font-bold text-[#0f1111]'
-                : 'border-transparent text-[#565959] hover:text-[#0f1111] hover:border-gray-400'
+                ? 'border-[#c5a059] text-[#9b8353] dark:text-[#e8d5b5]'
+                : 'border-transparent text-[#786b58] dark:text-[#9e978b] hover:text-[#141312] dark:hover:text-[#f8f5ee]'
             }`}
           >
-            Cancelled Orders
+            Cancelled Allocations
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('returns')}
-            className={`pb-2.5 transition-all cursor-pointer whitespace-nowrap border-b-2 ${
+            className={`pb-3 transition-all cursor-pointer whitespace-nowrap text-xs uppercase tracking-wider font-semibold border-b-2 ${
               activeTab === 'returns'
-                ? 'border-[#e77600] font-bold text-[#0f1111]'
-                : 'border-transparent text-[#565959] hover:text-[#0f1111] hover:border-gray-400'
+                ? 'border-[#c5a059] text-[#9b8353] dark:text-[#e8d5b5]'
+                : 'border-transparent text-[#786b58] dark:text-[#9e978b] hover:text-[#141312] dark:hover:text-[#f8f5ee]'
             }`}
           >
-            Returns &amp; Refunds ({returns.length})
+            Salon Exchanges &amp; Returns ({returns.length})
           </button>
         </div>
 
         {/* Time Period Filter Dropdown Bar */}
-        <div className="flex items-center gap-2 mb-6 text-xs text-[#0f1111]">
-          <span className="font-semibold text-[#565959]">
-            {filteredOrders.length} order{filteredOrders.length !== 1 ? 's' : ''} placed in
+        <div className="flex items-center gap-2.5 mb-6 text-xs text-[#141312] dark:text-[#f8f5ee]">
+          <span className="font-semibold text-[#786b58] dark:text-[#9e978b]">
+            {filteredOrders.length} allocation{filteredOrders.length !== 1 ? 's' : ''} placed in
           </span>
           <select
             value={timeFilter}
             onChange={(e) => setTimeFilter(e.target.value as TimeFilterOption)}
-            className="rounded border border-[#d5d9d9] bg-[#f0f2f2] hover:bg-[#e3e6e6] px-3 py-1 text-xs font-semibold text-[#0f1111] cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#e77600]"
+            className="rounded-xl border border-[#dfd6c5] dark:border-[#2f384d] bg-white dark:bg-[#161a25] px-3.5 py-1.5 text-xs font-semibold text-[#141312] dark:text-[#f8f5ee] cursor-pointer focus:outline-none focus:border-[#c5a059] focus:ring-1 focus:ring-[#c5a059]"
           >
-            <option value="3-months">past 3 months</option>
-            <option value="30-days">past 30 days</option>
-            <option value="6-months">last 6 months</option>
-            <option value="2026">2026</option>
-            <option value="2025">2025</option>
-            <option value="archived">Archived Orders</option>
+            <option value="3-months">Past 3 Months</option>
+            <option value="30-days">Past 30 Days</option>
+            <option value="6-months">Last 6 Months</option>
+            <option value="2026">Year 2026</option>
+            <option value="2025">Year 2025</option>
+            <option value="archived">Archived Allocations</option>
           </select>
         </div>
 
@@ -451,19 +452,27 @@ export default function OrdersPage() {
         {loading ? (
           <div className="space-y-6">
             {[1, 2].map((n) => (
-              <div key={n} className="h-48 bg-gray-100 rounded-lg border border-[#d5d9d9] animate-pulse" />
+              <div key={n} className="h-56 bg-[#ebe2d1]/50 dark:bg-[#161a25] rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] animate-pulse" />
             ))}
           </div>
         ) : filteredOrders.length === 0 ? (
-          <div className="rounded-lg border border-[#d5d9d9] bg-white p-12 text-center shadow-xs">
-            <Package size={44} className="text-gray-400 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-[#0f1111] mb-1">No orders found</h3>
-            <p className="text-xs text-[#565959] max-w-md mx-auto mb-6">
-              There are no orders matching your current filter selection. Try changing the time period or searching for a different keyword.
+          <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 p-12 text-center shadow-sm">
+            <div className="w-14 h-14 rounded-full border border-[#d6be90] dark:border-[#c5a059]/40 bg-[#fbfaf8] dark:bg-[#161a25] flex items-center justify-center mx-auto mb-3">
+              <Package size={26} className="text-[#9b8353] dark:text-[#d6be90]" />
+            </div>
+            <h3 className="font-serif text-lg font-medium text-[#141312] dark:text-[#f8f5ee] mb-1">
+              No Allocations Found
+            </h3>
+            <p className="text-xs text-[#786b58] dark:text-[#9e978b] max-w-md mx-auto mb-6 leading-relaxed">
+              No records match your active criteria. Explore our current Haute Horlogerie &amp; Joaillerie collections.
             </p>
-            <Button type="button" variant="cart" onClick={() => router.push('/')} className="font-bold text-xs px-6 py-2">
-              Continue Shopping
-            </Button>
+            <button
+              type="button"
+              onClick={() => router.push('/')}
+              className="px-6 py-3 rounded-xl font-sans text-xs uppercase tracking-[0.16em] font-semibold text-[#12110f] bg-gradient-to-r from-[#c5a059] to-[#b89548] hover:brightness-105 shadow-md transition-all cursor-pointer"
+            >
+              Explore Maison Salons
+            </button>
           </div>
         ) : (
           <div className="space-y-6">
@@ -474,17 +483,17 @@ export default function OrdersPage() {
               return (
                 <div
                   key={order.id}
-                  className="rounded-lg border border-[#d5d9d9] bg-white overflow-hidden shadow-2xs hover:shadow-xs transition-shadow"
+                  className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 overflow-hidden shadow-[0_12px_40px_rgba(26,23,20,0.04)] dark:shadow-[0_16px_45px_rgba(0,0,0,0.6)] hover:border-[#c5a059]/60 transition-all duration-300"
                 >
-                  {/* Order Header Bar (Real Amazon Grey Bar) */}
-                  <div className="bg-[#f6f6f6] px-5 py-3 border-b border-[#d5d9d9] flex flex-wrap items-center justify-between gap-4 text-xs">
+                  {/* Order Header Bar */}
+                  <div className="bg-[#fbfaf8] dark:bg-[#161a25] px-6 py-4 border-b border-[#f0eae0] dark:border-[#1e2433] flex flex-wrap items-center justify-between gap-4 text-xs">
                     <div className="flex flex-wrap items-center gap-6 sm:gap-10">
                       {/* Order Placed */}
                       <div>
-                        <span className="block text-[11px] uppercase text-[#565959] tracking-tight">
-                          ORDER PLACED
+                        <span className="block text-[10px] uppercase font-semibold text-[#8e816e] dark:text-[#7e8aa2] tracking-wider">
+                          Acquisition Date
                         </span>
-                        <span className="font-normal text-[#0f1111]">
+                        <span className="font-serif font-medium text-[#141312] dark:text-[#f8f5ee]">
                           {new Date(order.createdAt).toLocaleDateString('en-US', {
                             month: 'long',
                             day: 'numeric',
@@ -495,18 +504,18 @@ export default function OrdersPage() {
 
                       {/* Total */}
                       <div>
-                        <span className="block text-[11px] uppercase text-[#565959] tracking-tight">
-                          TOTAL
+                        <span className="block text-[10px] uppercase font-semibold text-[#8e816e] dark:text-[#7e8aa2] tracking-wider">
+                          Valuation Total
                         </span>
-                        <span className="font-bold text-[#0f1111]">
+                        <span className="font-serif font-semibold text-[#9b8353] dark:text-[#d6be90] text-sm sm:text-base">
                           {formatPrice(order.total)}
                         </span>
                       </div>
 
                       {/* Ship To Popover */}
                       <div className="relative">
-                        <span className="block text-[11px] uppercase text-[#565959] tracking-tight">
-                          SHIP TO
+                        <span className="block text-[10px] uppercase font-semibold text-[#8e816e] dark:text-[#7e8aa2] tracking-wider">
+                          Concierge Recipient
                         </span>
                         <button
                           type="button"
@@ -515,34 +524,36 @@ export default function OrdersPage() {
                               hoveredAddressOrderId === order.id ? null : order.id
                             )
                           }
-                          className="font-normal text-[#007185] hover:text-[#c7511f] flex items-center gap-0.5 cursor-pointer hover:underline"
+                          className="font-medium text-[#141312] dark:text-[#f8f5ee] hover:text-[#c5a059] dark:hover:text-[#d6be90] flex items-center gap-1 cursor-pointer transition-colors"
                         >
                           <span>{order.shippingAddress.fullName}</span>
-                          <ChevronDown size={12} />
+                          <ChevronDown size={12} className="text-[#c5a059]" />
                         </button>
 
                         {/* Address Hover Card */}
                         {hoveredAddressOrderId === order.id && (
-                          <div className="absolute left-0 top-full mt-2 z-30 w-64 rounded-md border border-[#d5d9d9] bg-white p-4 shadow-xl text-xs space-y-1 text-[#0f1111] animate-in fade-in">
-                            <div className="flex justify-between items-start pb-1.5 border-b border-gray-100">
-                              <span className="font-bold text-[#0f1111]">Shipping Address</span>
+                          <div className="absolute left-0 top-full mt-2 z-30 w-72 rounded-2xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white dark:bg-[#161a25] p-5 shadow-2xl text-xs space-y-1.5 text-[#141312] dark:text-[#f8f5ee] animate-in fade-in">
+                            <div className="flex justify-between items-start pb-2 border-b border-[#f0eae0] dark:border-[#1e2433]">
+                              <span className="font-serif font-semibold text-[#9b8353] dark:text-[#d6be90]">
+                                Destination Address
+                              </span>
                               <button
                                 onClick={() => setHoveredAddressOrderId(null)}
-                                className="text-gray-400 hover:text-gray-600"
+                                className="text-[#9a8d7a] hover:text-[#141312]"
                               >
                                 <X size={14} />
                               </button>
                             </div>
-                            <p className="font-bold">{order.shippingAddress.fullName}</p>
-                            <p>{order.shippingAddress.street}</p>
-                            <p>
+                            <p className="font-semibold">{order.shippingAddress.fullName}</p>
+                            <p className="text-[#615442] dark:text-[#b8af9f]">{order.shippingAddress.street}</p>
+                            <p className="text-[#615442] dark:text-[#b8af9f]">
                               {order.shippingAddress.city}, {order.shippingAddress.state}{' '}
                               {order.shippingAddress.postalCode}
                             </p>
-                            <p>{order.shippingAddress.country}</p>
+                            <p className="text-[#615442] dark:text-[#b8af9f]">{order.shippingAddress.country}</p>
                             {order.shippingAddress.phone && (
-                              <p className="text-[#565959] pt-1">
-                                Phone: {order.shippingAddress.phone}
+                              <p className="text-[#8e816e] dark:text-[#7e8aa2] pt-1">
+                                Secure Line: {order.shippingAddress.phone}
                               </p>
                             )}
                           </div>
@@ -552,34 +563,34 @@ export default function OrdersPage() {
 
                     {/* Order ID & Invoice Links */}
                     <div className="flex flex-col sm:items-end text-right">
-                      <div className="flex items-center gap-1.5 text-[11px] text-[#565959]">
-                        <span>ORDER #</span>
-                        <strong className="text-[#0f1111] font-mono">{order.id}</strong>
+                      <div className="flex items-center gap-1.5 text-[11px] text-[#8e816e] dark:text-[#7e8aa2]">
+                        <span className="tracking-wider uppercase">ALLOCATION #</span>
+                        <strong className="font-mono text-[#141312] dark:text-[#f8f5ee] tracking-tight">{order.id}</strong>
                       </div>
 
-                      <div className="flex items-center gap-3 text-xs mt-0.5">
+                      <div className="flex items-center gap-3 text-xs mt-1">
                         <Link
                           href={`/orders/${order.id}`}
-                          className="text-[#007185] hover:text-[#c7511f] hover:underline"
+                          className="font-medium text-[#9b8353] dark:text-[#d6be90] hover:underline transition-colors"
                         >
-                          View order details
+                          View Allocation Details
                         </Link>
-                        <span className="text-gray-300">|</span>
+                        <span className="text-[#dfd6c5] dark:text-[#2c3242]">|</span>
                         <button
                           type="button"
                           onClick={() => setInvoiceOrder(order)}
-                          className="text-[#007185] hover:text-[#c7511f] hover:underline flex items-center gap-0.5 cursor-pointer"
+                          className="font-medium text-[#9b8353] dark:text-[#d6be90] hover:underline flex items-center gap-1 cursor-pointer"
                         >
-                          <span>Invoice</span>
+                          <span>Atelier Certificate</span>
                           <ChevronDown size={11} />
                         </button>
                       </div>
                     </div>
                   </div>
 
-                  {/* Return Lifecycle Banner (If return active) */}
+                  {/* Return Lifecycle Banner */}
                   {orderReturns.length > 0 && (
-                    <div className="bg-[#fff9e6] px-5 py-3.5 border-b border-[#ffe299] text-xs">
+                    <div className="bg-[#fcf8f0] dark:bg-[#1a2130] px-6 py-4 border-b border-[#e8dcce] dark:border-[#2f384d] text-xs">
                       {orderReturns.map((ret) => {
                         const stages: ReturnRequest['status'][] = [
                           'RETURN_REQUESTED',
@@ -591,103 +602,90 @@ export default function OrdersPage() {
                         const currentStageIdx = stages.indexOf(ret.status);
 
                         return (
-                          <div key={ret.id} className="space-y-2.5">
+                          <div key={ret.id} className="space-y-3">
                             <div className="flex flex-wrap items-center justify-between gap-2">
-                              <span className="font-bold text-[#0f1111] flex items-center gap-1.5">
-                                <RotateCcw size={15} className="text-[#e47911]" />
-                                <span>Return Status:</span>
-                                <span className="text-[#c7511f] font-bold uppercase">
+                              <span className="font-medium text-[#141312] dark:text-[#f8f5ee] flex items-center gap-2">
+                                <RotateCcw size={15} className="text-[#c5a059]" />
+                                <span>Salon Return Sequence:</span>
+                                <span className="font-serif font-bold text-[#9b8353] dark:text-[#d6be90] uppercase">
                                   {ret.status.replace(/_/g, ' ')}
                                 </span>
                               </span>
-                              <span className="font-bold text-[#007600]">
-                                Refund Amount: {formatPrice(ret.refundAmount)}
+                              <span className="font-serif font-semibold text-emerald-700 dark:text-emerald-400">
+                                Refund Credit: {formatPrice(ret.refundAmount)}
                               </span>
                             </div>
 
                             {/* Stepper Bar */}
-                            <div className="grid grid-cols-5 gap-1.5 text-[10px] text-center font-semibold pt-1">
+                            <div className="grid grid-cols-5 gap-2 text-[10px] text-center font-medium pt-1">
                               {stages.map((stage, idx) => (
                                 <div key={stage} className="flex flex-col items-center">
                                   <div
-                                    className={`h-2.5 w-full rounded-full mb-1 transition-all ${
-                                      idx <= currentStageIdx ? 'bg-[#007600]' : 'bg-[#e7e7e7]'
+                                    className={`h-2 w-full rounded-full mb-1.5 transition-all ${
+                                      idx <= currentStageIdx ? 'bg-[#c5a059]' : 'bg-[#e5decb] dark:bg-[#283042]'
                                     }`}
                                   />
                                   <span
                                     className={
-                                      idx <= currentStageIdx ? 'text-[#007600] font-bold' : 'text-gray-400'
+                                      idx <= currentStageIdx ? 'text-[#9b8353] dark:text-[#d6be90] font-semibold' : 'text-[#a09585] dark:text-[#58647d]'
                                     }
                                   >
                                     {stage === 'RETURN_REQUESTED'
-                                      ? 'Requested'
+                                      ? 'Initiated'
                                       : stage === 'RETURN_APPROVED'
                                       ? 'Approved'
                                       : stage === 'RETURNED'
-                                      ? 'Returned'
+                                      ? 'Received'
                                       : stage === 'REFUND_PENDING'
                                       ? 'Processing'
-                                      : 'Refunded'}
+                                      : 'Settled'}
                                   </span>
                                 </div>
                               ))}
                             </div>
-
-                            {/* Advance Status Demo Action */}
-                            {currentStageIdx < stages.length - 1 && (
-                              <div className="pt-1.5 flex justify-end">
-                                <button
-                                  type="button"
-                                  onClick={() => handleAdvanceReturn(ret)}
-                                  className="text-[11px] font-semibold text-[#007185] hover:text-[#c7511f] bg-white px-3 py-1 rounded border border-[#d5d9d9] hover:bg-[#f7fafa] transition-colors"
-                                >
-                                  Advance to next status (Demo testing) →
-                                </button>
-                              </div>
-                            )}
                           </div>
                         );
                       })}
                     </div>
                   )}
 
-                  {/* Delivery Banner */}
-                  <div className="px-5 pt-4 pb-1">
+                  {/* Delivery Status Banner */}
+                  <div className="px-6 pt-5 pb-1">
                     {order.status === 'cancelled' ? (
-                      <div className="flex items-center gap-2 text-red-700 text-sm font-bold">
-                        <X size={18} className="text-red-600 shrink-0" />
-                        <span>Cancelled</span>
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 text-xs font-semibold">
+                        <X size={15} className="text-rose-600 shrink-0" />
+                        <span>Allocation Cancelled</span>
                       </div>
                     ) : order.status === 'delivered' ? (
-                      <div className="flex items-center gap-2 text-[#007600] text-sm font-bold">
-                        <CheckCircle2 size={18} className="shrink-0" />
-                        <span>Delivered {order.estimatedDelivery || 'on schedule'}</span>
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
+                        <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
+                        <span>Delivered to Private Salon {order.estimatedDelivery || 'on schedule'}</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2 text-[#0f1111] text-sm font-bold">
-                        <Truck size={18} className="text-[#007600] shrink-0" />
-                        <span>Arriving {order.estimatedDelivery || 'Tomorrow'}</span>
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f6efe1] dark:bg-[#1a2130] text-[#786b58] dark:text-[#d6be90] text-xs font-semibold">
+                        <Truck size={15} className="text-[#c5a059] shrink-0" />
+                        <span>Insured Armored Dispatch — Arriving {order.estimatedDelivery || 'in 4-5 Business Days'}</span>
                       </div>
                     )}
                   </div>
 
                   {/* Order Line Items */}
-                  <div className="p-5 divide-y divide-[#eaeded]">
+                  <div className="p-6 divide-y divide-[#f0eae0] dark:divide-[#1e2433]">
                     {order.items.map((item, idx) => (
                       <div
                         key={idx}
-                        className="py-4 first:pt-1 last:pb-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
+                        className="py-5 first:pt-2 last:pb-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
                       >
                         {/* Item Details */}
-                        <div className="flex gap-4 items-start flex-1 min-w-0">
+                        <div className="flex gap-5 items-start flex-1 min-w-0">
                           <Link href={`/product/${item.productId}`} className="shrink-0">
-                            <div className="relative h-24 w-24 rounded border border-[#d5d9d9] bg-white p-1.5 hover:opacity-90 transition-opacity">
+                            <div className="relative h-28 w-28 rounded-2xl border border-[#ebe2d1] dark:border-[#262c3d] bg-[#fbfaf8] dark:bg-[#161a25] p-2 hover:border-[#c5a059] transition-all">
                               <Image
                                 src={item.image}
                                 alt={item.title}
                                 fill
-                                sizes="96px"
-                                className="object-contain p-1"
+                                sizes="112px"
+                                className="object-contain p-1.5"
                               />
                             </div>
                           </Link>
@@ -695,58 +693,58 @@ export default function OrdersPage() {
                           <div className="space-y-1.5 min-w-0 flex-1">
                             <Link
                               href={`/product/${item.productId}`}
-                              className="text-sm font-semibold text-[#007185] hover:text-[#c7511f] hover:underline leading-snug line-clamp-2 block"
+                              className="font-serif text-sm font-medium text-[#141312] dark:text-[#f8f5ee] hover:text-[#c5a059] dark:hover:text-[#d6be90] leading-snug line-clamp-2 block transition-colors"
                             >
                               {item.title}
                             </Link>
 
-                            <p className="text-xs text-[#565959]">
-                              Qty: {item.quantity} · Price: {formatPrice(item.price)}
+                            <p className="text-xs text-[#786b58] dark:text-[#9e978b]">
+                              Quantity: {item.quantity} · Piece Valuation: <span className="font-serif font-semibold text-[#141312] dark:text-[#f8f5ee]">{formatPrice(item.price)}</span>
                             </p>
 
-                            <div className="text-[11px] text-[#565959] space-y-0.5">
-                              <p>Sold by: <span className="text-[#0f1111] font-medium">Amazon Clone partner</span></p>
-                              <p className="text-[#565959]">
+                            <div className="text-[11px] text-[#8e816e] dark:text-[#7e8aa2] space-y-0.5 pt-0.5">
+                              <p>Curated by: <span className="text-[#141312] dark:text-[#f8f5ee] font-medium">Valenza Certified Atelier Partner</span></p>
+                              <p>
                                 {order.status === 'delivered'
-                                  ? 'Return window closed'
-                                  : 'Eligible for Return or Replacement'}
+                                  ? 'Salon appraisal period active'
+                                  : 'Eligible for 30-Day Maison Exchange'}
                               </p>
                             </div>
 
-                            {/* Buy Again Button under item */}
-                            <div className="pt-1">
+                            {/* Buy Again Button */}
+                            <div className="pt-2">
                               <button
                                 type="button"
                                 onClick={() => handleBuyAgain(item)}
-                                className="inline-flex items-center gap-1.5 rounded-full bg-[#ffd814] hover:bg-[#f7ca00] text-[#0f1111] border border-[#fcd200] px-3.5 py-1 text-xs font-semibold shadow-xs cursor-pointer transition-colors"
+                                className="inline-flex items-center gap-1.5 rounded-xl border border-[#dfd6c5] dark:border-[#2f384d] bg-white dark:bg-[#161a25] hover:border-[#c5a059] px-3.5 py-1.5 text-xs font-semibold text-[#141312] dark:text-[#f8f5ee] shadow-xs cursor-pointer transition-all"
                               >
-                                <RefreshCw size={13} />
-                                <span>Buy it again</span>
+                                <RefreshCw size={12} className="text-[#c5a059]" />
+                                <span>Re-Acquire Piece</span>
                               </button>
                             </div>
                           </div>
                         </div>
 
-                        {/* Stacked Action Column (Authentic Amazon Buttons) */}
-                        <div className="flex flex-col gap-2 w-full md:w-56 text-xs shrink-0">
+                        {/* Action Column */}
+                        <div className="flex flex-col gap-2.5 w-full md:w-60 text-xs shrink-0">
                           {/* Track Package Button */}
                           {order.status !== 'cancelled' && (
                             <Link
                               href={`/orders/${order.id}`}
-                              className="w-full rounded-md bg-[#ffd814] hover:bg-[#f7ca00] text-[#0f1111] border border-[#fcd200] py-1.5 text-center font-medium shadow-2xs transition-colors flex items-center justify-center gap-1.5"
+                              className="w-full rounded-xl bg-gradient-to-r from-[#c5a059] via-[#d6be90] to-[#b89548] text-[#12110f] py-2.5 text-center font-sans font-semibold text-xs uppercase tracking-wider shadow-sm hover:brightness-105 transition-all flex items-center justify-center gap-2"
                             >
                               <Truck size={14} />
-                              <span>Track package</span>
+                              <span>Track Armored Dispatch</span>
                             </Link>
                           )}
 
                           {/* Write a Product Review */}
                           <Link
                             href={`/product/${item.productId}`}
-                            className="w-full rounded-md bg-white hover:bg-[#f7fafa] text-[#0f1111] border border-[#d5d9d9] py-1.5 text-center font-medium shadow-2xs transition-colors flex items-center justify-center gap-1.5"
+                            className="w-full rounded-xl bg-white dark:bg-[#161a25] hover:border-[#c5a059] text-[#141312] dark:text-[#f8f5ee] border border-[#dfd6c5] dark:border-[#2f384d] py-2 text-center font-medium shadow-xs transition-colors flex items-center justify-center gap-2"
                           >
-                            <Star size={14} className="text-[#e47911]" />
-                            <span>Write a product review</span>
+                            <Star size={13} className="text-[#c5a059]" />
+                            <span>Client Appraisal &amp; Review</span>
                           </Link>
 
                           {/* Return or Replace Items */}
@@ -754,22 +752,22 @@ export default function OrdersPage() {
                             <button
                               type="button"
                               onClick={() => handleStartReturnModal(order, item)}
-                              className="w-full rounded-md bg-white hover:bg-[#f7fafa] text-[#0f1111] border border-[#d5d9d9] py-1.5 text-center font-medium shadow-2xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                              className="w-full rounded-xl bg-white dark:bg-[#161a25] hover:border-[#c5a059] text-[#786b58] dark:text-[#c4b59d] border border-[#dfd6c5] dark:border-[#2f384d] py-2 text-center font-medium shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                             >
-                              <RotateCcw size={14} />
-                              <span>Return or replace items</span>
+                              <RotateCcw size={13} className="text-[#c5a059]" />
+                              <span>Salon Exchange / Return</span>
                             </button>
                           )}
 
-                          {/* Cancel Order Option (If pending/confirmed) */}
+                          {/* Cancel Order Option */}
                           {(order.status === 'pending' || order.status === 'confirmed') && (
                             <button
                               type="button"
                               onClick={() => handleCancelOrder(order.id)}
-                              className="w-full rounded-md bg-white hover:bg-red-50 text-red-700 border border-red-300 py-1.5 text-center font-medium shadow-2xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                              className="w-full rounded-xl bg-rose-50/60 dark:bg-rose-950/30 hover:bg-rose-100 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50 py-2 text-center font-medium shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                             >
                               <X size={14} />
-                              <span>Cancel order</span>
+                              <span>Cancel Allocation</span>
                             </button>
                           )}
 
@@ -777,10 +775,10 @@ export default function OrdersPage() {
                           <button
                             type="button"
                             onClick={() => handleArchiveOrder(order.id)}
-                            className="w-full rounded-md bg-white hover:bg-[#f7fafa] text-[#565959] hover:text-[#0f1111] border border-[#d5d9d9] py-1.5 text-center font-normal shadow-2xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                            className="w-full rounded-xl text-[#8e816e] dark:text-[#7e8aa2] hover:text-[#141312] dark:hover:text-[#f8f5ee] py-1 text-center font-normal transition-colors flex items-center justify-center gap-1.5 cursor-pointer text-[11px]"
                           >
-                            <Archive size={13} />
-                            <span>{isArchived ? 'Unarchive order' : 'Archive order'}</span>
+                            <Archive size={12} />
+                            <span>{isArchived ? 'Unarchive Record' : 'Archive to Vault'}</span>
                           </button>
                         </div>
                       </div>
@@ -793,128 +791,130 @@ export default function OrdersPage() {
         )}
       </div>
 
-      {/* ── Printable Invoice Modal ── */}
+      {/* ── Atelier Certificate & Invoice Modal ── */}
       {invoiceOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-[1px] p-4 animate-in fade-in">
-          <div className="w-full max-w-2xl bg-white rounded-lg shadow-2xl overflow-hidden border border-gray-300 max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in">
+          <div className="w-full max-w-2xl bg-white dark:bg-[#12151f] rounded-3xl shadow-2xl overflow-hidden border border-[#ebe2d1] dark:border-[#262c3d] max-h-[90vh] flex flex-col text-[#141312] dark:text-[#f8f5ee]">
             {/* Modal Header */}
-            <div className="flex items-center justify-between bg-[#f0f2f2] px-6 py-4 border-b border-[#d5d9d9]">
+            <div className="flex items-center justify-between bg-[#fbfaf8] dark:bg-[#161a25] px-6 py-5 border-b border-[#f0eae0] dark:border-[#1e2433]">
               <div className="flex items-center gap-2">
-                <FileText size={20} className="text-amazon-orange" />
-                <h3 className="font-bold text-[#0f1111] text-base">Order Invoice Summary</h3>
+                <Crown size={18} className="text-[#c5a059]" />
+                <h3 className="font-serif font-medium text-base">Atelier Certificate &amp; Valuation Invoice</h3>
               </div>
               <button
                 onClick={() => setInvoiceOrder(null)}
-                className="text-gray-500 hover:text-gray-800 p-1 rounded hover:bg-gray-200 transition-colors"
+                className="text-[#9a8d7a] hover:text-[#141312] dark:hover:text-[#f8f5ee] p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               >
                 <X size={18} />
               </button>
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 overflow-y-auto space-y-6 text-xs text-[#0f1111]">
-              <div className="flex justify-between items-start border-b border-gray-200 pb-4">
+            <div className="p-6 sm:p-8 overflow-y-auto space-y-6 text-xs">
+              <div className="flex justify-between items-start border-b border-[#f0eae0] dark:border-[#1e2433] pb-5">
                 <div>
-                  <h2 className="text-lg font-extrabold text-[#0f1111] tracking-tight">
-                    amazon<span className="text-amazon-orange">.</span>clone
+                  <h2 className="font-serif text-2xl font-light tracking-[0.2em] text-[#141312] dark:text-[#f8f5ee]">
+                    VALENZA
                   </h2>
-                  <p className="text-[#565959]">Order Invoice #{invoiceOrder.id}</p>
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-[#9b8353] dark:text-[#d6be90] font-medium">
+                    Haute Maison de Luxe
+                  </p>
+                  <p className="text-[#8e816e] dark:text-[#7e8aa2] mt-2 font-mono">Allocation #{invoiceOrder.id}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-[#0f1111]">
-                    Order Date: {new Date(invoiceOrder.createdAt).toLocaleDateString()}
+                  <p className="font-semibold text-[#141312] dark:text-[#f8f5ee]">
+                    Date: {new Date(invoiceOrder.createdAt).toLocaleDateString()}
                   </p>
-                  <p className="text-[#565959]">Status: {invoiceOrder.status}</p>
+                  <p className="text-[#8e816e] dark:text-[#7e8aa2] capitalize">Status: {invoiceOrder.status}</p>
                 </div>
               </div>
 
               {/* Shipping & Payment Summary */}
-              <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-md border border-gray-200">
+              <div className="grid grid-cols-2 gap-4 bg-[#fbfaf8] dark:bg-[#161a25] p-5 rounded-2xl border border-[#ebe2d1] dark:border-[#262c3d]">
                 <div>
-                  <span className="font-bold text-[#0f1111] block mb-1">Shipping Address</span>
-                  <p>{invoiceOrder.shippingAddress.fullName}</p>
-                  <p>{invoiceOrder.shippingAddress.street}</p>
-                  <p>
+                  <span className="font-serif font-semibold text-[#9b8353] dark:text-[#d6be90] block mb-1.5">
+                    Destination Client
+                  </span>
+                  <p className="font-medium">{invoiceOrder.shippingAddress.fullName}</p>
+                  <p className="text-[#615442] dark:text-[#b8af9f]">{invoiceOrder.shippingAddress.street}</p>
+                  <p className="text-[#615442] dark:text-[#b8af9f]">
                     {invoiceOrder.shippingAddress.city}, {invoiceOrder.shippingAddress.state}{' '}
                     {invoiceOrder.shippingAddress.postalCode}
                   </p>
-                  <p>{invoiceOrder.shippingAddress.country}</p>
+                  <p className="text-[#615442] dark:text-[#b8af9f]">{invoiceOrder.shippingAddress.country}</p>
                 </div>
 
                 <div>
-                  <span className="font-bold text-[#0f1111] block mb-1">Payment Method</span>
+                  <span className="font-serif font-semibold text-[#9b8353] dark:text-[#d6be90] block mb-1.5">
+                    Settlement Protocol
+                  </span>
                   <p className="uppercase font-semibold">{invoiceOrder.paymentMethod.type}</p>
                   {invoiceOrder.paymentMethod.last4 && (
-                    <p className="text-[#565959]">Card ending in **** {invoiceOrder.paymentMethod.last4}</p>
-                  )}
-                  {invoiceOrder.paymentMethod.upiId && (
-                    <p className="text-[#565959]">UPI ID: {invoiceOrder.paymentMethod.upiId}</p>
+                    <p className="text-[#615442] dark:text-[#b8af9f]">Vault Account ending in **** {invoiceOrder.paymentMethod.last4}</p>
                   )}
                 </div>
               </div>
 
               {/* Items Table */}
               <div>
-                <span className="font-bold text-[#0f1111] block mb-2 text-sm">Order Items</span>
-                <table className="w-full text-left border border-gray-200 rounded-md overflow-hidden">
-                  <thead className="bg-[#f0f2f2] text-gray-700 font-bold">
-                    <tr>
-                      <th className="p-2.5">Item</th>
-                      <th className="p-2.5 text-center">Qty</th>
-                      <th className="p-2.5 text-right">Price</th>
-                      <th className="p-2.5 text-right">Subtotal</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {invoiceOrder.items.map((item, i) => (
-                      <tr key={i}>
-                        <td className="p-2.5 font-medium">{item.title}</td>
-                        <td className="p-2.5 text-center">{item.quantity}</td>
-                        <td className="p-2.5 text-right">{formatPrice(item.price)}</td>
-                        <td className="p-2.5 text-right font-semibold">{formatPrice(item.subtotal)}</td>
+                <span className="font-serif font-medium text-sm block mb-3">Allocated Masterpieces</span>
+                <div className="rounded-2xl border border-[#ebe2d1] dark:border-[#262c3d] overflow-hidden">
+                  <table className="w-full text-left">
+                    <thead className="bg-[#fbfaf8] dark:bg-[#161a25] text-[#786b58] dark:text-[#a09a8e] text-[11px] uppercase tracking-wider font-semibold">
+                      <tr>
+                        <th className="p-3">Piece</th>
+                        <th className="p-3 text-center">Qty</th>
+                        <th className="p-3 text-right">Valuation</th>
+                        <th className="p-3 text-right">Subtotal</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-[#ebe2d1] dark:divide-[#262c3d]">
+                      {invoiceOrder.items.map((item, i) => (
+                        <tr key={i}>
+                          <td className="p-3 font-medium">{item.title}</td>
+                          <td className="p-3 text-center">{item.quantity}</td>
+                          <td className="p-3 text-right font-serif">{formatPrice(item.price)}</td>
+                          <td className="p-3 text-right font-serif font-semibold">{formatPrice(item.subtotal)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
               {/* Totals Breakdown */}
               <div className="flex justify-end pt-2">
-                <div className="w-64 space-y-1.5 text-right border-t border-gray-200 pt-3">
-                  <div className="flex justify-between">
-                    <span className="text-[#565959]">Subtotal:</span>
-                    <span>{formatPrice(invoiceOrder.subtotal)}</span>
+                <div className="w-64 space-y-2 text-right border-t border-[#ebe2d1] dark:border-[#262c3d] pt-4">
+                  <div className="flex justify-between text-[#786b58] dark:text-[#9e978b]">
+                    <span>Atelier Subtotal:</span>
+                    <span className="font-serif font-medium text-[#141312] dark:text-[#f8f5ee]">{formatPrice(invoiceOrder.subtotal)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#565959]">Shipping:</span>
-                    <span>{formatPrice(invoiceOrder.shippingCost)}</span>
+                  <div className="flex justify-between text-[#786b58] dark:text-[#9e978b]">
+                    <span>Insured Transit:</span>
+                    <span className="font-serif font-medium text-[#141312] dark:text-[#f8f5ee]">{formatPrice(invoiceOrder.shippingCost)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#565959]">Estimated Tax:</span>
-                    <span>{formatPrice(invoiceOrder.tax)}</span>
-                  </div>
-                  <div className="flex justify-between font-bold text-sm text-[#0f1111] border-t border-gray-300 pt-2">
-                    <span>Grand Total:</span>
-                    <span className="text-[#007600]">{formatPrice(invoiceOrder.total)}</span>
+                  <div className="flex justify-between font-serif font-bold text-base text-[#141312] dark:text-[#f8f5ee] border-t border-[#ebe2d1] dark:border-[#262c3d] pt-2">
+                    <span>Grand Valuation:</span>
+                    <span className="text-[#9b8353] dark:text-[#d6be90]">{formatPrice(invoiceOrder.total)}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="bg-[#f0f2f2] px-6 py-3 border-t border-[#d5d9d9] flex justify-end gap-2">
+            <div className="bg-[#fbfaf8] dark:bg-[#161a25] px-6 py-4 border-t border-[#f0eae0] dark:border-[#1e2433] flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="px-4 py-1.5 rounded-md bg-white border border-[#d5d9d9] hover:bg-gray-100 text-xs font-semibold text-[#0f1111] flex items-center gap-1.5 cursor-pointer"
+                className="px-5 py-2 rounded-xl bg-white dark:bg-[#12151f] border border-[#dfd6c5] dark:border-[#2f384d] text-xs font-semibold hover:border-[#c5a059] flex items-center gap-2 cursor-pointer transition-colors"
               >
-                <Printer size={14} />
-                <span>Print Invoice</span>
+                <Printer size={14} className="text-[#c5a059]" />
+                <span>Print Certificate</span>
               </button>
               <button
                 type="button"
                 onClick={() => setInvoiceOrder(null)}
-                className="px-4 py-1.5 rounded-md bg-[#ffd814] hover:bg-[#f7ca00] border border-[#fcd200] text-xs font-bold text-[#0f1111] cursor-pointer"
+                className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#c5a059] to-[#b89548] text-[#12110f] text-xs font-semibold cursor-pointer shadow-sm hover:brightness-105"
               >
                 Close
               </button>
@@ -925,64 +925,64 @@ export default function OrdersPage() {
 
       {/* ── Return Request Modal ── */}
       {selectedOrderForReturn && selectedItemForReturn && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-[1px] p-4 animate-in fade-in">
-          <div className="w-full max-w-lg rounded-lg bg-white shadow-2xl overflow-hidden border border-gray-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in">
+          <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-[#12151f] shadow-2xl overflow-hidden border border-[#ebe2d1] dark:border-[#262c3d] text-[#141312] dark:text-[#f8f5ee]">
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-5 py-3.5">
-              <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
-                <RotateCcw size={16} className="text-amazon-orange" />
-                Return or Replace Item
+            <div className="flex items-center justify-between border-b border-[#f0eae0] dark:border-[#1e2433] bg-[#fbfaf8] dark:bg-[#161a25] px-6 py-5">
+              <h2 className="font-serif text-base font-medium flex items-center gap-2">
+                <RotateCcw size={16} className="text-[#c5a059]" />
+                Salon Exchange &amp; Return Request
               </h2>
               <button
                 onClick={() => {
                   setSelectedOrderForReturn(null);
                   setSelectedItemForReturn(null);
                 }}
-                className="rounded p-1 text-gray-500 hover:bg-gray-200 transition-colors"
+                className="text-[#9a8d7a] hover:text-[#141312] dark:hover:text-[#f8f5ee] p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5"
               >
                 <X size={18} />
               </button>
             </div>
 
             {/* Modal Content */}
-            <form onSubmit={handleConfirmReturn} className="p-5 space-y-4 text-xs text-gray-700">
+            <form onSubmit={handleConfirmReturn} className="p-6 space-y-5 text-xs">
               {returnError && (
-                <div className="rounded border border-red-300 bg-red-50 p-3 text-red-900 flex items-center gap-2">
-                  <AlertTriangle size={16} className="text-red-600 shrink-0" />
+                <div className="rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/40 p-3.5 text-rose-900 dark:text-rose-200 flex items-center gap-2">
+                  <AlertTriangle size={16} className="text-rose-600 shrink-0" />
                   <span>{returnError}</span>
                 </div>
               )}
 
               {/* Selected Item Preview */}
-              <div className="flex gap-3 bg-gray-50 p-3 rounded border border-gray-200 items-center">
-                <div className="relative h-14 w-14 rounded border bg-white p-1 shrink-0">
+              <div className="flex gap-4 bg-[#fbfaf8] dark:bg-[#161a25] p-4 rounded-2xl border border-[#ebe2d1] dark:border-[#262c3d] items-center">
+                <div className="relative h-16 w-16 rounded-xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white dark:bg-[#12151f] p-1 shrink-0">
                   <Image
                     src={selectedItemForReturn.image}
                     alt={selectedItemForReturn.title}
                     fill
-                    sizes="56px"
+                    sizes="64px"
                     className="object-contain"
                   />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h4 className="font-semibold text-gray-900 truncate">
+                  <h4 className="font-serif font-medium truncate">
                     {selectedItemForReturn.title}
                   </h4>
-                  <p className="text-gray-500 mt-0.5">
-                    Order #{selectedOrderForReturn.id} · Refund Value: {formatPrice(selectedItemForReturn.price * selectedItemForReturn.quantity)}
+                  <p className="text-[#786b58] dark:text-[#9e978b] mt-0.5">
+                    Allocation #{selectedOrderForReturn.id} · Valuation: <span className="font-serif font-semibold">{formatPrice(selectedItemForReturn.price * selectedItemForReturn.quantity)}</span>
                   </p>
                 </div>
               </div>
 
               {/* Select Reason */}
-              <div>
-                <label className="block font-bold text-gray-900 mb-1">
-                  Why are you returning this item?
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-[#786b58] dark:text-[#c4b59d]">
+                  Reason for Salon Consultation / Return
                 </label>
                 <select
                   value={returnReason}
                   onChange={(e) => setReturnReason(e.target.value)}
-                  className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-amazon-orange"
+                  className="w-full rounded-xl border border-[#dfd6c5] dark:border-[#2f384d] bg-white dark:bg-[#161a25] px-3.5 py-2.5 text-xs focus:outline-none focus:border-[#c5a059] focus:ring-1 focus:ring-[#c5a059]"
                 >
                   {RETURN_REASONS.map((r) => (
                     <option key={r} value={r}>
@@ -993,16 +993,16 @@ export default function OrdersPage() {
               </div>
 
               {/* Additional Comments */}
-              <div>
-                <label className="block font-bold text-gray-900 mb-1">
-                  Comments (Optional)
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-[#786b58] dark:text-[#c4b59d]">
+                  Bespoke Notes for Client Concierge (Optional)
                 </label>
                 <textarea
                   rows={3}
                   value={returnNote}
                   onChange={(e) => setReturnNote(e.target.value)}
-                  placeholder="Provide any extra details about the issue..."
-                  className="w-full rounded border border-gray-300 px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-amazon-orange"
+                  placeholder="Provide any additional details or resizing / exchange preferences..."
+                  className="w-full rounded-xl border border-[#dfd6c5] dark:border-[#2f384d] bg-white dark:bg-[#161a25] px-3.5 py-2.5 text-xs focus:outline-none focus:border-[#c5a059] focus:ring-1 focus:ring-[#c5a059]"
                 />
               </div>
 
@@ -1014,16 +1014,16 @@ export default function OrdersPage() {
                     setSelectedOrderForReturn(null);
                     setSelectedItemForReturn(null);
                   }}
-                  className="rounded border border-gray-300 bg-gray-100 px-4 py-1.5 font-semibold text-gray-700 hover:bg-gray-200 transition-colors"
+                  className="rounded-xl border border-[#dfd6c5] dark:border-[#2f384d] bg-[#fbfaf8] dark:bg-[#161a25] px-5 py-2.5 font-semibold text-[#786b58] dark:text-[#c4b59d] hover:text-[#141312] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingReturn}
-                  className="rounded bg-amazon-orange px-5 py-1.5 font-bold text-white hover:bg-amazon-orange-hover transition-colors shadow-xs"
+                  className="rounded-xl bg-gradient-to-r from-[#c5a059] to-[#b89548] px-6 py-2.5 font-semibold text-[#12110f] text-xs uppercase tracking-wider hover:brightness-105 transition-all shadow-sm cursor-pointer disabled:opacity-50"
                 >
-                  {submittingReturn ? 'Submitting...' : 'Submit Return Request'}
+                  {submittingReturn ? 'Transmitting...' : 'Submit Request'}
                 </button>
               </div>
             </form>

@@ -109,12 +109,13 @@ export default function CouponsPage() {
   }, [coupons, onlyClipped, clippedIds, activeCategory, searchQuery]);
 
   const categories = [
-    { id: 'all', name: 'Most Popular' },
-    { id: 'electronics', name: 'Electronics' },
-    { id: 'home-kitchen', name: 'Home & Kitchen' },
-    { id: 'beauty', name: 'Beauty & Personal Care' },
-    { id: 'fashion', name: 'Fashion & Apparel' },
-    { id: 'sports', name: 'Sports & Fitness' },
+    { id: 'all', name: 'Curated Salons' },
+    { id: 'electronics', name: 'Haute Horlogerie' },
+    { id: 'beauty', name: 'High Joaillerie' },
+    { id: 'fashion', name: 'Haute Couture' },
+    { id: 'home-garden', name: 'Maison Living' },
+    { id: 'computers', name: 'Sculptural Tech' },
+    { id: 'sports', name: 'Grand Tourisme' },
   ];
 
   return (

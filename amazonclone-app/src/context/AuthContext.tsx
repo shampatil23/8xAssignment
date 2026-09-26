@@ -59,9 +59,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               // Always fetch profile from RTDB — role comes from the database, not the client
               const profile = await getUserProfile(fbUser.uid);
               if (profile) {
-                setUser(profileToAppUser(profile));
+                const appUser = profileToAppUser(profile);
+                // If RTDB profile has no displayName, fall back to Firebase Auth displayName
+                if (!appUser.displayName && fbUser.displayName) {
+                  appUser.displayName = fbUser.displayName;
+                }
+                setUser(appUser);
               } else {
-                // Profile missing (e.g. old test account) — use safe defaults
+                // Profile missing (e.g. old test account) — use safe defaults from Firebase Auth
                 setUser({
                   uid: fbUser.uid,
                   email: fbUser.email,
@@ -76,8 +81,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 });
               }
             } catch (profileErr) {
-              console.error('[AuthContext] profile fetch failed:', profileErr);
-              setUser(null);
+              console.error('[AuthContext] profile fetch failed, using Firebase Auth fallback:', profileErr);
+              // On error, still show the user as logged in using their Firebase Auth data
+              setUser({
+                uid: fbUser.uid,
+                email: fbUser.email,
+                displayName: fbUser.displayName,
+                photoURL: fbUser.photoURL,
+                phoneNumber: null,
+                emailVerified: fbUser.emailVerified,
+                role: 'customer',
+                addresses: [],
+                createdAt: fbUser.metadata.creationTime ?? new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              });
             }
           } else {
             if (typeof document !== 'undefined') {

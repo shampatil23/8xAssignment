@@ -1,0 +1,19 @@
+{
+  "agent-log-sync": {
+    "enabled": true,
+    "Stop": [
+      {
+        "type": "command",
+        "command": "python -c \"import os, subprocess, sys; script = os.path.abspath(r'.agent-logs/sync.py') if os.path.exists(r'.agent-logs/sync.py') else os.path.abspath(r'../.agent-logs/sync.py'); sys.exit(subprocess.call([sys.executable, script, '--hook']))\"",
+        "timeout": 30
+      }
+    ],
+    "PostInvocation": [
+      {
+        "type": "command",
+        "command": "python -c \"import os, subprocess, sys; script = os.path.abspath(r'.agent-logs/sync.py') if os.path.exists(r'.agent-logs/sync.py') else os.path.abspath(r'../.agent-logs/sync.py'); sys.exit(subprocess.call([sys.executable, script, '--hook']))\"",
+        "timeout": 30
+      }
+    ]
+  }
+}

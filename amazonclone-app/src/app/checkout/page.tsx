@@ -1,7 +1,7 @@
 'use client';
 // ============================================================================
 // Checkout Page — /checkout
-// Amazon-style 2-Column Accordion: Address → Delivery → Payment → Review
+// Valenza Maison Haute Horlogerie & Joaillerie Private Settlement Portal
 // ============================================================================
 import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
@@ -21,16 +21,18 @@ import {
   RotateCcw,
   Check,
   Star,
+  Crown,
+  ShoppingBag,
 } from 'lucide-react';
 import { getRecommendationsForHome } from '@/services/recommendationService';
 import type { Product } from '@/types';
-import { Button } from '@/components/ui/Button';
 import { AddressManager } from '@/components/checkout/AddressManager';
 import { DeliveryOptions } from '@/components/checkout/DeliveryOptions';
 import { PaymentMethodSelector } from '@/components/checkout/PaymentMethodSelector';
 import { CheckoutSummary } from '@/components/checkout/CheckoutSummary';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/context/CartContext';
+import { useLocation } from '@/context/LocationContext';
 import {
   fetchAddresses,
   addAddress,
@@ -41,8 +43,8 @@ import {
   DEFAULT_SHIPPING_OPTIONS,
   calculateCheckoutTotals,
   placeOrder,
-  validateOrderPlacement,
 } from '@/services/checkoutService';
+import { formatPrice } from '@/lib/utils';
 import type { Address, PaymentMethod, ShippingOption, Order } from '@/types';
 
 type CheckoutStep = 'address' | 'delivery' | 'payment' | 'review';
@@ -50,7 +52,8 @@ type CheckoutStep = 'address' | 'delivery' | 'payment' | 'review';
 export default function CheckoutPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const { cart, items, subtotal, itemCount, clearCart } = useCart();
+  const { cart, items, subtotal, itemCount, clearCart, appliedPromoCode, appliedDiscountPercent } = useCart();
+  const { country } = useLocation();
 
   // Saved addresses state
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -66,7 +69,7 @@ export default function CheckoutPage() {
     type: 'card',
     brand: 'Visa',
     last4: '4242',
-    cardHolder: user?.displayName || 'Customer',
+    cardHolder: user?.displayName || 'Privé Client',
   });
 
   // Submission & Confirmation state
@@ -97,11 +100,9 @@ export default function CheckoutPage() {
         if (!isMounted) return;
 
         setAddresses(list);
-        // Default selected address: either isDefault or first one
         const defaultAddr = list.find((a) => a.isDefault) || list[0] || null;
         setSelectedAddress(defaultAddr);
 
-        // If addresses already exist, we can start with review or address collapsed
         if (defaultAddr) {
           setActiveStep('delivery');
         }
@@ -123,32 +124,34 @@ export default function CheckoutPage() {
 
   // Financial totals calculation
   const totals = useMemo(() => {
-    return calculateCheckoutTotals(cart, selectedShipping);
-  }, [cart, selectedShipping]);
+    const discount = appliedPromoCode ? (subtotal * appliedDiscountPercent) / 100 : 0;
+    return calculateCheckoutTotals(cart, selectedShipping, discount);
+  }, [cart, selectedShipping, appliedPromoCode, appliedDiscountPercent, subtotal]);
 
   // Auth Protection check
   if (!authLoading && !user && !confirmedOrder) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-        <div className="max-w-md w-full rounded-xl border border-gray-200 bg-white p-8 shadow-xs text-center">
-          <div className="h-16 w-16 rounded-full bg-amber-50 text-amazon-orange flex items-center justify-center mx-auto mb-4">
-            <Lock size={32} />
+      <div className="min-h-screen bg-[#faf9f6] dark:bg-[#0b0c10] flex flex-col items-center justify-center p-4 text-[#141312] dark:text-[#f8f5ee]">
+        <div className="max-w-md w-full rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 p-8 shadow-[0_12px_40px_rgba(26,23,20,0.06)] dark:shadow-[0_16px_45px_rgba(0,0,0,0.6)] text-center">
+          <div className="h-16 w-16 rounded-full border border-[#d6be90] dark:border-[#c5a059]/40 bg-[#fbfaf8] dark:bg-[#161a25] text-[#c5a059] flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <Lock size={28} />
           </div>
-          <h1 className="text-xl font-bold text-gray-900 mb-2">
-            Sign in to continue checkout
+          <span className="text-[10px] uppercase font-semibold tracking-[0.25em] text-[#9b8353] dark:text-[#d6be90] block mb-1">
+            Private Client Portal
+          </span>
+          <h1 className="font-serif text-2xl font-light mb-2">
+            Sign In to Complete Settlement
           </h1>
-          <p className="text-xs text-gray-600 mb-6 leading-relaxed">
-            Please sign in to access your saved delivery addresses, payment methods, and review your order.
+          <p className="text-xs text-[#786b58] dark:text-[#9e978b] mb-6 leading-relaxed">
+            Please authenticate to access your saved destination residences, private settlement protocols, and confirm your acquisition.
           </p>
-          <Button
+          <button
             type="button"
-            variant="buy-now"
-            fullWidth
             onClick={() => router.push('/auth/sign-in?redirect=/checkout')}
-            className="py-2.5 font-bold"
+            className="w-full py-3.5 rounded-xl font-sans text-xs uppercase tracking-[0.18em] font-semibold text-[#12110f] bg-gradient-to-r from-[#c5a059] via-[#d6be90] to-[#b89548] hover:brightness-105 shadow-md cursor-pointer transition-all"
           >
-            Sign in to your account
-          </Button>
+            Access Client Account
+          </button>
         </div>
       </div>
     );
@@ -161,37 +164,29 @@ export default function CheckoutPage() {
     if (res.success && res.data) {
       setAddresses((prev) => [...prev, res.data!]);
       setSelectedAddress(res.data);
-      setActiveStep('delivery');
-      return true;
-    } else {
-      setOrderError(res.error || 'Failed to add address');
-      return false;
-    }
-  };
-
-  const handleUpdateAddress = async (address: Address) => {
-    if (!user) return false;
-    const res = await updateAddress(user.uid, address);
-    if (res.success) {
-      setAddresses((prev) =>
-        prev.map((a) => (a.id === address.id ? address : a)),
-      );
-      if (selectedAddress?.id === address.id) {
-        setSelectedAddress(address);
-      }
       return true;
     }
     return false;
   };
 
-  const handleDeleteAddress = async (addressId: string) => {
+  const handleUpdateAddress = async (addr: Address) => {
     if (!user) return false;
-    const res = await removeAddress(user.uid, addressId);
+    const res = await updateAddress(user.uid, addr);
+    if (res.success && res.data) {
+      setAddresses((prev) => prev.map((a) => (a.id === addr.id ? res.data! : a)));
+      if (selectedAddress?.id === addr.id) setSelectedAddress(res.data);
+      return true;
+    }
+    return false;
+  };
+
+  const handleDeleteAddress = async (id: string) => {
+    if (!user) return false;
+    const res = await removeAddress(user.uid, id);
     if (res.success) {
-      setAddresses((prev) => prev.filter((a) => a.id !== addressId));
-      if (selectedAddress?.id === addressId) {
-        const remaining = addresses.filter((a) => a.id !== addressId);
-        setSelectedAddress(remaining[0] || null);
+      setAddresses((prev) => prev.filter((a) => a.id !== id));
+      if (selectedAddress?.id === id) {
+        setSelectedAddress(addresses.find((a) => a.id !== id) || null);
       }
       return true;
     }
@@ -203,7 +198,7 @@ export default function CheckoutPage() {
     setOrderError(null);
 
     if (!user || !cart || !selectedAddress) {
-      setOrderError('Please select a delivery address to proceed.');
+      setOrderError('Please select a destination residence to proceed.');
       setActiveStep('address');
       return;
     }
@@ -235,115 +230,115 @@ export default function CheckoutPage() {
   // ── Success / Order Confirmation View ──
   if (confirmedOrder) {
     return (
-      <div className="min-h-screen bg-gray-100/60 pb-16">
-        {/* Minimal Checkout Header */}
-        <header className="bg-amazon-dark border-b border-gray-700 py-3 px-4 shadow-sm">
+      <div className="min-h-screen bg-[#faf9f6] dark:bg-[#0b0c10] pb-20 text-[#141312] dark:text-[#f8f5ee]">
+        {/* Luxury Checkout Header */}
+        <header className="bg-white/95 dark:bg-[#12151f]/95 border-b border-[#ebe2d1] dark:border-[#262c3d] py-4 px-6 backdrop-blur-md sticky top-0 z-30 shadow-xs">
           <div className="mx-auto max-w-screen-xl flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-1">
-              <span className="font-extrabold text-white text-xl tracking-tight leading-none">
-                amazon<span className="text-amazon-orange">.</span>
-                <span className="text-xs align-super">clone</span>
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full border border-[#d6be90] dark:border-[#c5a059]/40 bg-[#ffffff] dark:bg-[#161a25] flex items-center justify-center">
+                <span className="font-serif text-sm font-bold text-[#9b8353] dark:text-[#d6be90]">V</span>
+              </div>
+              <span className="font-serif text-lg font-light tracking-[0.2em] text-[#141312] dark:text-[#f8f5ee]">
+                VALENZA
               </span>
             </Link>
-            <div className="flex items-center gap-1.5 text-white text-sm font-semibold">
-              <ShieldCheck size={18} className="text-green-400" />
-              <span>Order Confirmed</span>
+            <div className="flex items-center gap-2 text-xs uppercase tracking-widest font-semibold text-[#9b8353] dark:text-[#d6be90]">
+              <ShieldCheck size={16} className="text-[#c5a059]" />
+              <span>Allocation Confirmed</span>
             </div>
           </div>
         </header>
 
-        <main className="mx-auto max-w-screen-lg px-4 py-8">
-          <div className="rounded-xl border border-gray-200 bg-white p-6 md:p-8 shadow-xs">
-            {/* Green confirmation banner */}
-            <div className="flex items-start gap-4 border-b border-gray-200 pb-6">
-              <div className="rounded-full bg-green-100 p-2 text-green-700 mt-1">
-                <CheckCircle2 size={32} />
+        <main className="mx-auto max-w-screen-lg px-4 sm:px-6 py-10">
+          <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 p-8 md:p-10 shadow-[0_15px_40px_rgba(26,23,20,0.06)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+            {/* Confirmation Banner */}
+            <div className="flex items-start gap-5 border-b border-[#f0eae0] dark:border-[#1e2433] pb-8">
+              <div className="rounded-2xl bg-[#f6efe1] dark:bg-[#1a2130] p-3.5 text-[#c5a059] border border-[#e4d6bf] dark:border-[#2f384d] mt-1 shadow-sm">
+                <CheckCircle2 size={36} />
               </div>
-              <div className="space-y-1">
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Order placed, thank you!
+              <div className="space-y-1.5">
+                <span className="text-[10px] uppercase font-semibold tracking-[0.25em] text-[#9b8353] dark:text-[#d6be90]">
+                  Valenza Maison Privée
+                </span>
+                <h1 className="font-serif text-2xl sm:text-3xl font-light tracking-tight text-[#141312] dark:text-[#f8f5ee]">
+                  Acquisition Confirmed, Welcome.
                 </h1>
-                <p className="text-xs text-gray-600">
-                  Confirmation has been sent to{' '}
-                  <strong className="text-gray-900">{user?.email}</strong>.
+                <p className="text-xs text-[#786b58] dark:text-[#9e978b] leading-relaxed">
+                  Confidential certificate of acquisition and courier tracking dispatched to{' '}
+                  <strong className="text-[#141312] dark:text-[#f8f5ee]">{user?.email}</strong>.
                 </p>
-                <p className="text-xs text-gray-500 pt-1">
-                  Order ID: <strong className="text-gray-900 font-mono">{confirmedOrder.id}</strong>
+                <p className="text-xs text-[#8e816e] dark:text-[#7e8aa2] pt-1 font-mono">
+                  Allocation ID: <strong className="text-[#141312] dark:text-[#f8f5ee]">{confirmedOrder.id}</strong>
                 </p>
               </div>
             </div>
 
             {/* Delivery & Address Summary Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-6 border-b border-gray-200 text-xs">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8 border-b border-[#f0eae0] dark:border-[#1e2433] text-xs">
               <div>
-                <h3 className="font-bold text-gray-900 uppercase text-[11px] mb-2 text-gray-500">
-                  Shipping Address
+                <h3 className="font-serif font-semibold text-[#9b8353] dark:text-[#d6be90] mb-2">
+                  Destination Residence
                 </h3>
-                <p className="font-bold text-gray-900">{confirmedOrder.shippingAddress.fullName}</p>
-                <p className="text-gray-700">{confirmedOrder.shippingAddress.street}</p>
-                <p className="text-gray-700">
+                <p className="font-semibold">{confirmedOrder.shippingAddress.fullName}</p>
+                <p className="text-[#615442] dark:text-[#b8af9f]">{confirmedOrder.shippingAddress.street}</p>
+                <p className="text-[#615442] dark:text-[#b8af9f]">
                   {confirmedOrder.shippingAddress.city}, {confirmedOrder.shippingAddress.state}{' '}
                   {confirmedOrder.shippingAddress.postalCode}
                 </p>
-                <p className="text-gray-700">{confirmedOrder.shippingAddress.country}</p>
+                <p className="text-[#615442] dark:text-[#b8af9f]">{confirmedOrder.shippingAddress.country}</p>
               </div>
 
               <div>
-                <h3 className="font-bold text-gray-900 uppercase text-[11px] mb-2 text-gray-500">
-                  Payment Method
+                <h3 className="font-serif font-semibold text-[#9b8353] dark:text-[#d6be90] mb-2">
+                  Settlement Protocol
                 </h3>
-                <p className="font-bold text-gray-900 capitalize">
+                <p className="font-semibold capitalize">
                   {confirmedOrder.paymentMethod.type}
                 </p>
                 {confirmedOrder.paymentMethod.type === 'card' && (
-                  <p className="text-gray-700">
-                    {confirmedOrder.paymentMethod.brand} ending in {confirmedOrder.paymentMethod.last4}
-                  </p>
-                )}
-                {confirmedOrder.paymentMethod.type === 'razorpay' && (
-                  <p className="text-gray-700">
-                    Razorpay Test Mode ({confirmedOrder.paymentMethod.razorpayPaymentId || 'Authorized'})
+                  <p className="text-[#615442] dark:text-[#b8af9f]">
+                    Vault Account ending in {confirmedOrder.paymentMethod.last4}
                   </p>
                 )}
                 {confirmedOrder.paymentMethod.type === 'upi' && (
-                  <p className="text-gray-700">UPI: {confirmedOrder.paymentMethod.upiId}</p>
+                  <p className="text-[#615442] dark:text-[#b8af9f]">UPI ID: {confirmedOrder.paymentMethod.upiId}</p>
                 )}
                 {confirmedOrder.paymentMethod.type === 'cod' && (
-                  <p className="text-gray-700">Pay on Delivery</p>
+                  <p className="text-[#615442] dark:text-[#b8af9f]">Vault Concierge Settlement</p>
                 )}
               </div>
 
               <div>
-                <h3 className="font-bold text-gray-900 uppercase text-[11px] mb-2 text-gray-500">
-                  Order Summary
+                <h3 className="font-serif font-semibold text-[#9b8353] dark:text-[#d6be90] mb-2">
+                  Valuation Breakdown
                 </h3>
-                <div className="space-y-1 text-gray-700">
+                <div className="space-y-1.5 text-[#615442] dark:text-[#b8af9f]">
                   <div className="flex justify-between">
-                    <span>Items Subtotal:</span>
-                    <span>${confirmedOrder.subtotal.toFixed(2)}</span>
+                    <span>Pieces Subtotal:</span>
+                    <span className="font-serif font-medium text-[#141312] dark:text-[#f8f5ee]">{formatPrice(confirmedOrder.subtotal)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Shipping:</span>
-                    <span>${confirmedOrder.shippingCost.toFixed(2)}</span>
+                    <span>Insured Transit:</span>
+                    <span className="font-serif font-medium text-[#141312] dark:text-[#f8f5ee]">{formatPrice(confirmedOrder.shippingCost)}</span>
                   </div>
-                  <div className="flex justify-between font-bold text-gray-900 border-t pt-1 text-sm">
-                    <span>Total Paid:</span>
-                    <span className="text-[#b12704]">${confirmedOrder.total.toFixed(2)}</span>
+                  <div className="flex justify-between font-serif font-bold text-sm text-[#141312] dark:text-[#f8f5ee] border-t border-[#f0eae0] dark:border-[#1e2433] pt-2">
+                    <span>Grand Valuation:</span>
+                    <span className="text-[#9b8353] dark:text-[#d6be90]">{formatPrice(confirmedOrder.total)}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Purchased Items Recap */}
-            <div className="py-6">
-              <h3 className="font-bold text-gray-900 text-sm mb-4">
-                Items in this shipment ({confirmedOrder.items.length})
+            <div className="py-8">
+              <h3 className="font-serif font-medium text-base mb-5">
+                Allocated Masterpieces ({confirmedOrder.items.length})
               </h3>
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-[#f0eae0] dark:divide-[#1e2433]">
                 {confirmedOrder.items.map((item, idx) => (
-                  <div key={idx} className="py-3 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="relative h-16 w-16 rounded border bg-white p-1 flex-shrink-0">
+                  <div key={idx} className="py-4 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="relative h-16 w-16 rounded-2xl border border-[#ebe2d1] dark:border-[#262c3d] bg-[#fbfaf8] dark:bg-[#161a25] p-1.5 flex-shrink-0">
                         <Image
                           src={item.image}
                           alt={item.title}
@@ -353,16 +348,16 @@ export default function CheckoutPage() {
                         />
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-gray-900 line-clamp-1 max-w-md">
+                        <p className="font-serif text-xs font-medium line-clamp-1 max-w-md">
                           {item.title}
                         </p>
-                        <p className="text-[11px] text-gray-500 mt-0.5">
+                        <p className="text-[11px] text-[#786b58] dark:text-[#9e978b] mt-0.5">
                           Quantity: {item.quantity}
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold text-gray-900">
-                      ${item.subtotal.toFixed(2)}
+                    <span className="font-serif font-semibold text-sm">
+                      {formatPrice(item.subtotal)}
                     </span>
                   </div>
                 ))}
@@ -370,69 +365,22 @@ export default function CheckoutPage() {
             </div>
 
             {/* Actions CTA */}
-            <div className="pt-4 border-t border-gray-200 flex flex-col sm:flex-row gap-3">
-              <Button
+            <div className="pt-6 border-t border-[#f0eae0] dark:border-[#1e2433] flex flex-col sm:flex-row gap-4">
+              <button
                 type="button"
-                variant="cart"
                 onClick={() => router.push('/')}
-                className="font-bold"
+                className="px-6 py-3 rounded-xl font-sans text-xs uppercase tracking-[0.16em] font-semibold text-[#12110f] bg-gradient-to-r from-[#c5a059] to-[#b89548] hover:brightness-105 shadow-md cursor-pointer transition-all"
               >
-                Continue Shopping
-              </Button>
-              <Button
+                Continue Exploring Salons
+              </button>
+              <button
                 type="button"
-                variant="secondary"
                 onClick={() => router.push(`/orders/${confirmedOrder.id}`)}
-                className="font-bold"
+                className="px-6 py-3 rounded-xl font-sans text-xs uppercase tracking-[0.16em] font-semibold text-[#786b58] dark:text-[#c4b59d] border border-[#dfd6c5] dark:border-[#2f384d] hover:border-[#c5a059] cursor-pointer transition-all"
               >
-                View Order &amp; Returns
-              </Button>
+                View Allocation Dossier
+              </button>
             </div>
-
-            {/* Recommendations Strip */}
-            {confirmationRecs.length > 0 && (
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <h3 className="font-bold text-gray-900 text-sm mb-4">
-                  Recommended based on your purchase
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  {confirmationRecs.map((p) => {
-                    const img =
-                      p.images?.[0]?.url ||
-                      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300';
-                    return (
-                      <Link
-                        key={p.id}
-                        href={`/product/${p.slug}`}
-                        className="group flex flex-col justify-between rounded-lg border border-gray-200 p-3 hover:border-gray-300 hover:shadow-xs transition-all bg-white"
-                      >
-                        <div>
-                          <div className="relative h-24 w-full rounded bg-white overflow-hidden mb-2">
-                            <Image
-                              src={img}
-                              alt={p.title}
-                              fill
-                              sizes="120px"
-                              className="object-contain p-1 group-hover:scale-105 transition-transform"
-                            />
-                          </div>
-                          <h4 className="text-xs font-medium text-amazon-link group-hover:underline line-clamp-2">
-                            {p.title}
-                          </h4>
-                          <div className="mt-1 flex items-center gap-1 text-xs text-amber-500">
-                            <Star size={11} className="fill-amber-400 text-amber-400" />
-                            <span className="text-gray-700 font-bold">{p.rating.toFixed(1)}</span>
-                          </div>
-                        </div>
-                        <div className="mt-2 pt-1 border-t border-gray-100 text-xs font-bold text-gray-900">
-                          ${p.price.toFixed(2)}
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
           </div>
         </main>
       </div>
@@ -442,66 +390,71 @@ export default function CheckoutPage() {
   // ── Empty Cart State during Checkout ──
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-        <div className="max-w-md w-full rounded-xl border border-gray-200 bg-white p-8 shadow-xs text-center">
-          <div className="h-16 w-16 rounded-full bg-amber-50 text-amazon-orange flex items-center justify-center mx-auto mb-4">
-            <ShoppingCart size={32} />
+      <div className="min-h-screen bg-[#faf9f6] dark:bg-[#0b0c10] flex flex-col items-center justify-center p-4 text-[#141312] dark:text-[#f8f5ee]">
+        <div className="max-w-md w-full rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 p-8 shadow-[0_12px_40px_rgba(26,23,20,0.06)] dark:shadow-[0_16px_45px_rgba(0,0,0,0.6)] text-center">
+          <div className="h-16 w-16 rounded-full border border-[#d6be90] dark:border-[#c5a059]/40 bg-[#fbfaf8] dark:bg-[#161a25] text-[#c5a059] flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <ShoppingBag size={28} />
           </div>
-          <h1 className="text-xl font-bold text-gray-900 mb-2">
-            Your Cart is empty
+          <h1 className="font-serif text-2xl font-light mb-2">
+            Acquisition Bag is Empty
           </h1>
-          <p className="text-xs text-gray-600 mb-6">
-            There are no items in your shopping cart to checkout.
+          <p className="text-xs text-[#786b58] dark:text-[#9e978b] mb-6">
+            There are no reserved pieces in your bag ready for settlement.
           </p>
-          <Button
+          <button
             type="button"
-            variant="cart"
-            fullWidth
             onClick={() => router.push('/')}
-            className="font-bold"
+            className="w-full py-3.5 rounded-xl font-sans text-xs uppercase tracking-[0.18em] font-semibold text-[#12110f] bg-gradient-to-r from-[#c5a059] to-[#b89548] hover:brightness-105 shadow-md cursor-pointer transition-all"
           >
-            Start Shopping
-          </Button>
+            Explore Maison Salons
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100/60 pb-20">
-      {/* ── Minimalist Amazon Checkout Header ── */}
-      <header className="bg-amazon-dark border-b border-gray-700 py-3 px-4 shadow-sm sticky top-0 z-30">
+    <div className="min-h-screen bg-[#faf9f6] dark:bg-[#0b0c10] pb-24 text-[#141312] dark:text-[#f8f5ee]">
+      {/* ── Luxury Checkout Header ── */}
+      <header className="bg-white/95 dark:bg-[#12151f]/95 border-b border-[#ebe2d1] dark:border-[#262c3d] py-4 px-6 backdrop-blur-md sticky top-0 z-30 shadow-xs">
         <div className="mx-auto max-w-screen-xl flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-1">
-            <span className="font-extrabold text-white text-xl tracking-tight leading-none">
-              amazon<span className="text-amazon-orange">.</span>
-              <span className="text-xs align-super">clone</span>
-            </span>
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full border border-[#d6be90] dark:border-[#c5a059]/40 bg-[#ffffff] dark:bg-[#161a25] flex items-center justify-center shadow-xs">
+              <span className="font-serif text-sm font-bold text-[#9b8353] dark:text-[#d6be90]">V</span>
+            </div>
+            <div>
+              <span className="font-serif text-lg font-light tracking-[0.2em] text-[#141312] dark:text-[#f8f5ee] block leading-none">
+                VALENZA
+              </span>
+              <span className="text-[8px] uppercase tracking-[0.3em] text-[#9b8353] dark:text-[#c5a059] font-medium">
+                Haute Maison
+              </span>
+            </div>
           </Link>
 
-          <div className="flex items-center gap-1 text-white text-sm md:text-base font-semibold">
-            <Lock size={16} className="text-gray-300" />
-            <span>Secure checkout</span>
+          <div className="flex items-center gap-2 text-xs uppercase tracking-widest font-semibold text-[#786b58] dark:text-[#c4b59d]">
+            <Lock size={14} className="text-[#c5a059]" />
+            <span>Encrypted Settlement Portal</span>
           </div>
 
           <Link
             href="/cart"
-            className="flex items-center gap-1 text-white text-xs font-semibold hover:text-amazon-orange transition-colors"
+            className="flex items-center gap-2 text-xs uppercase tracking-wider font-semibold text-[#9b8353] dark:text-[#d6be90] hover:underline transition-colors"
           >
-            <ShoppingCart size={20} />
-            <span className="hidden sm:inline">Cart ({itemCount})</span>
+            <ShoppingBag size={18} />
+            <span className="hidden sm:inline">Bag ({itemCount})</span>
           </Link>
         </div>
       </header>
 
       {/* ── Main Checkout Container ── */}
-      <main className="mx-auto max-w-screen-xl px-4 py-6">
+      <main className="mx-auto max-w-screen-xl px-4 sm:px-6 py-8">
         {/* Error Alert */}
         {orderError && (
-          <div className="mb-6 flex items-start gap-3 rounded-lg bg-red-50 p-4 text-xs text-red-800 border border-red-200">
-            <AlertTriangle size={18} className="text-red-600 flex-shrink-0 mt-0.5" />
+          <div className="mb-8 flex items-start gap-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 p-4 text-xs text-rose-900 dark:text-rose-200 border border-rose-200 dark:border-rose-900/50">
+            <AlertTriangle size={18} className="text-rose-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="font-bold">Please check your order details</p>
+              <p className="font-semibold uppercase tracking-wider">Settlement Verification Required</p>
               <p className="mt-0.5">{orderError}</p>
             </div>
           </div>
@@ -509,22 +462,23 @@ export default function CheckoutPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* ── Left Column: Checkout Accordion Steps (8 cols) ── */}
-          <div className="lg:col-span-8 space-y-4">
+          <div className="lg:col-span-8 space-y-6">
+            
             {/* ── STEP 1: Delivery Address ── */}
             <section
               aria-labelledby="step-address-heading"
-              className="rounded-lg border border-gray-300 bg-white p-5 shadow-xs"
+              className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 p-6 sm:p-7 shadow-[0_12px_40px_rgba(26,23,20,0.04)] dark:shadow-[0_16px_45px_rgba(0,0,0,0.6)]"
             >
-              <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amazon-dark text-xs font-bold text-white">
+              <div className="flex items-center justify-between border-b border-[#f0eae0] dark:border-[#1e2433] pb-4 mb-5">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#141312] dark:bg-[#1f2533] border border-[#c5a059]/40 text-xs font-serif font-bold text-[#d6be90]">
                     1
                   </span>
                   <h2
                     id="step-address-heading"
-                    className="text-base font-bold text-gray-900"
+                    className="font-serif text-base font-medium text-[#141312] dark:text-[#f8f5ee]"
                   >
-                    Delivery address
+                    Destination Residence &amp; Client Protocol
                   </h2>
                 </div>
 
@@ -532,9 +486,9 @@ export default function CheckoutPage() {
                   <button
                     type="button"
                     onClick={() => setActiveStep('address')}
-                    className="text-xs font-semibold text-amazon-link hover:underline cursor-pointer"
+                    className="text-xs uppercase tracking-wider font-semibold text-[#9b8353] dark:text-[#d6be90] hover:underline cursor-pointer"
                   >
-                    Change
+                    Modify
                   </button>
                 )}
               </div>
@@ -554,22 +508,21 @@ export default function CheckoutPage() {
                   />
 
                   {selectedAddress && (
-                    <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end">
-                      <Button
+                    <div className="mt-5 pt-4 border-t border-[#f0eae0] dark:border-[#1e2433] flex justify-end">
+                      <button
                         type="button"
-                        variant="buy-now"
                         onClick={() => setActiveStep('delivery')}
-                        className="px-6 py-2 text-xs font-bold"
+                        className="px-6 py-2.5 rounded-xl font-sans text-xs uppercase tracking-wider font-semibold text-[#12110f] bg-gradient-to-r from-[#c5a059] to-[#b89548] hover:brightness-105 shadow-sm cursor-pointer"
                       >
-                        Use this address
-                      </Button>
+                        Confirm Destination
+                      </button>
                     </div>
                   )}
                 </div>
               ) : (
                 selectedAddress && (
-                  <div className="pl-8 text-xs text-gray-700 leading-relaxed">
-                    <p className="font-bold text-gray-900">
+                  <div className="pl-10 text-xs text-[#615442] dark:text-[#b8af9f] leading-relaxed">
+                    <p className="font-semibold text-[#141312] dark:text-[#f8f5ee]">
                       {selectedAddress.fullName}
                     </p>
                     <p>{selectedAddress.street}</p>
@@ -578,7 +531,7 @@ export default function CheckoutPage() {
                       {selectedAddress.postalCode}
                     </p>
                     <p>{selectedAddress.country}</p>
-                    <p className="text-gray-500 mt-1">Phone: {selectedAddress.phone}</p>
+                    <p className="text-[#8e816e] dark:text-[#7e8aa2] mt-1">Secure Line: {selectedAddress.phone}</p>
                   </div>
                 )
               )}
@@ -587,18 +540,18 @@ export default function CheckoutPage() {
             {/* ── STEP 2: Delivery Speed / Shipping Option ── */}
             <section
               aria-labelledby="step-shipping-heading"
-              className="rounded-lg border border-gray-300 bg-white p-5 shadow-xs"
+              className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 p-6 sm:p-7 shadow-[0_12px_40px_rgba(26,23,20,0.04)] dark:shadow-[0_16px_45px_rgba(0,0,0,0.6)]"
             >
-              <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amazon-dark text-xs font-bold text-white">
+              <div className="flex items-center justify-between border-b border-[#f0eae0] dark:border-[#1e2433] pb-4 mb-5">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#141312] dark:bg-[#1f2533] border border-[#c5a059]/40 text-xs font-serif font-bold text-[#d6be90]">
                     2
                   </span>
                   <h2
                     id="step-shipping-heading"
-                    className="text-base font-bold text-gray-900"
+                    className="font-serif text-base font-medium text-[#141312] dark:text-[#f8f5ee]"
                   >
-                    Delivery options
+                    White-Glove Armored Courier &amp; Dispatch Speed
                   </h2>
                 </div>
 
@@ -606,9 +559,9 @@ export default function CheckoutPage() {
                   <button
                     type="button"
                     onClick={() => setActiveStep('delivery')}
-                    className="text-xs font-semibold text-amazon-link hover:underline cursor-pointer"
+                    className="text-xs uppercase tracking-wider font-semibold text-[#9b8353] dark:text-[#d6be90] hover:underline cursor-pointer"
                   >
-                    Change
+                    Modify
                   </button>
                 )}
               </div>
@@ -621,31 +574,30 @@ export default function CheckoutPage() {
                     subtotal={subtotal}
                   />
 
-                  <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end">
-                    <Button
+                  <div className="mt-5 pt-4 border-t border-[#f0eae0] dark:border-[#1e2433] flex justify-end">
+                    <button
                       type="button"
-                      variant="buy-now"
                       onClick={() => setActiveStep('payment')}
-                      className="px-6 py-2 text-xs font-bold"
+                      className="px-6 py-2.5 rounded-xl font-sans text-xs uppercase tracking-wider font-semibold text-[#12110f] bg-gradient-to-r from-[#c5a059] to-[#b89548] hover:brightness-105 shadow-sm cursor-pointer"
                     >
-                      Continue to payment
-                    </Button>
+                      Proceed to Settlement Protocol
+                    </button>
                   </div>
                 </div>
               ) : (
-                <div className="pl-8 text-xs text-gray-700">
+                <div className="pl-10 text-xs text-[#615442] dark:text-[#b8af9f]">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-gray-900">
+                    <span className="font-serif font-semibold text-[#141312] dark:text-[#f8f5ee]">
                       {selectedShipping.title}
                     </span>
-                    <span className="text-green-700 font-semibold">
+                    <span className="text-emerald-700 dark:text-emerald-400 font-semibold">
                       ({selectedShipping.estimatedDate})
                     </span>
                   </div>
-                  <p className="text-gray-500 text-[11px] mt-0.5">
+                  <p className="text-[#8e816e] dark:text-[#7e8aa2] text-[11px] mt-0.5">
                     {totals.shippingCost === 0
-                      ? 'FREE Shipping'
-                      : `$${totals.shippingCost.toFixed(2)} delivery charge`}
+                      ? 'Complimentary Insured White-Glove Transit'
+                      : `$${totals.shippingCost.toFixed(2)} Armored Dispatch`}
                   </p>
                 </div>
               )}
@@ -654,18 +606,18 @@ export default function CheckoutPage() {
             {/* ── STEP 3: Payment Method ── */}
             <section
               aria-labelledby="step-payment-heading"
-              className="rounded-lg border border-gray-300 bg-white p-5 shadow-xs"
+              className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 p-6 sm:p-7 shadow-[0_12px_40px_rgba(26,23,20,0.04)] dark:shadow-[0_16px_45px_rgba(0,0,0,0.6)]"
             >
-              <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amazon-dark text-xs font-bold text-white">
+              <div className="flex items-center justify-between border-b border-[#f0eae0] dark:border-[#1e2433] pb-4 mb-5">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#141312] dark:bg-[#1f2533] border border-[#c5a059]/40 text-xs font-serif font-bold text-[#d6be90]">
                     3
                   </span>
                   <h2
                     id="step-payment-heading"
-                    className="text-base font-bold text-gray-900"
+                    className="font-serif text-base font-medium text-[#141312] dark:text-[#f8f5ee]"
                   >
-                    Payment method
+                    Confidential Settlement Protocol
                   </h2>
                 </div>
 
@@ -673,9 +625,9 @@ export default function CheckoutPage() {
                   <button
                     type="button"
                     onClick={() => setActiveStep('payment')}
-                    className="text-xs font-semibold text-amazon-link hover:underline cursor-pointer"
+                    className="text-xs uppercase tracking-wider font-semibold text-[#9b8353] dark:text-[#d6be90] hover:underline cursor-pointer"
                   >
-                    Change
+                    Modify
                   </button>
                 )}
               </div>
@@ -688,36 +640,31 @@ export default function CheckoutPage() {
                     orderAmount={totals.total}
                   />
 
-                  <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end">
-                    <Button
+                  <div className="mt-5 pt-4 border-t border-[#f0eae0] dark:border-[#1e2433] flex justify-end">
+                    <button
                       type="button"
-                      variant="buy-now"
                       onClick={() => setActiveStep('review')}
-                      className="px-6 py-2 text-xs font-bold"
+                      className="px-6 py-2.5 rounded-xl font-sans text-xs uppercase tracking-wider font-semibold text-[#12110f] bg-gradient-to-r from-[#c5a059] to-[#b89548] hover:brightness-105 shadow-sm cursor-pointer"
                     >
-                      Use this payment method
-                    </Button>
+                      Review Masterpiece Allocation
+                    </button>
                   </div>
                 </div>
               ) : (
-                <div className="pl-8 text-xs text-gray-700">
-                  <span className="font-bold text-gray-900 capitalize">
+                <div className="pl-10 text-xs text-[#615442] dark:text-[#b8af9f]">
+                  <p className="font-serif font-semibold capitalize text-[#141312] dark:text-[#f8f5ee]">
                     {selectedPayment.type}
-                  </span>
+                  </p>
                   {selectedPayment.type === 'card' && (
-                    <span className="text-gray-600">
-                      {' '}
-                      ({selectedPayment.brand} ending in {selectedPayment.last4})
-                    </span>
-                  )}
-                  {selectedPayment.type === 'razorpay' && (
-                    <span className="text-[#0066cc] font-semibold">
-                      {' '}
-                      (Razorpay Test Mode • ID: {selectedPayment.razorpayPaymentId || 'Authorized'})
-                    </span>
+                    <p className="text-[#8e816e] dark:text-[#7e8aa2]">
+                      Vault Account ending in **** {selectedPayment.last4}
+                    </p>
                   )}
                   {selectedPayment.type === 'upi' && (
-                    <span className="text-gray-600"> ({selectedPayment.upiId})</span>
+                    <p className="text-[#8e816e] dark:text-[#7e8aa2]">UPI: {selectedPayment.upiId}</p>
+                  )}
+                  {selectedPayment.type === 'cod' && (
+                    <p className="text-[#8e816e] dark:text-[#7e8aa2]">Vault Concierge Settlement</p>
                   )}
                 </div>
               )}
@@ -726,93 +673,55 @@ export default function CheckoutPage() {
             {/* ── STEP 4: Review Items and Delivery ── */}
             <section
               aria-labelledby="step-review-heading"
-              className="rounded-lg border border-gray-300 bg-white p-5 shadow-xs"
+              className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 p-6 sm:p-7 shadow-[0_12px_40px_rgba(26,23,20,0.04)] dark:shadow-[0_16px_45px_rgba(0,0,0,0.6)]"
             >
-              <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amazon-dark text-xs font-bold text-white">
-                    4
-                  </span>
-                  <h2
-                    id="step-review-heading"
-                    className="text-base font-bold text-gray-900"
-                  >
-                    Review items and delivery
-                  </h2>
-                </div>
-
-                <Link
-                  href="/cart"
-                  className="text-xs font-semibold text-amazon-link hover:underline"
+              <div className="flex items-center gap-3 border-b border-[#f0eae0] dark:border-[#1e2433] pb-4 mb-5">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#141312] dark:bg-[#1f2533] border border-[#c5a059]/40 text-xs font-serif font-bold text-[#d6be90]">
+                  4
+                </span>
+                <h2
+                  id="step-review-heading"
+                  className="font-serif text-base font-medium text-[#141312] dark:text-[#f8f5ee]"
                 >
-                  Edit Cart
-                </Link>
+                  Masterpiece Review &amp; Allocation Dossier
+                </h2>
               </div>
 
-              {/* Items Summary Strip */}
-              <div className="divide-y divide-gray-100 space-y-4">
-                {items.map((item) => {
-                  const imgUrl =
-                    item.product.images?.[0]?.url ||
-                    'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300';
-
-                  return (
-                    <div
-                      key={item.id}
-                      className="pt-4 first:pt-0 flex gap-4 items-center justify-between"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="relative h-16 w-16 rounded border bg-white p-1 flex-shrink-0">
-                          <Image
-                            src={imgUrl}
-                            alt={item.product.title}
-                            fill
-                            sizes="64px"
-                            className="object-contain p-1"
-                          />
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold text-gray-900 line-clamp-2 max-w-sm">
-                            {item.product.title}
-                          </p>
-                          {item.variantTitle && (
-                            <p className="text-[11px] text-gray-500 mt-0.5">
-                              Option: {item.variantTitle}
-                            </p>
-                          )}
-                          <p className="text-[11px] text-gray-500 mt-0.5">
-                            Qty: <strong className="text-gray-800">{item.quantity}</strong> · ${item.product.price.toFixed(2)} each
-                          </p>
-                        </div>
+              <div className="divide-y divide-[#f0eae0] dark:divide-[#1e2433]">
+                {items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="py-4 flex items-center justify-between gap-4"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="relative h-16 w-16 rounded-2xl border border-[#ebe2d1] dark:border-[#262c3d] bg-[#fbfaf8] dark:bg-[#161a25] p-1.5 flex-shrink-0">
+                        <Image
+                          src={item.product.images?.[0]?.url || 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=300'}
+                          alt={item.product.title}
+                          fill
+                          sizes="64px"
+                          className="object-contain p-1"
+                        />
                       </div>
-
-                      <div className="text-right">
-                        <span className="text-sm font-bold text-gray-900">
-                          ${(item.product.price * item.quantity).toFixed(2)}
-                        </span>
+                      <div>
+                        <p className="font-serif text-xs font-medium line-clamp-1 max-w-md">
+                          {item.product.title}
+                        </p>
+                        <p className="text-[11px] text-[#786b58] dark:text-[#9e978b] mt-0.5">
+                          Quantity: {item.quantity} · {item.variantTitle || 'Standard Spec'}
+                        </p>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-
-              {/* Delivery notice */}
-              <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between text-xs text-gray-700 bg-gray-50 p-3 rounded-md">
-                <div className="flex items-center gap-2">
-                  <Truck size={16} className="text-amazon-orange" />
-                  <span>
-                    Guaranteed delivery date:{' '}
-                    <strong className="text-green-700">{selectedShipping.estimatedDate}</strong>
-                  </span>
-                </div>
-                <span className="font-semibold text-gray-900">
-                  {totals.shippingCost === 0 ? 'FREE' : `$${totals.shippingCost.toFixed(2)}`}
-                </span>
+                    <span className="font-serif font-semibold text-sm">
+                      {formatPrice(item.product.price * item.quantity)}
+                    </span>
+                  </div>
+                ))}
               </div>
             </section>
           </div>
 
-          {/* ── Right Column: Order Summary Sidebar (4 cols) ── */}
+          {/* ── Right Column: Order Summary (4 cols) ── */}
           <div className="lg:col-span-4">
             <CheckoutSummary
               totals={totals}

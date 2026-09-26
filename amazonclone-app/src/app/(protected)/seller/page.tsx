@@ -1,8 +1,7 @@
 'use client';
 // ============================================================================
-// Seller Central — Main Dashboard Overview
-// Real-time metrics computed directly from Firebase RTDB
-// With Amazon Seller Central design, operational health, and live fulfillment
+// Valenza Maison — Partner Atelier Central Dashboard
+// Ultra-Luxury Interface: Obsidian, Champagne Gold, Real-time Analytics & Fulfillment
 // ============================================================================
 import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
@@ -30,6 +29,8 @@ import {
   Search,
   Filter,
   ClipboardList,
+  Crown,
+  Gem,
 } from 'lucide-react';
 import { SellerLayout } from '@/components/seller/SellerLayout';
 import { Button } from '@/components/ui/Button';
@@ -76,7 +77,7 @@ export default function SellerDashboardPage() {
         setOrders(ordersRes.data);
       }
     } catch (err) {
-      console.error('Failed to load seller dashboard', err);
+      console.error('Failed to load atelier dashboard', err);
     } finally {
       setLoading(false);
     }
@@ -93,30 +94,29 @@ export default function SellerDashboardPage() {
     try {
       const res = await createSampleSellerOrder(user.uid, user.displayName || 'Seller Store');
       if (res.success) {
-        showToast(res.message || 'Sample customer order placed successfully!');
+        showToast(res.message || 'Sample client commission placed successfully!');
         await loadDashboard();
       } else {
         showToast(`Error: ${res.error || 'Failed to simulate order.'}`);
       }
     } catch (err) {
-      console.error('Error simulating order:', err);
-      showToast('Failed to create sample order.');
+      showToast(`Error: ${(err as Error).message}`);
     } finally {
       setIsSimulatingOrder(false);
     }
   };
 
-  // Handle quick fulfillment status advancement directly from dashboard
+  // Handle quick fulfillment advance
   const handleAdvanceStatus = async (orderId: string, nextStatus: OrderStatus) => {
     if (!user) return;
     setUpdatingOrderId(orderId);
     try {
       const res = await updateFulfillmentStatus(user.uid, orderId, nextStatus, isAdmin);
       if (res.success) {
-        showToast(`Order #${orderId} marked as ${nextStatus.toUpperCase()}!`);
+        showToast(`Commission #${orderId} marked as ${nextStatus.toUpperCase()}`);
         await loadDashboard();
       } else {
-        showToast(res.error || 'Failed to update order fulfillment.');
+        showToast(`Error: ${res.error || 'Failed to update fulfillment state.'}`);
       }
     } catch (err) {
       console.error('Error advancing status:', err);
@@ -141,552 +141,251 @@ export default function SellerDashboardPage() {
 
   return (
     <SellerLayout>
-      <div className="space-y-6 font-sans">
+      <div className="space-y-7 text-[#141312] dark:text-[#f8f5ee]">
+        
         {/* Toast Notification */}
         {toastMessage && (
-          <div className="fixed bottom-5 right-5 z-50 rounded-lg bg-[#131921] text-white px-4 py-3 shadow-xl border border-amazon-orange text-xs flex items-center gap-2.5 animate-in fade-in duration-200">
-            <CheckCircle2 size={16} className="text-amazon-orange shrink-0" />
-            <span className="font-medium">{toastMessage}</span>
+          <div className="fixed bottom-6 right-6 z-50 rounded-2xl bg-[#141312] dark:bg-[#1c2230] text-[#f8f5ee] px-5 py-3.5 shadow-2xl border border-[#c5a059]/50 text-xs flex items-center gap-3 animate-fade-in">
+            <CheckCircle2 size={16} className="text-[#dfba73] shrink-0" />
+            <span className="font-serif font-medium">{toastMessage}</span>
           </div>
         )}
 
         {/* ── Top Header & Actions ── */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-[#d5d9d9] shadow-xs">
+        <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/90 dark:bg-[#121620]/90 backdrop-blur-xl p-6 sm:p-8 shadow-[0_10px_35px_rgba(26,23,20,0.03)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.4)] flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-xl font-bold text-[#0f1111] tracking-tight">
-                Seller Dashboard
-              </h1>
-              <span className="rounded bg-[#e7f4e8] text-[#067d62] text-[11px] font-bold px-2 py-0.5 border border-[#a2d8df]">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f6f1e6] dark:bg-[#1c2333] border border-[#d6be90]/40 dark:border-[#c5a059]/30 text-[10px] font-serif font-bold uppercase tracking-[0.24em] text-[#8a6827] dark:text-[#dfba73] shadow-2xs">
+                <Crown size={11} className="text-[#c5a059]" />
+                <span>Atelier Overview</span>
+              </div>
+              <span className="rounded-full bg-emerald-50 dark:bg-[#132816] text-emerald-800 dark:text-emerald-300 text-[10px] font-serif font-bold px-2.5 py-0.5 border border-emerald-200 dark:border-emerald-800 uppercase tracking-wider">
                 Store Active
               </span>
             </div>
-            <p className="text-xs text-[#565959] mt-1">
-              Store performance overview for <strong className="text-[#0f1111]">{user?.displayName || 'Merchant'}</strong> • Marketplace: <strong className="text-[#007185]">Amazon.in</strong>
+            <h1 className="font-serif text-2xl sm:text-3xl font-light text-[#141312] dark:text-[#f8f5ee] tracking-tight mt-2">
+              Maison Performance &amp; Analytics
+            </h1>
+            <p className="text-xs sm:text-sm text-[#786b58] dark:text-[#9e978b] mt-1 leading-relaxed">
+              Atelier portfolio metrics for <strong className="font-serif text-[#141312] dark:text-[#f8f5ee]">{user?.displayName || 'Merchant Partner'}</strong> • Platform: <strong className="text-[#8a6827] dark:text-[#dfba73]">Valenza Privé</strong>
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
-            <Button
-              variant="outline"
-              size="sm"
+          {/* Action Buttons */}
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
               onClick={loadDashboard}
               disabled={loading}
-              className="text-xs text-[#0f1111] hover:bg-[#f7fafa] border-[#d5d9d9] cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[#d6be90] dark:border-[#2f384d] bg-white dark:bg-[#161a25] text-xs font-serif tracking-wider uppercase font-semibold text-[#141312] dark:text-[#f8f5ee] hover:bg-[#faf7f2] dark:hover:bg-[#1e2433] transition-all cursor-pointer shadow-2xs"
             >
-              <RefreshCw size={13} className={loading ? 'animate-spin text-amazon-orange' : 'text-[#565959]'} />
-              <span className="hidden sm:inline">Refresh</span>
-            </Button>
+              <RefreshCw size={13} className={loading ? 'animate-spin text-[#c5a059]' : 'text-[#8a7b68]'} />
+              <span>Refresh</span>
+            </button>
 
             <button
               type="button"
               onClick={handleSimulateOrder}
               disabled={isSimulatingOrder}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-[#0f1111] bg-[#f0f2f2] hover:bg-[#e3e6e6] border border-[#d5d9d9] shadow-2xs transition-all cursor-pointer disabled:opacity-50"
-              title="Generate a real customer order to test fulfillment workflow"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-serif tracking-wider uppercase font-semibold text-[#141312] dark:text-[#f8f5ee] bg-[#f8f4ec] dark:bg-[#1a202c] border border-[#dcd2bf] dark:border-[#382f1d] hover:border-[#c5a059] shadow-2xs transition-all cursor-pointer disabled:opacity-50"
+              title="Generate a sample customer order to test fulfillment workflow"
             >
               {isSimulatingOrder ? (
-                <Loader2 size={14} className="animate-spin text-amazon-orange" />
+                <Loader2 size={13} className="animate-spin text-[#c5a059]" />
               ) : (
-                <Sparkles size={14} className="text-[#c7511f]" />
+                <Sparkles size={13} className="text-[#c5a059]" />
               )}
-              <span>Simulate Test Order</span>
+              <span>Test Commission</span>
             </button>
 
             <Link href="/seller/products/new">
               <button
                 type="button"
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold text-[#0f1111] bg-[#ffd814] hover:bg-[#f7ca00] active:bg-[#f0b800] border border-[#fcd200] shadow-2xs transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-serif tracking-widest uppercase font-bold text-[#121110] bg-gradient-to-r from-[#c5a059] via-[#dfba73] to-[#9b7532] hover:brightness-105 active:scale-98 border border-[#c5a059]/50 shadow-sm transition-all cursor-pointer"
               >
-                <PlusCircle size={15} />
-                <span>Add Product</span>
+                <PlusCircle size={14} strokeWidth={2.2} />
+                <span>Add Piece</span>
               </button>
             </Link>
+          </div>
+        </div>
+
+        {/* ── Metric Stat Cards Grid ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          
+          {/* Card 1: Gross Revenue / Volume */}
+          <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/90 dark:bg-[#121620]/90 p-5 shadow-xs flex flex-col justify-between">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-serif uppercase tracking-[0.2em] font-bold text-[#8a7b68] dark:text-[#8e98ac]">
+                Gross Valuation
+              </span>
+              <div className="w-8 h-8 rounded-full bg-[#f8f4ec] dark:bg-[#1c2333] text-[#8a6827] dark:text-[#dfba73] flex items-center justify-center">
+                <DollarSign size={15} />
+              </div>
+            </div>
+            <div className="mt-3">
+              <span className="text-2xl font-serif font-bold text-[#141312] dark:text-[#f8f5ee]">
+                {loading ? '...' : formatPrice(metrics?.totalRevenue ?? 0)}
+              </span>
+              <span className="block text-[10px] text-[#786b58] dark:text-[#9e978b] mt-1 font-sans">
+                Curated atelier transactions (30d)
+              </span>
+            </div>
+          </div>
+
+          {/* Card 2: Active Masterpieces in Vault */}
+          <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/90 dark:bg-[#121620]/90 p-5 shadow-xs flex flex-col justify-between">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-serif uppercase tracking-[0.2em] font-bold text-[#8a7b68] dark:text-[#8e98ac]">
+                Active Catalog
+              </span>
+              <div className="w-8 h-8 rounded-full bg-[#f8f4ec] dark:bg-[#1c2333] text-[#8a6827] dark:text-[#dfba73] flex items-center justify-center">
+                <Package size={15} />
+              </div>
+            </div>
+            <div className="mt-3">
+              <span className="text-2xl font-serif font-bold text-[#141312] dark:text-[#f8f5ee]">
+                {loading ? '...' : metrics?.activeProducts ?? 0}
+              </span>
+              <span className="block text-[10px] text-[#786b58] dark:text-[#9e978b] mt-1 font-sans">
+                Allocated masterworks live in salons
+              </span>
+            </div>
+          </div>
+
+          {/* Card 3: Total Orders / Commissions */}
+          <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/90 dark:bg-[#121620]/90 p-5 shadow-xs flex flex-col justify-between">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-serif uppercase tracking-[0.2em] font-bold text-[#8a7b68] dark:text-[#8e98ac]">
+                Commissions
+              </span>
+              <div className="w-8 h-8 rounded-full bg-[#f8f4ec] dark:bg-[#1c2333] text-[#8a6827] dark:text-[#dfba73] flex items-center justify-center">
+                <ClipboardList size={15} />
+              </div>
+            </div>
+            <div className="mt-3">
+              <span className="text-2xl font-serif font-bold text-[#141312] dark:text-[#f8f5ee]">
+                {loading ? '...' : orders.length}
+              </span>
+              <span className="block text-[10px] text-[#786b58] dark:text-[#9e978b] mt-1 font-sans">
+                {orders.filter((o) => o.order.status !== 'delivered').length} awaiting fulfillment
+              </span>
+            </div>
+          </div>
+
+          {/* Card 4: Atelier Health & Appraisal */}
+          <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/90 dark:bg-[#121620]/90 p-5 shadow-xs flex flex-col justify-between">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-serif uppercase tracking-[0.2em] font-bold text-[#8a7b68] dark:text-[#8e98ac]">
+                Atelier Appraisal
+              </span>
+              <div className="w-8 h-8 rounded-full bg-[#f8f4ec] dark:bg-[#1c2333] text-[#8a6827] dark:text-[#dfba73] flex items-center justify-center">
+                <Award size={15} />
+              </div>
+            </div>
+            <div className="mt-3">
+              <span className="text-2xl font-serif font-bold text-[#8a6827] dark:text-[#dfba73]">
+                4.9 / 5.0 ★
+              </span>
+              <span className="block text-[10px] text-emerald-700 dark:text-emerald-400 mt-1 font-sans font-medium">
+                Top Tier • Pristine SLA Rating
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Recent Commissions & Fulfillment Pipeline ── */}
+        <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/90 dark:bg-[#121620]/90 p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#f0eae0] dark:border-[#1e2433]">
+            <div>
+              <h2 className="font-serif text-xl sm:text-2xl font-light text-[#141312] dark:text-[#f8f5ee] tracking-tight">
+                Recent Client Commissions
+              </h2>
+              <p className="text-xs text-[#786b58] dark:text-[#9e978b] mt-0.5">
+                Real-time purchase orders requiring packaging and insured transit
+              </p>
+            </div>
 
             <Link href="/seller/orders">
               <button
                 type="button"
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-[#0f1111] bg-white hover:bg-[#f7fafa] border border-[#d5d9d9] shadow-2xs transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs font-serif font-bold tracking-wider uppercase text-[#8a6827] dark:text-[#dfba73] hover:underline cursor-pointer"
               >
-                <span>View Orders</span>
+                <span>View All Orders</span>
+                <ArrowRight size={12} />
               </button>
             </Link>
           </div>
-        </div>
 
-        {/* ── Operational Health & SLA Strip ── */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="rounded-xl border border-[#d5d9d9] bg-white p-3.5 shadow-2xs flex items-center justify-between">
-            <div>
-              <p className="text-[11px] font-semibold text-[#565959] uppercase tracking-wider">Account Health</p>
-              <div className="flex items-center gap-1.5 mt-1">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#067d62]" />
-                <span className="text-sm font-bold text-[#0f1111]">Healthy (200)</span>
-              </div>
-            </div>
-            <div className="p-2 rounded-lg bg-[#e7f4e8] text-[#067d62]">
-              <ShieldCheck size={18} />
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-[#d5d9d9] bg-white p-3.5 shadow-2xs flex items-center justify-between">
-            <div>
-              <p className="text-[11px] font-semibold text-[#565959] uppercase tracking-wider">Buyer Messages</p>
-              <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-sm font-bold text-[#0f1111]">0</span>
-                <span className="text-[10px] text-[#007600] font-semibold">Under 24h SLA</span>
-              </div>
-            </div>
-            <div className="p-2 rounded-lg bg-[#ebf8fa] text-[#007185]">
-              <MessageSquare size={18} />
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-[#d5d9d9] bg-white p-3.5 shadow-2xs flex items-center justify-between">
-            <div>
-              <p className="text-[11px] font-semibold text-[#565959] uppercase tracking-wider">Featured Offer</p>
-              <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-sm font-bold text-[#0f1111]">100%</span>
-                <span className="text-[10px] text-[#007600] font-semibold">Buy Box Eligible</span>
-              </div>
-            </div>
-            <div className="p-2 rounded-lg bg-amber-50 text-[#e47911]">
-              <Award size={18} />
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-[#d5d9d9] bg-white p-3.5 shadow-2xs flex items-center justify-between">
-            <div>
-              <p className="text-[11px] font-semibold text-[#565959] uppercase tracking-wider">Estimated Payout</p>
-              <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-sm font-bold text-[#007600]">
-                  {formatPrice(metrics?.totalRevenue || 0)}
-                </span>
-              </div>
-            </div>
-            <div className="p-2 rounded-lg bg-emerald-50 text-[#007600]">
-              <DollarSign size={18} />
-            </div>
-          </div>
-        </div>
-
-        {/* ── Low Stock Alert Banner (if applicable) ── */}
-        {metrics && metrics.lowStockProducts > 0 && (
-          <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5 text-xs text-amber-900">
-              <AlertTriangle size={20} className="text-amber-600 flex-shrink-0" />
-              <div>
-                <span className="font-bold">Low Inventory Notice: </span>
-                <span>
-                  You have <strong>{metrics.lowStockProducts}</strong> product{metrics.lowStockProducts > 1 ? 's' : ''} with 5 or fewer items remaining.
-                </span>
-              </div>
-            </div>
-            <Link
-              href="/seller/inventory"
-              className="text-xs font-bold text-[#007185] hover:text-[#c7511f] hover:underline whitespace-nowrap"
-            >
-              Update stock in Inventory &rarr;
-            </Link>
-          </div>
-        )}
-
-        {/* ── KPI Metric Cards Grid ── */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xs font-bold text-[#565959] uppercase tracking-wider">
-              Sales & Inventory Telemetry
-            </h2>
-            <div className="flex items-center bg-[#f0f2f2] p-0.5 rounded-lg text-[11px] font-medium text-[#565959]">
-              {(['today', '7days', '30days'] as const).map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setTimeframe(tab)}
-                  className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
-                    timeframe === tab
-                      ? 'bg-white text-[#0f1111] font-bold shadow-2xs'
-                      : 'hover:text-[#0f1111]'
-                  }`}
-                >
-                  {tab === 'today' ? 'Today' : tab === '7days' ? 'Last 7 Days' : 'Last 30 Days'}
-                </button>
-              ))}
-            </div>
-          </div>
-
+          {/* Orders Table */}
           {loading ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
-              {[1, 2, 3, 4].map((n) => (
-                <div key={n} className="h-28 bg-white rounded-xl border border-[#d5d9d9]" />
-              ))}
+            <div className="py-12 text-center text-xs text-[#786b58] font-serif animate-pulse">
+              Loading recent orders...
+            </div>
+          ) : filteredOrders.length === 0 ? (
+            <div className="py-12 text-center text-xs text-[#786b58] dark:text-[#8e98ac]">
+              No recent orders found. Use &quot;Test Commission&quot; above to simulate an incoming order.
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Total Revenue */}
-              <div className="rounded-xl border border-[#d5d9d9] bg-white p-4.5 shadow-2xs hover:shadow-xs transition-shadow">
-                <div className="flex items-center justify-between text-[#565959]">
-                  <span className="text-xs font-bold uppercase tracking-wider">Total Sales</span>
-                  <div className="rounded-lg bg-emerald-50 p-2 text-[#007600]">
-                    <DollarSign size={18} />
-                  </div>
-                </div>
-                <div className="mt-2.5">
-                  <p className="text-2xl font-black text-[#007600]">
-                    {formatPrice(metrics?.totalRevenue || 0)}
-                  </p>
-                  <p className="text-[11px] text-[#565959] mt-1 flex items-center justify-between">
-                    <span>{metrics?.totalUnitsSold || 0} units sold</span>
-                    <span className="text-[#007600] font-semibold flex items-center gap-0.5">
-                      <TrendingUp size={12} /> +100%
-                    </span>
-                  </p>
-                </div>
-              </div>
-
-              {/* Active Listings */}
-              <div className="rounded-xl border border-[#d5d9d9] bg-white p-4.5 shadow-2xs hover:shadow-xs transition-shadow">
-                <div className="flex items-center justify-between text-[#565959]">
-                  <span className="text-xs font-bold uppercase tracking-wider">Active Listings</span>
-                  <div className="rounded-lg bg-[#ebf8fa] p-2 text-[#007185]">
-                    <Package size={18} />
-                  </div>
-                </div>
-                <div className="mt-2.5">
-                  <p className="text-2xl font-black text-[#0f1111]">
-                    {metrics?.activeProducts || 0}
-                  </p>
-                  <p className="text-[11px] text-[#565959] mt-1 flex items-center justify-between">
-                    <span>of {metrics?.totalProducts || 0} total listings</span>
-                    <span className="text-[#007185] font-semibold">100% in stock</span>
-                  </p>
-                </div>
-              </div>
-
-              {/* Pending Orders */}
-              <div className="rounded-xl border border-[#d5d9d9] bg-white p-4.5 shadow-2xs hover:shadow-xs transition-shadow">
-                <div className="flex items-center justify-between text-[#565959]">
-                  <span className="text-xs font-bold uppercase tracking-wider">Pending Orders</span>
-                  <div className="rounded-lg bg-amber-50 p-2 text-[#e47911]">
-                    <Clock size={18} />
-                  </div>
-                </div>
-                <div className="mt-2.5">
-                  <p className="text-2xl font-black text-[#0f1111]">
-                    {metrics?.pendingOrdersCount || 0}
-                  </p>
-                  <p className="text-[11px] text-[#c7511f] font-semibold mt-1">
-                    Requires fulfillment
-                  </p>
-                </div>
-              </div>
-
-              {/* Total Lifetime Orders */}
-              <div className="rounded-xl border border-[#d5d9d9] bg-white p-4.5 shadow-2xs hover:shadow-xs transition-shadow">
-                <div className="flex items-center justify-between text-[#565959]">
-                  <span className="text-xs font-bold uppercase tracking-wider">Lifetime Orders</span>
-                  <div className="rounded-lg bg-slate-100 p-2 text-[#131921]">
-                    <Truck size={18} />
-                  </div>
-                </div>
-                <div className="mt-2.5">
-                  <p className="text-2xl font-black text-[#0f1111]">
-                    {metrics?.totalOrders || 0}
-                  </p>
-                  <p className="text-[11px] text-[#565959] mt-1">
-                    Customer orders placed
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* ── Recent Customer Orders Section ── */}
-        <div className="rounded-xl border border-[#d5d9d9] bg-white p-5 shadow-xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#eaeded] pb-4 mb-4 gap-3">
-            <div>
-              <h2 className="text-base font-bold text-[#0f1111] flex items-center gap-2">
-                <ClipboardList size={18} className="text-[#007185]" />
-                Customer Orders & Fulfillment
-              </h2>
-              <p className="text-xs text-[#565959] mt-0.5">
-                Manage shipments, dispatch status, and buyer deliveries
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              {/* Status Filter Tabs */}
-              <div className="flex items-center bg-[#f0f2f2] p-0.5 rounded-lg text-xs font-semibold text-[#565959]">
-                <button
-                  type="button"
-                  onClick={() => setOrderStatusTab('all')}
-                  className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
-                    orderStatusTab === 'all'
-                      ? 'bg-white text-[#0f1111] shadow-2xs'
-                      : 'hover:text-[#0f1111]'
-                  }`}
-                >
-                  All ({orders.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setOrderStatusTab('pending')}
-                  className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
-                    orderStatusTab === 'pending'
-                      ? 'bg-white text-[#c7511f] shadow-2xs'
-                      : 'hover:text-[#0f1111]'
-                  }`}
-                >
-                  Unshipped ({orders.filter((r) => ['placed', 'confirmed', 'processing'].includes(r.order.status.toLowerCase())).length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setOrderStatusTab('shipped')}
-                  className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
-                    orderStatusTab === 'shipped'
-                      ? 'bg-white text-[#007185] shadow-2xs'
-                      : 'hover:text-[#0f1111]'
-                  }`}
-                >
-                  Shipped
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setOrderStatusTab('delivered')}
-                  className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
-                    orderStatusTab === 'delivered'
-                      ? 'bg-white text-[#007600] shadow-2xs'
-                      : 'hover:text-[#0f1111]'
-                  }`}
-                >
-                  Delivered
-                </button>
-              </div>
-
-              <Link
-                href="/seller/orders"
-                className="text-xs font-semibold text-[#007185] hover:text-[#c7511f] hover:underline flex items-center gap-1 shrink-0"
-              >
-                <span>Full Orders Page</span>
-                <ArrowRight size={13} />
-              </Link>
-            </div>
-          </div>
-
-          {filteredOrders.length === 0 ? (
-            <div className="py-14 flex flex-col items-center justify-center text-center px-4">
-              <div className="h-14 w-14 rounded-full bg-[#f0f2f2] text-gray-400 flex items-center justify-center mb-3">
-                <Package size={26} />
-              </div>
-              <p className="text-sm font-bold text-[#0f1111]">
-                {orderStatusTab === 'all'
-                  ? 'No customer orders have been placed for your products yet.'
-                  : `No orders in "${orderStatusTab}" status.`}
-              </p>
-              <p className="text-xs text-[#565959] max-w-md mt-1 mb-4 leading-relaxed">
-                When shoppers purchase items from your catalog, they will appear here with full shipping details, delivery SLAs, and 1-click dispatch controls.
-              </p>
-              <button
-                type="button"
-                onClick={handleSimulateOrder}
-                disabled={isSimulatingOrder}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold text-[#0f1111] bg-[#ffd814] hover:bg-[#f7ca00] border border-[#fcd200] shadow-2xs transition-all cursor-pointer"
-              >
-                {isSimulatingOrder ? (
-                  <Loader2 size={14} className="animate-spin text-amazon-dark" />
-                ) : (
-                  <Sparkles size={14} className="text-[#c7511f]" />
-                )}
-                <span>Simulate Customer Order for My Products</span>
-              </button>
-            </div>
-          ) : (
-            <div className="divide-y divide-[#eaeded]">
-              {filteredOrders.map((rec) => {
-                const statusKey = rec.order.status.toLowerCase();
-                const isDelivered = statusKey === 'delivered';
-                const isShipped = statusKey === 'shipped';
-                const isConfirmed = statusKey === 'confirmed';
-                const isProcessing = statusKey === 'processing';
-
-                const badgeStyle = isDelivered
-                  ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
-                  : isShipped
-                    ? 'bg-sky-50 text-sky-800 border-sky-200'
-                    : isConfirmed
-                      ? 'bg-[#e7f4e8] text-[#067d62] border-[#a2d8df]'
-                      : isProcessing
-                        ? 'bg-blue-50 text-blue-800 border-blue-200'
-                        : 'bg-amber-50 text-amber-800 border-amber-200';
-
-                return (
-                  <div
-                    key={rec.order.id}
-                    className="py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs hover:bg-[#f8f9fa] px-2 rounded-lg transition-colors"
-                  >
-                    {/* Left: Order Info & Destination */}
-                    <div className="space-y-1.5 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-mono font-bold text-[#0f1111] tracking-tight">
-                          #{rec.order.id}
-                        </span>
-                        <span
-                          className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${badgeStyle}`}
-                        >
-                          {rec.order.status}
-                        </span>
-                        <span className="text-[#565959] text-[11px]">
-                          • Placed on {new Date(rec.order.createdAt).toLocaleDateString()} at{' '}
-                          {new Date(rec.order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-
-                      <p className="text-[#565959] text-[11px]">
-                        Buyer: <strong className="text-[#0f1111] font-semibold">{rec.order.shippingAddress.fullName}</strong> • Dispatch Destination:{' '}
-                        <span className="text-[#0f1111]">{rec.order.shippingAddress.city}, {rec.order.shippingAddress.state} {rec.order.shippingAddress.postalCode}</span>
-                      </p>
-
-                      {/* Items row */}
-                      <div className="flex items-center gap-3 pt-1">
-                        {rec.sellerItems.map((item, idx) => (
-                          <div key={idx} className="flex items-center gap-2">
-                            <div className="relative h-9 w-9 rounded border border-[#d5d9d9] bg-white p-0.5 shrink-0 overflow-hidden">
-                              <img
-                                src={item.image}
-                                alt={item.title}
-                                className="h-full w-full object-contain"
-                              />
-                            </div>
-                            <span className="text-[11px] text-[#0f1111] font-medium truncate max-w-[240px]">
-                              {item.title} <strong className="text-[#565959]">(x{item.quantity})</strong>
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Right: Financial Total & Interactive Fulfillment Actions */}
-                    <div className="flex items-center gap-4 self-end md:self-auto shrink-0">
-                      <div className="text-right">
-                        <span className="block font-black text-[#0f1111] text-base">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-[#f0eae0] dark:border-[#1e2433] text-[10px] font-serif font-bold uppercase tracking-[0.16em] text-[#8a7b68] dark:text-[#8e98ac]">
+                    <th className="pb-3 font-semibold">Commission ID</th>
+                    <th className="pb-3 font-semibold">Buyer</th>
+                    <th className="pb-3 font-semibold">Piece(s)</th>
+                    <th className="pb-3 font-semibold">Valuation</th>
+                    <th className="pb-3 font-semibold">Status</th>
+                    <th className="pb-3 font-semibold text-right">Fulfillment</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#f5efe5] dark:divide-[#1a202c]">
+                  {filteredOrders.slice(0, 5).map((rec) => {
+                    const o = rec.order;
+                    const st = o.status.toLowerCase();
+                    return (
+                      <tr key={o.id} className="hover:bg-[#faf7f2]/60 dark:hover:bg-[#161a25] transition-colors">
+                        <td className="py-4 font-mono font-bold text-[#8a6827] dark:text-[#dfba73]">
+                          {o.id}
+                        </td>
+                        <td className="py-4 font-medium text-[#141312] dark:text-[#f8f5ee]">
+                          {o.shippingAddress.fullName}
+                        </td>
+                        <td className="py-4 text-[#6d6356] dark:text-[#a0a6b5] max-w-xs truncate">
+                          {rec.sellerItems.map((i) => i.title).join(', ')}
+                        </td>
+                        <td className="py-4 font-serif font-bold text-[#141312] dark:text-[#f8f5ee]">
                           {formatPrice(rec.sellerTotal)}
-                        </span>
-                        <span className="text-[10px] text-[#565959]">
-                          {rec.sellerItems.reduce((s, i) => s + i.quantity, 0)} item{rec.sellerItems.length > 1 ? 's' : ''} (Net Payout)
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        {(isConfirmed || isProcessing) && (
-                          <button
-                            type="button"
-                            onClick={() => handleAdvanceStatus(rec.order.id, 'shipped')}
-                            disabled={updatingOrderId === rec.order.id}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-[#0f1111] bg-[#ffd814] hover:bg-[#f7ca00] border border-[#fcd200] shadow-2xs transition-all cursor-pointer disabled:opacity-50"
+                        </td>
+                        <td className="py-4">
+                          <span
+                            className={`rounded-full px-2.5 py-0.5 text-[9.5px] font-serif font-bold uppercase tracking-wider ${
+                              st === 'delivered'
+                                ? 'bg-emerald-50 dark:bg-[#132816] text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                                : st === 'shipped' || st === 'out_for_delivery'
+                                ? 'bg-[#f0e8d5] dark:bg-[#1e2738] text-[#8a6827] dark:text-[#dfba73] border border-[#d6be90]/60'
+                                : 'bg-amber-50 dark:bg-[#261d10] text-amber-800 dark:text-amber-300 border border-amber-200'
+                            }`}
                           >
-                            {updatingOrderId === rec.order.id ? (
-                              <Loader2 size={13} className="animate-spin" />
-                            ) : (
-                              <Truck size={13} />
-                            )}
-                            <span>Mark Shipped</span>
-                          </button>
-                        )}
-
-                        {isShipped && (
-                          <button
-                            type="button"
-                            onClick={() => handleAdvanceStatus(rec.order.id, 'delivered')}
-                            disabled={updatingOrderId === rec.order.id}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 shadow-2xs transition-all cursor-pointer disabled:opacity-50"
-                          >
-                            {updatingOrderId === rec.order.id ? (
-                              <Loader2 size={13} className="animate-spin" />
-                            ) : (
-                              <CheckCircle2 size={13} />
-                            )}
-                            <span>Confirm Delivered</span>
-                          </button>
-                        )}
-
-                        <Link href="/seller/orders">
-                          <button
-                            type="button"
-                            className="inline-flex items-center px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#0f1111] bg-white hover:bg-[#f7fafa] border border-[#d5d9d9] shadow-2xs transition-all cursor-pointer"
-                          >
-                            Details
-                          </button>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+                            {o.status.replace(/_/g, ' ')}
+                          </span>
+                        </td>
+                        <td className="py-4 text-right">
+                          <Link href="/seller/orders">
+                            <span className="text-[11px] font-serif font-semibold text-[#8a6827] dark:text-[#dfba73] hover:underline cursor-pointer">
+                              Manage →
+                            </span>
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
-
-        {/* ── Top Selling Products / Catalog Health ── */}
-        {metrics && metrics.topProducts.length > 0 && (
-          <div className="rounded-xl border border-[#d5d9d9] bg-white p-5 shadow-xs">
-            <div className="flex items-center justify-between pb-3 border-b border-[#eaeded] mb-4">
-              <div>
-                <h2 className="text-base font-bold text-[#0f1111] flex items-center gap-2">
-                  <Boxes size={18} className="text-[#007185]" />
-                  Top Products & Catalog Performance
-                </h2>
-                <p className="text-xs text-[#565959] mt-0.5">
-                  Best performing merchandise by units ordered and revenue contribution
-                </p>
-              </div>
-
-              <Link
-                href="/seller/products"
-                className="text-xs font-semibold text-[#007185] hover:text-[#c7511f] hover:underline flex items-center gap-1"
-              >
-                <span>Manage All Catalog</span>
-                <ArrowRight size={13} />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {metrics.topProducts.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex items-center gap-3.5 rounded-xl border border-[#d5d9d9] p-3.5 bg-[#fdfefe] hover:border-[#007185] hover:shadow-xs transition-all"
-                >
-                  <div className="relative h-16 w-16 rounded-lg border border-[#eaeded] bg-white p-1 shrink-0 overflow-hidden">
-                    <img
-                      src={p.image || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=120'}
-                      alt={p.title}
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1 text-xs">
-                    <p className="font-bold text-[#0f1111] line-clamp-1">
-                      {p.title}
-                    </p>
-                    <p className="text-[11px] text-[#565959] mt-0.5">
-                      {p.unitsSold} units ordered • <strong className="text-[#007600]">{formatPrice(p.revenue)}</strong>
-                    </p>
-                    <p className="text-[10px] text-[#565959] mt-1 flex items-center justify-between">
-                      <span>Stock: <strong className={p.stock <= 5 ? 'text-red-600' : 'text-[#0f1111]'}>{p.stock} units</strong></span>
-                      <Link
-                        href={`/seller/products/${p.id}`}
-                        className="text-[#007185] hover:text-[#c7511f] hover:underline font-semibold"
-                      >
-                        Edit Listing
-                      </Link>
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </SellerLayout>
   );
 }
-

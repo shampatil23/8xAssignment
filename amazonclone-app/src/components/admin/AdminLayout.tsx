@@ -17,6 +17,7 @@ import {
   MessageSquare,
   RotateCcw,
   Tag,
+  Sparkles,
   BarChart3,
   Settings,
   ExternalLink,
@@ -102,9 +103,15 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       exact: false,
     },
     {
-      name: 'Promotions',
+      name: 'Promotions & Coupons',
       href: '/admin/promotions',
       icon: <Tag size={18} />,
+      exact: false,
+    },
+    {
+      name: 'Hero Banners & Offers',
+      href: '/admin/banners',
+      icon: <Sparkles size={18} />,
       exact: false,
     },
     {

@@ -367,6 +367,29 @@ export interface UIState {
 }
 
 // --- Admin & Platform Types ---
+export interface HeroBanner {
+  id: string;
+  badge: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  image: string;
+  imagePublicId?: string;
+  primaryHref: string;
+  primaryCta: string;
+  secondaryHref?: string;
+  secondaryCta?: string;
+  highlightTag?: string;
+  discountText?: string;
+  offerCode?: string;
+  startDate?: string;
+  endDate?: string;
+  order: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface Promotion {
   id: string;
   code: string;

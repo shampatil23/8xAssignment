@@ -1,370 +1,516 @@
 'use client';
 // ============================================================================
-// Quadrant Category Grid Component — matching home2.png
-// 4-in-1 multi-item product cards with category links, headers & right chevrons
+// Quadrant Category Grid — Ultra-Luxury Editorial 2×2 Ateliers
+// Palette: Warm Ivory (#fcfbf9), Champagne Gold (#c5a059, #dfba73), Charcoal Noir (#171513)
+// Connected dynamically to live database & seller catalog
 // ============================================================================
-import React from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
+import {
+  Headphones,
+  Shirt,
+  Watch,
+  Gem,
+  ShoppingBag,
+  Armchair,
+  Flame,
+  ArrowRight,
+  BookOpen,
+  Award,
+  Sparkles,
+  Layers,
+} from 'lucide-react';
+import { fetchProducts } from '@/services/productService';
+import type { Product } from '@/types';
 
-interface QuadrantSubItem {
+interface SalonSectionConfig {
   id: string;
-  name: string;
-  image: string;
-  href: string;
-  bgColor?: string;
-}
-
-interface QuadrantCardData {
-  id: string;
+  categorySlug: string;
+  kicker: string;
   title: string;
-  headerHref: string;
-  items: QuadrantSubItem[];
+  subtitle: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  fallbackItems: {
+    id: string;
+    name: string;
+    image: string;
+    href: string;
+  }[];
 }
 
-const QUADRANT_SECTIONS: QuadrantCardData[] = [
-  // Card 1: Plug in with our electronics
+const SALON_SECTIONS: SalonSectionConfig[] = [
+  // ── Card 1: Luxury Watches & Timepieces ──
   {
-    id: 'electronics',
-    title: 'Plug in with our electronics',
-    headerHref: '/category/electronics',
-    items: [
+    id: 'horlogerie',
+    categorySlug: 'electronics',
+    kicker: 'SWISS MANUFACTURE',
+    title: 'Haute Horlogerie',
+    subtitle: 'Grand complications, perpetual calendars, and tourbillons.',
+    icon: Watch,
+    fallbackItems: [
       {
-        id: 'headphones',
-        name: 'Headphones',
-        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=headphones',
-        bgColor: '#f7ebe6',
+        id: 'fb-watch-1',
+        name: 'Tourbillon Edition',
+        image: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=600&auto=format&fit=crop&q=85',
+        href: '/category/electronics',
       },
       {
-        id: 'tablets',
-        name: 'Tablets',
-        image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=tablet',
-        bgColor: '#eceaf4',
+        id: 'fb-watch-2',
+        name: 'Chronograph Calibre',
+        image: 'https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=600&auto=format&fit=crop&q=85',
+        href: '/category/electronics',
       },
       {
-        id: 'gaming',
-        name: 'Gaming',
-        image: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=gaming',
-        bgColor: '#fae3ec',
+        id: 'fb-watch-3',
+        name: 'Royal Oak Skeleton',
+        image: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=600&auto=format&fit=crop&q=85',
+        href: '/category/electronics',
       },
       {
-        id: 'speakers',
-        name: 'Speakers',
-        image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=speaker',
-        bgColor: '#fdece2',
+        id: 'fb-watch-4',
+        name: 'Traditionnelle Complication',
+        image: 'https://images.unsplash.com/photo-1533139502658-0198f920d8e8?w=600&auto=format&fit=crop&q=85',
+        href: '/category/electronics',
       },
     ],
   },
-  // Card 2: Score the top PCs & Accessories
+
+  // ── Card 2: Fine Jewelry & Fragrances ──
   {
-    id: 'computers',
-    title: 'Score the top PCs & Accessories',
-    headerHref: '/category/computers',
-    items: [
+    id: 'high-jewelry',
+    categorySlug: 'beauty',
+    kicker: 'PRECIOUS ATELIERS',
+    title: 'High Joaillerie & Fragrance',
+    subtitle: 'Flawless diamonds, royal emeralds, and Grasse extraits.',
+    icon: Gem,
+    fallbackItems: [
       {
-        id: 'desktops',
-        name: 'Desktops',
-        image: 'https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=desktop',
-        bgColor: '#deefec',
+        id: 'fb-jewel-1',
+        name: 'Solitaire Diamonds',
+        image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&auto=format&fit=crop&q=85',
+        href: '/category/beauty',
       },
       {
-        id: 'laptops',
-        name: 'Laptops',
-        image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=laptop',
-        bgColor: '#e2f2ef',
+        id: 'fb-jewel-2',
+        name: 'Colombian Emeralds',
+        image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&auto=format&fit=crop&q=85',
+        href: '/category/beauty',
       },
       {
-        id: 'hard-drives',
-        name: 'Hard Drives',
-        image: 'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=hard+drive',
-        bgColor: '#e3f1e9',
+        id: 'fb-jewel-3',
+        name: 'Grasse Rose Extrait',
+        image: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=600&auto=format&fit=crop&q=85',
+        href: '/category/beauty',
       },
       {
-        id: 'pc-accessories',
-        name: 'PC Accessories',
-        image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=pc+accessories',
-        bgColor: '#ddf3e7',
+        id: 'fb-jewel-4',
+        name: 'Panthère Gold Ring',
+        image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&auto=format&fit=crop&q=85',
+        href: '/category/beauty',
       },
     ],
   },
-  // Card 3: Gear up to get fit
+
+  // ── Card 3: Fashion & Haute Couture ──
   {
-    id: 'fitness',
-    title: 'Gear up to get fit',
-    headerHref: '/category/sports',
-    items: [
+    id: 'couture',
+    categorySlug: 'fashion',
+    kicker: 'PARISIAN EDITIONS',
+    title: 'Haute Couture & Leather',
+    subtitle: 'Handcrafted steamer trunks, exotics, and silk tailoring.',
+    icon: ShoppingBag,
+    fallbackItems: [
       {
-        id: 'clothing',
-        name: 'Clothing',
-        image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=athletic+clothing',
-        bgColor: '#fcf6dd',
+        id: 'fb-fashion-1',
+        name: 'Cabin Steamer Trunk',
+        image: 'https://images.unsplash.com/photo-1565026057447-bc90a3dceb87?w=600&auto=format&fit=crop&q=85',
+        href: '/category/fashion',
       },
       {
-        id: 'trackers',
-        name: 'Trackers',
-        image: 'https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=smartwatch',
-        bgColor: '#fcf6dd',
+        id: 'fb-fashion-2',
+        name: 'Togo Calfskin Bag',
+        image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600&auto=format&fit=crop&q=85',
+        href: '/category/fashion',
       },
       {
-        id: 'equipment',
-        name: 'Equipment',
-        image: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=dumbbells',
-        bgColor: '#fcf6dd',
+        id: 'fb-fashion-3',
+        name: 'Caviar Classic Flap',
+        image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&auto=format&fit=crop&q=85',
+        href: '/category/fashion',
       },
       {
-        id: 'deals',
-        name: 'Deals',
-        image: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=300&auto=format&fit=crop&q=80',
-        href: '/deals',
-        bgColor: '#fcf6dd',
+        id: 'fb-fashion-4',
+        name: 'Vicuña Overcoat',
+        image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=600&auto=format&fit=crop&q=85',
+        href: '/category/fashion',
       },
     ],
   },
-  // Card 4: Apparel under ₹999
+
+  // ── Card 4: Home & Sanctuary Living ──
   {
-    id: 'apparel',
-    title: 'Apparel under ₹999',
-    headerHref: '/category/fashion',
-    items: [
+    id: 'sanctuary-living',
+    categorySlug: 'home-garden',
+    kicker: 'SANCTUARY OBJECTS',
+    title: 'Maison Living & Art',
+    subtitle: 'Murano blown glass, statuary marble, and gilded bronzes.',
+    icon: Armchair,
+    fallbackItems: [
       {
-        id: 'women',
-        name: 'Women',
-        image: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=300&auto=format&fit=crop&q=80',
-        href: '/search?category=fashion&q=women',
-        bgColor: '#fbe4eb',
+        id: 'fb-home-1',
+        name: 'Murano Glass Vase',
+        image: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=600&auto=format&fit=crop&q=85',
+        href: '/category/home-garden',
       },
       {
-        id: 'men',
-        name: 'Men',
-        image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80',
-        href: '/search?category=fashion&q=men',
-        bgColor: '#edeae5',
+        id: 'fb-home-2',
+        name: 'Carrara Marble Table',
+        image: 'https://images.unsplash.com/photo-1540177656454-3f6c4547bed1?w=600&auto=format&fit=crop&q=85',
+        href: '/category/home-garden',
       },
       {
-        id: 'girls',
-        name: 'Girls',
-        image: 'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?w=300&auto=format&fit=crop&q=80',
-        href: '/search?category=fashion&q=girls',
-        bgColor: '#f6eee5',
+        id: 'fb-home-3',
+        name: 'Crystal Chandelier',
+        image: 'https://images.unsplash.com/photo-1546379045-bfd4808b24d0?w=600&auto=format&fit=crop&q=85',
+        href: '/category/home-garden',
       },
       {
-        id: 'boys',
-        name: 'Boys',
-        image: 'https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=300&auto=format&fit=crop&q=80',
-        href: '/search?category=fashion&q=boys',
-        bgColor: '#dae8f5',
+        id: 'fb-home-4',
+        name: 'Heritage Leather Chair',
+        image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&auto=format&fit=crop&q=85',
+        href: '/category/home-garden',
       },
     ],
   },
-  // Card 5: Fantastic Finds for Home
+
+  // ── Card 5: Electronics & Premium Audio ──
   {
-    id: 'home-finds',
-    title: 'Fantastic Finds for Home',
-    headerHref: '/category/home-garden',
-    items: [
+    id: 'sculptural-audio',
+    categorySlug: 'computers',
+    kicker: 'ACOUSTIC ARTISTRY',
+    title: 'Sculptural Audio & Tech',
+    subtitle: 'Valve amplifiers, marble turntables, and titanium drivers.',
+    icon: Headphones,
+    fallbackItems: [
       {
-        id: 'kitchen',
-        name: 'Kitchen',
-        image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=300&auto=format&fit=crop&q=80',
-        href: '/search?category=home-garden&q=kitchen',
-        bgColor: '#edf2f0',
+        id: 'fb-audio-1',
+        name: 'Sound Center',
+        image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?w=600&auto=format&fit=crop&q=85',
+        href: '/category/computers',
       },
       {
-        id: 'living-room',
-        name: 'Living Room',
-        image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300&auto=format&fit=crop&q=80',
-        href: '/search?category=home-garden&q=living+room',
-        bgColor: '#efeae4',
+        id: 'fb-audio-2',
+        name: 'Vacuum Tube Amp',
+        image: 'https://images.unsplash.com/photo-1767808452633-58fa8d05bf9d?w=600&auto=format&fit=crop&q=85',
+        href: '/category/computers',
       },
       {
-        id: 'bedding',
-        name: 'Bedding',
-        image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=300&auto=format&fit=crop&q=80',
-        href: '/search?category=home-garden&q=bedding',
-        bgColor: '#f6f0eb',
+        id: 'fb-audio-3',
+        name: 'Vinyl Turntable',
+        image: 'https://images.unsplash.com/photo-1603048588665-791ca8aea617?w=600&auto=format&fit=crop&q=85',
+        href: '/category/computers',
       },
       {
-        id: 'decor',
-        name: 'Decor',
-        image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=300&auto=format&fit=crop&q=80',
-        href: '/search?category=home-garden&q=decor',
-        bgColor: '#eef1f4',
+        id: 'fb-audio-4',
+        name: 'Leica Rangefinder',
+        image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&auto=format&fit=crop&q=85',
+        href: '/category/computers',
       },
     ],
   },
-  // Card 6: Shine brighter with your fashion faves
+
+  // ── Card 6: Rare Folios & Heritage Archives (Replaces Wine Section) ──
   {
-    id: 'fashion-faves',
-    title: 'Shine brighter with your fashion faves',
-    headerHref: '/category/fashion',
-    items: [
+    id: 'rare-editions',
+    categorySlug: 'books',
+    kicker: 'HERITAGE ARCHIVES',
+    title: 'Rare Folios & Editions',
+    subtitle: 'First-edition literature, handcrafted bindings, and archival masterworks.',
+    icon: BookOpen,
+    fallbackItems: [
       {
-        id: 'jewelry',
-        name: 'Jewelry',
-        image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=jewelry',
-        bgColor: '#f9eee6',
+        id: 'fb-book-1',
+        name: 'Gatsby First Edition',
+        image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=85',
+        href: '/category/books',
       },
       {
-        id: 'handbags',
-        name: 'Handbags',
-        image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=handbag',
-        bgColor: '#f4ede7',
+        id: 'fb-book-2',
+        name: 'Assouline Horology',
+        image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600&auto=format&fit=crop&q=85',
+        href: '/category/books',
       },
       {
-        id: 'footwear',
-        name: 'Footwear',
-        image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=shoes',
-        bgColor: '#fbe7de',
+        id: 'fb-book-3',
+        name: 'Shakespeare First Folio',
+        image: 'https://images.unsplash.com/photo-1476275466078-4007374efbbe?w=600&auto=format&fit=crop&q=85',
+        href: '/category/books',
       },
       {
-        id: 'sunglasses',
-        name: 'Sunglasses',
-        image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=sunglasses',
-        bgColor: '#e8ecf2',
-      },
-    ],
-  },
-  // Card 7: Unveil your radiance
-  {
-    id: 'beauty-radiance',
-    title: 'Unveil your radiance',
-    headerHref: '/category/beauty',
-    items: [
-      {
-        id: 'skincare',
-        name: 'Skincare',
-        image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300&auto=format&fit=crop&q=80',
-        href: '/search?category=beauty&q=skincare',
-        bgColor: '#faeae3',
-      },
-      {
-        id: 'makeup',
-        name: 'Makeup',
-        image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=300&auto=format&fit=crop&q=80',
-        href: '/search?category=beauty&q=makeup',
-        bgColor: '#fde5eb',
-      },
-      {
-        id: 'haircare',
-        name: 'Haircare',
-        image: 'https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?w=300&auto=format&fit=crop&q=80',
-        href: '/search?category=beauty&q=haircare',
-        bgColor: '#f3e8df',
-      },
-      {
-        id: 'fragrances',
-        name: 'Fragrances',
-        image: 'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=300&auto=format&fit=crop&q=80',
-        href: '/search?category=beauty&q=perfume',
-        bgColor: '#ebedf5',
-      },
-    ],
-  },
-  // Card 8: Level up your PC here
-  {
-    id: 'pc-gaming',
-    title: 'Level up your PC here',
-    headerHref: '/category/computers',
-    items: [
-      {
-        id: 'monitors',
-        name: 'Monitors',
-        image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=monitor',
-        bgColor: '#e3e8f2',
-      },
-      {
-        id: 'keyboards',
-        name: 'Keyboards',
-        image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=keyboard',
-        bgColor: '#e7eaf0',
-      },
-      {
-        id: 'graphics',
-        name: 'Graphics Cards',
-        image: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=graphics+card',
-        bgColor: '#f1e6f5',
-      },
-      {
-        id: 'mice',
-        name: 'Gaming Mice',
-        image: 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=300&auto=format&fit=crop&q=80',
-        href: '/search?q=gaming+mouse',
-        bgColor: '#f3e6e8',
+        id: 'fb-book-4',
+        name: 'Audubon Elephant Folio',
+        image: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=600&auto=format&fit=crop&q=85',
+        href: '/category/books',
       },
     ],
   },
 ];
 
 export function QuadrantCategoryGrid() {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-      {QUADRANT_SECTIONS.map((section) => (
-        <div
-          key={section.id}
-          className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow"
-        >
-          {/* Section Header */}
-          <Link
-            href={section.headerHref}
-            className="group/header flex items-center justify-between mb-3"
-          >
-            <h2 className="text-base sm:text-lg font-black text-gray-900 leading-tight group-hover/header:text-amazon-link transition-colors">
-              {section.title}
-            </h2>
-            <ChevronRight
-              size={18}
-              className="text-gray-400 group-hover/header:text-amazon-orange group-hover/header:translate-x-0.5 transition-all flex-shrink-0"
-            />
-          </Link>
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-          {/* 2x2 Sub-items Grid */}
-          <div className="grid grid-cols-2 gap-3 mt-1">
-            {section.items.map((item) => (
-              <Link
-                key={item.id}
-                href={item.href}
-                className="group/item flex flex-col cursor-pointer"
-              >
-                {/* Image Box */}
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadCatalog() {
+      try {
+        const res = await fetchProducts();
+        if (isMounted && res.success && res.data) {
+          setProducts(res.data);
+        }
+      } catch (err) {
+        console.warn('[QuadrantCategoryGrid] live catalog fetch error:', err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+
+    loadCatalog();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Group products dynamically by category
+  const categorizedItems = useMemo(() => {
+    return SALON_SECTIONS.map((section) => {
+      // Find all live active products in this category
+      const matching = products.filter((p) => {
+        if (p.status !== 'active') return false;
+        const cat = p.category?.toLowerCase() || '';
+        const target = section.categorySlug.toLowerCase();
+        if (cat === target) return true;
+        if ((target === 'home-garden' || target === 'home-kitchen') && (cat === 'home-garden' || cat === 'home-kitchen')) {
+          return true;
+        }
+        if ((target === 'electronics' || target === 'watches') && (cat === 'electronics' || cat === 'watches')) {
+          return true;
+        }
+        return false;
+      });
+
+      // Map live products to grid items
+      const liveItems = matching.slice(0, 4).map((p) => {
+        // Shorten long title cleanly for 2x2 grid tile
+        const shortName = p.title.length > 26 ? `${p.title.slice(0, 24)}...` : p.title;
+        const imgUrl =
+          p.images && p.images.length > 0 && p.images[0].url
+            ? p.images[0].url
+            : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600';
+
+        return {
+          id: p.id,
+          name: shortName,
+          image: imgUrl,
+          href: `/product/${p.slug}`,
+          brand: p.brand,
+          price: p.price,
+          isLiveSellerItem: true,
+        };
+      });
+
+      // If fewer than 4 live items, fill remaining slots with curated high-res fallbacks
+      const remainingSlots = 4 - liveItems.length;
+      const combined =
+        remainingSlots > 0
+          ? [...liveItems, ...section.fallbackItems.slice(0, remainingSlots)]
+          : liveItems;
+
+      return {
+        ...section,
+        items: combined,
+        itemCount: matching.length,
+      };
+    });
+  }, [products]);
+
+  const renderSectionCard = (section: (typeof categorizedItems)[0]) => {
+    const SectionIcon = section.icon;
+    const headerHref = `/category/${section.categorySlug}`;
+
+    return (
+      <div
+        key={section.id}
+        className="
+          rounded-[24px] sm:rounded-[28px]
+          border border-[#ebe2d1] dark:border-[#2a2418]
+          bg-[#fcfbf9] dark:bg-[#11141c]
+          p-4 sm:p-5
+          shadow-[0_8px_24px_rgba(197,160,89,0.06)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.45)]
+          hover:shadow-[0_14px_32px_rgba(197,160,89,0.12)] dark:hover:shadow-[0_14px_32px_rgba(0,0,0,0.65)]
+          hover:border-[#c5a059]/60 dark:hover:border-[#dfba73]/40
+          transition-all duration-300 flex flex-col justify-between group/card
+        "
+      >
+        {/* ── Top Header Section ── */}
+        <div className="mb-3">
+          {/* Kicker + Circle Arrow button row */}
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <span className="font-sans text-[9.5px] sm:text-[10px] font-semibold tracking-[0.22em] uppercase text-[#9b7835] dark:text-[#dfba73] block">
+                {section.kicker}
+              </span>
+              <Link href={headerHref} className="group/headtitle block mt-0.5">
+                <h3 className="font-serif text-lg sm:text-xl md:text-[22px] font-normal tracking-tight text-[#141312] dark:text-[#f8f5ee] leading-tight group-hover/headtitle:text-[#8a6827] dark:group-hover/headtitle:text-[#dfba73] transition-colors">
+                  {section.title}
+                </h3>
+              </Link>
+            </div>
+
+            {/* Header Right Circle Arrow Button */}
+            <Link
+              href={headerHref}
+              className="
+                w-7 h-7 sm:w-8 sm:h-8 rounded-full
+                border border-[#dcd2bf] dark:border-[#382f1d]
+                hover:border-[#b89047] dark:hover:border-[#dfba73]
+                bg-[#f8f4ec] dark:bg-[#171c26]
+                text-[#8a6827] dark:text-[#dfba73]
+                flex items-center justify-center shrink-0
+                hover:bg-[#8a6827] hover:text-white dark:hover:bg-[#dfba73] dark:hover:text-[#121110]
+                shadow-xs hover:scale-105 transition-all
+              "
+              aria-label={`Explore ${section.title}`}
+            >
+              <ArrowRight size={13} strokeWidth={2} />
+            </Link>
+          </div>
+
+          {/* Subtitle */}
+          <p className="text-[11px] sm:text-xs text-[#787166] dark:text-[#9ea3b0] font-sans font-normal mt-1 leading-relaxed line-clamp-1">
+            {section.subtitle}
+          </p>
+        </div>
+
+        {/* ── 2×2 Sub-items Product Cards Grid (Real Products from Sellers & Catalog) ── */}
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 my-auto">
+          {section.items.map((item) => (
+            <Link
+              key={item.id}
+              href={item.href}
+              className="
+                group/item flex flex-col rounded-[16px] sm:rounded-[18px] overflow-hidden
+                border border-[#ede4d4] dark:border-[#282218]
+                bg-white dark:bg-[#141722]
+                hover:border-[#c5a059] dark:hover:border-[#dfba73]
+                shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_6px_18px_rgba(197,160,89,0.1)]
+                transition-all duration-300 cursor-pointer
+              "
+            >
+              {/* Image Box with Floating Category Icon */}
+              <div className="relative w-full h-22 sm:h-24 md:h-26 lg:h-28 overflow-hidden bg-[#f5efe5]/70 dark:bg-[#191e2b]/70">
+                {/* Floating Luxury Circular Icon Badge on Top-Left */}
                 <div
-                  className="w-full h-28 sm:h-32 rounded-lg p-2 flex items-center justify-center overflow-hidden transition-transform duration-200 group-hover/item:scale-102"
-                  style={{ backgroundColor: item.bgColor || '#f3f4f6' }}
+                  className="
+                    absolute top-2 left-2 z-10
+                    w-6 h-6 rounded-full
+                    bg-black/45 backdrop-blur-md border border-white/30
+                    text-white flex items-center justify-center shadow-xs
+                  "
                 >
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="h-full w-full object-contain mix-blend-multiply group-hover/item:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                  />
+                  <SectionIcon size={11} className="text-white/95" />
                 </div>
 
-                {/* Sub-item Label */}
-                <span className="mt-1.5 text-xs font-semibold text-gray-800 leading-tight group-hover/item:text-amazon-link transition-colors">
+                {/* Product Image with Graceful Error Fallback */}
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-full object-cover group-hover/item:scale-108 transition-transform duration-500 ease-out"
+                  loading="lazy"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src =
+                      'https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=600&auto=format&fit=crop&q=80';
+                  }}
+                />
+              </div>
+
+              {/* Bottom Label Bar with Sub-item Arrow */}
+              <div
+                className="
+                  flex items-center justify-between px-2.5 sm:px-3 py-1.5 sm:py-2
+                  bg-[#faf7f1] dark:bg-[#151924]
+                  border-t border-[#ede4d4] dark:border-[#232938]
+                "
+              >
+                <span
+                  className="
+                    font-serif text-[11px] sm:text-xs font-medium
+                    text-[#181614] dark:text-[#f8f5ee]
+                    group-hover/item:text-[#8a6827] dark:group-hover/item:text-[#dfba73]
+                    transition-colors truncate pr-1
+                  "
+                  title={item.name}
+                >
                   {item.name}
                 </span>
-              </Link>
-            ))}
-          </div>
+
+                <div
+                  className="
+                    w-5 h-5 rounded-full
+                    border border-[#d8ccb8] dark:border-[#382f1d]
+                    bg-[#f8f4ec] dark:bg-[#1b212f]
+                    text-[#8a6827] dark:text-[#dfba73]
+                    flex items-center justify-center shrink-0
+                    group-hover/item:bg-[#8a6827] group-hover/item:text-white
+                    dark:group-hover/item:bg-[#dfba73] dark:group-hover/item:text-[#121110]
+                    transition-all
+                  "
+                >
+                  <ArrowRight size={10} strokeWidth={2.4} />
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
-      ))}
+
+        {/* ── Strong Dark-Gold "EXPLORE COLLECTION" CTA Pill ── */}
+        <Link
+          href={headerHref}
+          className="
+            mt-3.5 w-full py-2.5 sm:py-3 px-4 sm:px-5 rounded-full
+            bg-gradient-to-r from-[#171513] via-[#201b16] to-[#12100e]
+            dark:from-[#0d1017] dark:via-[#161b26] dark:to-[#090b10]
+            border border-[#c5a059]/50 hover:border-[#dfba73]
+            shadow-md hover:shadow-lg flex items-center justify-between group transition-all
+          "
+        >
+          <div className="flex items-center gap-1.5">
+            <Gem size={12} className="text-[#dfba73] opacity-80 group-hover:opacity-100 transition-opacity" />
+            <span className="font-serif tracking-[0.18em] text-[10px] sm:text-[11px] uppercase font-bold text-[#dfba73] group-hover:text-[#fae5b6] transition-colors">
+              EXPLORE {section.title}
+            </span>
+          </div>
+
+          {/* Right Gold Shimmer Arrow Circle */}
+          <div
+            className="
+              w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-full
+              bg-gradient-to-tr from-[#c5a059] to-[#ebd29b]
+              text-[#121110] flex items-center justify-center
+              shadow-xs group-hover:translate-x-1 group-hover:scale-105 transition-all shrink-0
+            "
+          >
+            <ArrowRight size={12} strokeWidth={2.5} />
+          </div>
+        </Link>
+      </div>
+    );
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+      {categorizedItems.map((section) => renderSectionCard(section))}
     </div>
   );
 }

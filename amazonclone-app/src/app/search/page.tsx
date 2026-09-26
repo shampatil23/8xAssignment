@@ -1,8 +1,10 @@
 'use client';
 // ============================================================================
 // Search Results Page — /search
+// Valenza Maison Haute Horlogerie & Joaillerie Curated Catalog Search
 // ============================================================================
 import React, { useEffect, useState, Suspense } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   SlidersHorizontal,
@@ -10,12 +12,14 @@ import {
   ChevronLeft,
   ChevronRight,
   SearchX,
+  Gem,
+  RotateCcw,
+  ChevronDown,
 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ProductCardSkeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { Button } from '@/components/ui/Button';
 import { SearchFilters } from '@/components/search/SearchFilters';
 import { MobileFilterDrawer } from '@/components/search/MobileFilterDrawer';
 import {
@@ -148,13 +152,13 @@ function SearchPageContent() {
   const activeTags: { label: string; onRemove: () => void }[] = [];
   if (category) {
     activeTags.push({
-      label: `Department: ${category}`,
+      label: `Salon: ${category}`,
       onRemove: () => updateQueryParams({ category: undefined, page: 1 }),
     });
   }
   if (brand) {
     activeTags.push({
-      label: `Brand: ${brand}`,
+      label: `Maison: ${brand}`,
       onRemove: () => updateQueryParams({ brand: undefined, page: 1 }),
     });
   }
@@ -173,126 +177,145 @@ function SearchPageContent() {
   }
   if (inStockOnly) {
     activeTags.push({
-      label: 'In Stock Only',
+      label: 'Vault Stock Only',
       onRemove: () => updateQueryParams({ inStockOnly: undefined, page: 1 }),
     });
   }
   if (isPrimeOnly) {
     activeTags.push({
-      label: 'Prime',
+      label: 'White-Glove Courier',
       onRemove: () => updateQueryParams({ isPrimeOnly: undefined, page: 1 }),
     });
   }
 
   return (
     <MainLayout>
-      <div className="mx-auto max-w-screen-2xl px-4 py-4">
-        {/* ── Top Bar: Results Count & Sort Dropdown ── */}
-        <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 border-b pb-3">
-          <div>
-            <p className="text-xs md:text-sm text-gray-700">
-              {loading ? (
-                'Searching...'
-              ) : totalResults > 0 ? (
-                <>
-                  <span className="font-semibold text-gray-900">
-                    {Math.min((page - 1) * 12 + 1, totalResults)}-
-                    {Math.min(page * 12, totalResults)}
-                  </span>{' '}
-                  of <span className="font-semibold text-gray-900">{totalResults}</span>{' '}
-                  results{' '}
-                  {query && (
-                    <>
-                      for{' '}
-                      <span className="font-bold text-amazon-orange">
-                        &quot;{query}&quot;
-                      </span>
-                    </>
-                  )}
-                </>
-              ) : (
-                <>
-                  No results{' '}
-                  {query && (
-                    <>
-                      for{' '}
-                      <span className="font-bold text-amazon-orange">
-                        &quot;{query}&quot;
-                      </span>
-                    </>
-                  )}
-                </>
-              )}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 self-end md:self-auto">
-            {/* Mobile Filter Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setMobileFilterOpen(true)}
-              className="md:hidden flex items-center gap-1.5 text-xs py-1"
-            >
-              <SlidersHorizontal size={14} />
-              Filters {activeTags.length > 0 && `(${activeTags.length})`}
-            </Button>
-
-            {/* Sort Selector */}
-            <div className="flex items-center gap-1.5 text-xs">
-              <span className="text-gray-500 whitespace-nowrap hidden sm:inline">
-                Sort by:
-              </span>
-              <select
-                id="search-sort-select"
-                value={sortBy}
-                onChange={(e) =>
-                  updateQueryParams({
-                    sortBy: e.target.value as SearchSortOption,
-                    page: 1,
-                  })
-                }
-                className="rounded border border-gray-300 bg-white px-2.5 py-1 text-xs text-gray-800 focus:outline-none focus:ring-1 focus:ring-amazon-orange cursor-pointer"
-              >
-                <option value="relevance">Featured</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="rating">Avg. Customer Review</option>
-                <option value="newest">Newest Arrivals</option>
-              </select>
-            </div>
-          </div>
+      <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 py-6 sm:py-8 text-[#141312] dark:text-[#f8f5ee]">
+        {/* ── Breadcrumb ── */}
+        <div className="text-[11px] uppercase tracking-[0.16em] font-medium text-[#786b58] dark:text-[#9e978b] mb-4 flex items-center gap-2">
+          <Link href="/" className="hover:text-[#c5a059] dark:hover:text-[#d6be90] transition-colors">
+            Maison
+          </Link>
+          <span className="text-[#dfd6c5] dark:text-[#2c3242]">◆</span>
+          <span className="text-[#141312] dark:text-[#f8f5ee] font-semibold">Salon Search</span>
+          {query && (
+            <>
+              <span className="text-[#dfd6c5] dark:text-[#2c3242]">◆</span>
+              <span className="text-[#8a6827] dark:text-[#dfba73] font-serif">&quot;{query}&quot;</span>
+            </>
+          )}
         </div>
 
-        {/* ── Active Filter Badges ── */}
-        {activeTags.length > 0 && (
-          <div className="mb-4 flex flex-wrap items-center gap-2">
-            <span className="text-xs text-gray-500">Active filters:</span>
-            {activeTags.map((tag) => (
-              <span
-                key={tag.label}
-                className="inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-2.5 py-0.5 text-xs text-gray-700 shadow-sm"
-              >
-                {tag.label}
-                <button
-                  type="button"
-                  onClick={tag.onRemove}
-                  className="rounded-full hover:bg-gray-100 p-0.5 text-gray-400 hover:text-gray-600 cursor-pointer"
-                  aria-label={`Remove filter ${tag.label}`}
-                >
-                  <X size={12} />
-                </button>
+        {/* ── Editorial Header Banner ── */}
+        <div className="mb-6 rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 backdrop-blur-xl p-6 sm:p-8 shadow-[0_10px_35px_rgba(26,23,20,0.03)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.5)]">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <span className="text-[10px] uppercase font-semibold tracking-[0.25em] text-[#9b8353] dark:text-[#d6be90] block mb-1.5 flex items-center gap-1.5">
+                <Gem size={11} className="text-[#c5a059]" />
+                Valenza Curated Search Results
               </span>
-            ))}
-            <button
-              type="button"
-              onClick={handleClearAllFilters}
-              className="text-xs font-semibold text-amazon-link hover:underline ml-1"
-            >
-              Clear all
-            </button>
+              <h1 className="font-serif text-2xl sm:text-3xl font-light tracking-tight text-[#141312] dark:text-[#f8f5ee]">
+                {query ? (
+                  <>
+                    Catalog Allocations for <span className="italic font-normal">&quot;{query}&quot;</span>
+                  </>
+                ) : (
+                  'All Maison Masterpieces & Catalog'
+                )}
+              </h1>
+              <p className="text-xs sm:text-sm text-[#786b58] dark:text-[#9e978b] mt-1">
+                {loading ? (
+                  'Scanning private vaults and salon reserves...'
+                ) : totalResults > 0 ? (
+                  <>
+                    Showing{' '}
+                    <strong className="text-[#141312] dark:text-[#f8f5ee]">
+                      {Math.min((page - 1) * 12 + 1, totalResults)}–{Math.min(page * 12, totalResults)}
+                    </strong>{' '}
+                    of <strong className="text-[#141312] dark:text-[#f8f5ee]">{totalResults}</strong> curated creations
+                  </>
+                ) : (
+                  'No private vault creations matched your search criteria.'
+                )}
+              </p>
+            </div>
+
+            {/* Sort & Mobile Controls */}
+            <div className="flex items-center gap-3 self-start md:self-auto shrink-0">
+              {/* Mobile Filter Button */}
+              <button
+                type="button"
+                onClick={() => setMobileFilterOpen(true)}
+                className="md:hidden inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#ebe2d1] dark:border-[#2f384d] bg-[#fbfaf8] dark:bg-[#161a25] text-xs font-semibold uppercase tracking-wider text-[#141312] dark:text-[#f8f5ee] shadow-xs cursor-pointer hover:border-[#c5a059] transition-all"
+              >
+                <SlidersHorizontal size={14} className="text-[#c5a059]" />
+                <span>Filters {activeTags.length > 0 && `(${activeTags.length})`}</span>
+              </button>
+
+              {/* Sort Dropdown */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs uppercase tracking-wider font-semibold text-[#8a7b68] dark:text-[#8e98ac] hidden sm:inline">
+                  Sort:
+                </span>
+                <div className="relative">
+                  <select
+                    id="search-sort-select"
+                    value={sortBy}
+                    onChange={(e) =>
+                      updateQueryParams({
+                        sortBy: e.target.value as SearchSortOption,
+                        page: 1,
+                      })
+                    }
+                    className="appearance-none rounded-xl border border-[#ebe2d1] dark:border-[#2f384d] bg-[#fbfaf8] dark:bg-[#161a25] pl-3.5 pr-8 py-2 text-xs font-semibold text-[#141312] dark:text-[#f8f5ee] focus:outline-none focus:border-[#c5a059] dark:focus:border-[#dfba73] cursor-pointer shadow-xs transition-all"
+                  >
+                    <option value="relevance">Maison Curated / Featured</option>
+                    <option value="price-asc">Valuation: Low to High</option>
+                    <option value="price-desc">Valuation: High to Low</option>
+                    <option value="rating">Client Appraisals</option>
+                    <option value="newest">Newest Atelier Arrivals</option>
+                  </select>
+                  <ChevronDown
+                    size={13}
+                    className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8a7b68] dark:text-[#8e98ac]"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-        )}
+
+          {/* ── Active Filter Badges ── */}
+          {activeTags.length > 0 && (
+            <div className="mt-5 pt-4 border-t border-[#f0eae0] dark:border-[#1e2433] flex flex-wrap items-center gap-2">
+              <span className="text-[11px] uppercase tracking-wider font-semibold text-[#8a7b68] dark:text-[#8e98ac] mr-1">
+                Active Refinements:
+              </span>
+              {activeTags.map((tag) => (
+                <span
+                  key={tag.label}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#e2d5c0] dark:border-[#383020] bg-[#f8f4ec] dark:bg-[#1c1810] px-3 py-1 text-xs font-medium text-[#8a6827] dark:text-[#dfba73] shadow-xs"
+                >
+                  <span>{tag.label}</span>
+                  <button
+                    type="button"
+                    onClick={tag.onRemove}
+                    className="rounded-full hover:bg-black/5 dark:hover:bg-white/10 p-0.5 text-[#8a6827] dark:text-[#dfba73] cursor-pointer transition-colors"
+                    aria-label={`Remove filter ${tag.label}`}
+                  >
+                    <X size={11} />
+                  </button>
+                </span>
+              ))}
+              <button
+                type="button"
+                onClick={handleClearAllFilters}
+                className="inline-flex items-center gap-1 text-xs uppercase tracking-wider font-semibold text-[#8a6827] dark:text-[#dfba73] hover:underline ml-2 cursor-pointer transition-colors"
+              >
+                <RotateCcw size={11} /> Reset All
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* ── Main Content Grid: Sidebar + Product Grid ── */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
@@ -311,7 +334,7 @@ function SearchPageContent() {
           {/* Product Results (9 cols) */}
           <div className="md:col-span-9 lg:col-span-9">
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <ProductCardSkeleton key={i} />
                 ))}
@@ -324,42 +347,50 @@ function SearchPageContent() {
                 onAction={() => window.location.reload()}
               />
             ) : products.length === 0 ? (
-              <div className="rounded-lg border border-gray-200 bg-white p-12 text-center">
-                <SearchX className="mx-auto h-16 w-16 text-gray-400 mb-4" />
-                <h2 className="text-xl font-bold text-gray-900 mb-2">
-                  No results found for &quot;{query}&quot;
+              <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 p-12 text-center shadow-[0_10px_35px_rgba(26,23,20,0.03)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.5)]">
+                <div className="h-16 w-16 mx-auto rounded-full bg-[#fbfaf8] dark:bg-[#161a25] border border-[#e2d5c0] dark:border-[#383020] flex items-center justify-center text-[#c5a059] mb-4 shadow-sm">
+                  <SearchX size={28} />
+                </div>
+                <span className="text-[10px] uppercase font-semibold tracking-[0.25em] text-[#9b8353] dark:text-[#d6be90] block mb-1">
+                  Private Salon Archive
+                </span>
+                <h2 className="font-serif text-xl sm:text-2xl font-light text-[#141312] dark:text-[#f8f5ee] mb-2">
+                  No allocations found for &quot;{query}&quot;
                 </h2>
-                <p className="text-sm text-gray-600 max-w-md mx-auto mb-6 leading-relaxed">
-                  Try checking your spelling, using more general keywords, or clearing some of your active filters.
+                <p className="text-xs sm:text-sm text-[#786b58] dark:text-[#9e978b] max-w-md mx-auto mb-6 leading-relaxed">
+                  Try refining your search keyword, exploring our Haute Horlogerie &amp; Joaillerie salons, or resetting active filters.
                 </p>
                 {activeTags.length > 0 && (
-                  <Button variant="primary" size="sm" onClick={handleClearAllFilters}>
-                    Clear All Filters
-                  </Button>
+                  <button
+                    type="button"
+                    onClick={handleClearAllFilters}
+                    className="px-6 py-3 rounded-xl font-sans text-xs uppercase tracking-[0.16em] font-semibold text-[#12110f] bg-gradient-to-r from-[#c5a059] via-[#d6be90] to-[#b89548] hover:brightness-105 shadow-md cursor-pointer transition-all"
+                  >
+                    Reset All Filters
+                  </button>
                 )}
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
                   {products.map((prod) => (
                     <ProductCard key={prod.id} product={prod} />
                   ))}
                 </div>
 
-                {/* ── Pagination ── */}
+                {/* ── Luxury Pagination ── */}
                 {totalPages > 1 && (
-                  <div className="mt-10 flex items-center justify-center gap-2 border-t pt-6">
-                    <Button
-                      variant="outline"
-                      size="sm"
+                  <div className="mt-12 flex items-center justify-center gap-2 border-t border-[#f0eae0] dark:border-[#1e2433] pt-8">
+                    <button
+                      type="button"
                       disabled={page <= 1}
                       onClick={() => updateQueryParams({ page: page - 1 })}
-                      className="inline-flex items-center gap-1"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-[#ebe2d1] dark:border-[#2f384d] bg-[#fbfaf8] dark:bg-[#161a25] text-xs font-semibold uppercase tracking-wider text-[#141312] dark:text-[#f8f5ee] disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#c5a059] cursor-pointer transition-all shadow-xs"
                     >
-                      <ChevronLeft size={16} /> Previous
-                    </Button>
+                      <ChevronLeft size={14} /> Previous
+                    </button>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5 mx-2">
                       {Array.from({ length: totalPages }).map((_, i) => {
                         const pageNum = i + 1;
                         const isCurrent = pageNum === page;
@@ -368,10 +399,10 @@ function SearchPageContent() {
                             key={pageNum}
                             type="button"
                             onClick={() => updateQueryParams({ page: pageNum })}
-                            className={`h-8 w-8 rounded border text-xs font-semibold transition-colors cursor-pointer ${
+                            className={`h-9 w-9 rounded-xl text-xs font-serif font-bold transition-all cursor-pointer ${
                               isCurrent
-                                ? 'border-amazon-orange bg-amber-50 text-amazon-dark font-bold ring-1 ring-amazon-orange'
-                                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                                ? 'bg-gradient-to-r from-[#c5a059] to-[#a88237] text-[#0d0a06] shadow-sm'
+                                : 'border border-[#ebe2d1] dark:border-[#2f384d] bg-[#fbfaf8] dark:bg-[#161a25] text-[#141312] dark:text-[#f8f5ee] hover:border-[#c5a059]'
                             }`}
                           >
                             {pageNum}
@@ -380,15 +411,14 @@ function SearchPageContent() {
                       })}
                     </div>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
+                    <button
+                      type="button"
                       disabled={page >= totalPages}
                       onClick={() => updateQueryParams({ page: page + 1 })}
-                      className="inline-flex items-center gap-1"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-[#ebe2d1] dark:border-[#2f384d] bg-[#fbfaf8] dark:bg-[#161a25] text-xs font-semibold uppercase tracking-wider text-[#141312] dark:text-[#f8f5ee] disabled:opacity-40 disabled:cursor-not-allowed hover:border-[#c5a059] cursor-pointer transition-all shadow-xs"
                     >
-                      Next <ChevronRight size={16} />
-                    </Button>
+                      Next <ChevronRight size={14} />
+                    </button>
                   </div>
                 )}
               </>
@@ -419,8 +449,8 @@ export default function SearchPage() {
       fallback={
         <MainLayout>
           <div className="mx-auto max-w-screen-2xl px-4 py-8">
-            <div className="h-6 w-48 bg-gray-200 rounded animate-pulse mb-6" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            <div className="h-6 w-48 bg-[#ebe2d1] dark:bg-[#1f2533] rounded-full animate-pulse mb-6" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {Array.from({ length: 8 }).map((_, i) => (
                 <ProductCardSkeleton key={i} />
               ))}
@@ -433,3 +463,4 @@ export default function SearchPage() {
     </Suspense>
   );
 }
+

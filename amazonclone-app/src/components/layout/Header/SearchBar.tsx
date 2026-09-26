@@ -134,36 +134,24 @@ export function SearchBar() {
   }
 
   return (
-    <div ref={containerRef} className="relative flex-1 min-w-0">
+    <div ref={containerRef} className="relative w-full max-w-2xl mx-auto">
       <form
         onSubmit={handleSubmit}
-        className="flex h-10 w-full overflow-hidden rounded ring-1 ring-transparent focus-within:ring-2 focus-within:ring-amazon-orange"
+        className="
+          flex items-center h-10 w-full overflow-hidden rounded-full
+          border border-[#dcd4c3] dark:border-[#2f281a]
+          bg-white/80 dark:bg-[#121620]/80 backdrop-blur-md
+          shadow-[0_2px_10px_rgba(0,0,0,0.03)] dark:shadow-[0_2px_14px_rgba(0,0,0,0.25)]
+          focus-within:border-[#b89047] dark:focus-within:border-[#dfba73]
+          focus-within:ring-2 focus-within:ring-[#c5a059]/25
+          transition-all duration-300
+        "
         role="search"
-        aria-label="Search Amazon"
+        aria-label="Search Valenza Maison"
       >
-        {/* Category dropdown */}
-        <div className="relative flex-shrink-0">
-          <select
-            id="search-category-select"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="
-              h-full appearance-none rounded-l border-r border-gray-300
-              bg-gray-100 pl-3 pr-7 text-xs text-gray-700
-              hover:bg-gray-200 focus:outline-none cursor-pointer
-            "
-            aria-label="Search category"
-          >
-            {SEARCH_CATEGORIES.map((c) => (
-              <option key={c.value} value={c.value}>
-                {c.label}
-              </option>
-            ))}
-          </select>
-          {/* Chevron icon */}
-          <span className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-gray-500 text-[9px]">
-            ▼
-          </span>
+        {/* Subtle search icon prefix */}
+        <div className="flex items-center pl-3.5 pr-1.5 text-[#9a7833] dark:text-[#dfba73] pointer-events-none">
+          <Search size={15} />
         </div>
 
         {/* Search input */}
@@ -180,10 +168,11 @@ export function SearchBar() {
           }}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder="Search Amazon"
+          placeholder="Search timepieces, fine jewels, haute couture, ateliers..."
           className="
-            min-w-0 flex-1 border-0 bg-white px-3 text-sm text-gray-900
-            placeholder:text-gray-400
+            min-w-0 flex-1 border-0 bg-transparent px-2 text-xs md:text-sm text-[#141312] dark:text-[#f8f5ee]
+            placeholder:text-[#9a9184] dark:placeholder:text-[#7d776d]
+            placeholder:font-serif placeholder:italic placeholder:tracking-wide
             focus:outline-none
           "
           aria-label="Search"
@@ -191,19 +180,21 @@ export function SearchBar() {
           aria-autocomplete="list"
         />
 
-        {/* Search button */}
+        {/* Gold Luxury Submit Button */}
         <button
           type="submit"
           id="search-submit-btn"
           className="
-            flex items-center justify-center px-4
-            bg-amazon-yellow hover:bg-amazon-yellow-dark
-            rounded-r transition-colors duration-150 cursor-pointer
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-amazon-orange
+            mr-1 my-auto flex items-center justify-center h-7 px-3.5 rounded-full
+            bg-gradient-to-r from-[#c5a059] via-[#dfba73] to-[#9b7532]
+            text-[#121110] font-serif text-[10px] tracking-[0.16em] uppercase font-bold
+            hover:brightness-110 transition-all duration-200 cursor-pointer shadow-xs
+            focus:outline-none active:scale-95
           "
           aria-label="Submit search"
         >
-          <Search size={19} className="text-amazon-dark" />
+          <span className="hidden sm:inline">Search</span>
+          <Search size={12} className="sm:hidden stroke-[2.5]" />
         </button>
       </form>
 
@@ -212,9 +203,10 @@ export function SearchBar() {
         <div
           id="search-suggestions-dropdown"
           className="
-            absolute left-0 right-0 top-full z-50 mt-1
-            overflow-hidden rounded-md border border-gray-300
-            bg-white shadow-xl
+            absolute left-0 right-0 top-full z-50 mt-1.5
+            overflow-hidden rounded-xl border border-[#dcd4c3] dark:border-[#382f1d]
+            bg-[#faf9f6]/95 dark:bg-[#121620]/95 backdrop-blur-xl
+            shadow-[0_12px_36px_rgba(0,0,0,0.12)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.5)]
           "
           role="listbox"
         >
@@ -228,29 +220,32 @@ export function SearchBar() {
                 onMouseEnter={() => setActiveIndex(index)}
                 onClick={() => handleSelectSuggestion(suggestion)}
                 className={`
-                  flex items-center justify-between px-4 py-2.5 text-sm cursor-pointer transition-colors
-                  ${isSelected ? 'bg-gray-100 text-gray-900' : 'text-gray-800 hover:bg-gray-50'}
+                  flex items-center justify-between px-4 py-2.5 text-xs md:text-sm cursor-pointer transition-colors border-b border-[#f0ebe0]/60 dark:border-[#1d222e] last:border-0
+                  ${isSelected 
+                    ? 'bg-[#f0e8d5] dark:bg-[#1c2230] text-[#141312] dark:text-[#dfba73]' 
+                    : 'text-[#38332d] dark:text-[#ddd6c8] hover:bg-[#f6f1e6] dark:hover:bg-[#181d28]'
+                  }
                 `}
               >
                 <div className="flex items-center gap-2.5 overflow-hidden">
-                  <Search size={14} className="text-gray-400 flex-shrink-0" />
-                  <span className="truncate font-normal">
+                  <Search size={13} className="text-[#9a7833] dark:text-[#dfba73] flex-shrink-0" />
+                  <span className="truncate font-sans">
                     {suggestion.text}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1 flex-shrink-0 text-xs text-gray-400">
+                <div className="flex items-center gap-1.5 flex-shrink-0 text-xs text-[#8a8277] dark:text-[#888175]">
                   {suggestion.type === 'category' && (
-                    <span className="inline-flex items-center gap-1 rounded bg-blue-50 px-1.5 py-0.5 text-[10px] font-medium text-blue-700">
-                      <Layers size={10} /> In Department
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[#f0e8d5] dark:bg-[#202737] border border-[#d6be90]/40 dark:border-[#c5a059]/30 px-2 py-0.5 text-[9px] font-serif uppercase tracking-wider text-[#8a6827] dark:text-[#dfba73]">
+                      <Layers size={9} /> Department
                     </span>
                   )}
                   {suggestion.type === 'brand' && (
-                    <span className="inline-flex items-center gap-1 rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
-                      <Tag size={10} /> Brand
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[#fdf5e6] dark:bg-[#232018] border border-[#c5a059]/40 px-2 py-0.5 text-[9px] font-serif uppercase tracking-wider text-[#9a7833] dark:text-[#e4c480]">
+                      <Tag size={9} /> Maison
                     </span>
                   )}
-                  <ArrowUpLeft size={13} className="text-gray-300 ml-1" />
+                  <ArrowUpLeft size={12} className="text-[#a8a195] ml-1" />
                 </div>
               </div>
             );

@@ -1,7 +1,7 @@
 'use client';
 // ============================================================================
-// Order Details Page — /orders/[id]
-// Amazon-style layout: Order Information, Status, Return & Refund Tracking
+// Order Details & Tracking Page — /orders/[id]
+// Valenza Maison Haute Horlogerie & Joaillerie Private Allocation Dossier
 // ============================================================================
 import React, { useEffect, useState, use } from 'react';
 import Link from 'next/link';
@@ -19,10 +19,15 @@ import {
   CreditCard,
   MapPin,
   Clock,
+  Sparkles,
+  Award,
+  Crown,
+  FileText,
+  Printer,
 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
+import { useLocation } from '@/context/LocationContext';
 import { getOrderById } from '@/services/orderService';
 import {
   createCustomerReturn,
@@ -32,6 +37,7 @@ import {
   checkReturnEligibility,
 } from '@/services/returnService';
 import { getRecommendationsForHome } from '@/services/recommendationService';
+import { formatPrice } from '@/lib/utils';
 import type { Order, OrderItem, ReturnRequest, Product } from '@/types';
 
 interface PageProps {
@@ -42,6 +48,7 @@ export default function OrderDetailsPage({ params }: PageProps) {
   const { id } = use(params);
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const { country, convertPrice } = useLocation();
 
   const [order, setOrder] = useState<Order | null>(null);
   const [returns, setReturns] = useState<ReturnRequest[]>([]);
@@ -85,7 +92,7 @@ export default function OrderDetailsPage({ params }: PageProps) {
     if (!order) return;
     const eligibility = checkReturnEligibility(order, item.productId);
     if (!eligibility.isEligible) {
-      alert(eligibility.reason || 'This item is not eligible for return.');
+      alert(eligibility.reason || 'This piece is not eligible for salon return.');
       return;
     }
     setSelectedItemForReturn(item);
@@ -111,7 +118,7 @@ export default function OrderDetailsPage({ params }: PageProps) {
 
       if (res.success && res.data) {
         setSelectedItemForReturn(null);
-        setNoticeMessage('Your return request has been placed! Track its progress below.');
+        setNoticeMessage('Your salon exchange/return request has been submitted to the Atelier Concierge.');
         setTimeout(() => setNoticeMessage(null), 4000);
         await loadOrderData();
       } else {
@@ -145,10 +152,10 @@ export default function OrderDetailsPage({ params }: PageProps) {
   if (loading || authLoading) {
     return (
       <MainLayout>
-        <div className="mx-auto max-w-screen-xl px-4 py-8 animate-pulse">
-          <div className="h-6 w-48 bg-gray-200 rounded mb-6" />
-          <div className="h-44 bg-gray-200 rounded-lg mb-6" />
-          <div className="h-64 bg-gray-200 rounded-lg" />
+        <div className="mx-auto max-w-screen-xl px-4 sm:px-6 py-10 animate-pulse">
+          <div className="h-4 w-48 bg-[#ebe2d1] dark:bg-[#1f2533] rounded-full mb-8" />
+          <div className="h-48 bg-[#ebe2d1]/50 dark:bg-[#161a25] rounded-3xl mb-8" />
+          <div className="h-64 bg-[#ebe2d1]/50 dark:bg-[#161a25] rounded-3xl" />
         </div>
       </MainLayout>
     );
@@ -157,20 +164,23 @@ export default function OrderDetailsPage({ params }: PageProps) {
   if (!order) {
     return (
       <MainLayout>
-        <div className="mx-auto max-w-screen-md px-4 py-16 text-center">
-          <Package size={48} className="text-gray-400 mx-auto mb-3" />
-          <h1 className="text-xl font-bold text-gray-900 mb-2">Order Not Found</h1>
-          <p className="text-xs text-gray-600 mb-6">
-            We couldn&apos;t find an order matching the requested identifier.
+        <div className="mx-auto max-w-screen-md px-4 py-20 text-center">
+          <div className="w-14 h-14 rounded-full border border-[#d6be90] dark:border-[#c5a059]/40 bg-[#fbfaf8] dark:bg-[#161a25] flex items-center justify-center mx-auto mb-3">
+            <Package size={24} className="text-[#9b8353] dark:text-[#d6be90]" />
+          </div>
+          <h1 className="font-serif text-2xl font-medium text-[#141312] dark:text-[#f8f5ee] mb-2">
+            Allocation Dossier Not Found
+          </h1>
+          <p className="text-xs text-[#786b58] dark:text-[#9e978b] max-w-md mx-auto mb-6">
+            We could not locate an active archive matching the requested allocation ID.
           </p>
-          <Button
+          <button
             type="button"
-            variant="cart"
             onClick={() => router.push('/orders')}
-            className="text-xs font-bold px-6 py-2"
+            className="px-6 py-3 rounded-xl font-sans text-xs uppercase tracking-wider font-semibold text-[#12110f] bg-gradient-to-r from-[#c5a059] to-[#b89548] hover:brightness-105 shadow-md cursor-pointer"
           >
-            Back to Your Orders
-          </Button>
+            Return to Allocations
+          </button>
         </div>
       </MainLayout>
     );
@@ -178,53 +188,66 @@ export default function OrderDetailsPage({ params }: PageProps) {
 
   return (
     <MainLayout>
-      <div className="mx-auto max-w-screen-xl px-4 py-6">
+      <div className="mx-auto max-w-screen-xl px-4 sm:px-6 py-6 sm:py-8 font-sans text-[#141312] dark:text-[#f8f5ee]">
         {/* Notice alert */}
         {noticeMessage && (
-          <div className="fixed top-20 right-4 z-50 flex items-center gap-2 rounded-lg bg-green-700 px-4 py-3 text-sm font-semibold text-white shadow-xl animate-bounce">
-            <CheckCircle2 size={18} strokeWidth={3} />
+          <div className="fixed top-24 right-6 z-50 flex items-center gap-2.5 rounded-2xl bg-[#141312]/95 dark:bg-[#1f2533]/95 border border-[#c5a059]/40 backdrop-blur-md px-5 py-3.5 text-xs uppercase tracking-widest font-semibold text-[#f8f5ee] shadow-2xl transition-all animate-bounce">
+            <Sparkles size={16} className="text-[#c5a059]" />
             <span>{noticeMessage}</span>
           </div>
         )}
 
         {/* Back Link */}
-        <div className="mb-4">
+        <div className="mb-6">
           <Link
             href="/orders"
-            className="inline-flex items-center gap-1 text-xs text-amazon-link hover:underline font-medium"
+            className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider font-semibold text-[#9b8353] dark:text-[#d6be90] hover:underline"
           >
             <ChevronLeft size={14} />
-            Back to Your Orders
+            Back to Client Allocations
           </Link>
         </div>
 
         {/* Page Heading & Meta */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-200 pb-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#ebe2d1] dark:border-[#1e2433] pb-5 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Order Details</h1>
-            <p className="text-xs text-gray-500 mt-1">
-              Ordered on{' '}
-              <strong className="text-gray-700">
+            <span className="text-[10px] uppercase font-semibold tracking-[0.25em] text-[#9b8353] dark:text-[#d6be90] block mb-1">
+              Atelier Dossier &amp; Transit Record
+            </span>
+            <h1 className="font-serif text-2xl sm:text-3xl font-light tracking-tight text-[#141312] dark:text-[#f8f5ee]">
+              Allocation #{order.id}
+            </h1>
+            <p className="text-xs text-[#786b58] dark:text-[#9e978b] mt-1.5">
+              Acquired on{' '}
+              <strong className="text-[#141312] dark:text-[#f8f5ee] font-medium">
                 {new Date(order.createdAt).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',
                 })}
-              </strong>{' '}
-              | Order # <strong className="font-mono text-gray-800">{order.id}</strong>
+              </strong>
             </p>
           </div>
 
-          <div className="text-xs">
-            <span className="rounded bg-green-100 px-2.5 py-1 font-bold text-green-800 uppercase">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#f6efe1] dark:bg-[#1a2130] border border-[#e4d6bf] dark:border-[#2f384d] text-xs font-semibold text-[#786b58] dark:text-[#d6be90] uppercase tracking-wider">
+              <Sparkles size={13} className="text-[#c5a059]" />
               {order.status}
             </span>
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="p-2 rounded-xl border border-[#dfd6c5] dark:border-[#2f384d] bg-white dark:bg-[#161a25] hover:border-[#c5a059] text-[#786b58] dark:text-[#c4b59d] cursor-pointer"
+              title="Print Dossier"
+            >
+              <Printer size={16} />
+            </button>
           </div>
         </div>
 
-        {/* ── Return / Refund Active Banner (if any) ── */}
+        {/* ── Return Active Banner ── */}
         {returns.length > 0 && (
-          <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-5 shadow-xs">
+          <div className="mb-8 rounded-3xl border border-[#e8dcce] dark:border-[#2f384d] bg-[#fcf8f0] dark:bg-[#1a2130] p-6 shadow-sm">
             {returns.map((ret) => {
               const stages: ReturnRequest['status'][] = [
                 'RETURN_REQUESTED',
@@ -239,24 +262,24 @@ export default function OrderDetailsPage({ params }: PageProps) {
                 <div key={ret.id} className="space-y-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <RotateCcw size={18} className="text-amazon-orange" />
-                      <h2 className="text-sm font-bold text-gray-900">
-                        Return Request for: {ret.itemTitle}
+                      <RotateCcw size={18} className="text-[#c5a059]" />
+                      <h2 className="font-serif text-sm font-medium text-[#141312] dark:text-[#f8f5ee]">
+                        Salon Consultation for: {ret.itemTitle}
                       </h2>
                     </div>
                     <div className="text-xs">
-                      <span className="font-bold text-green-800">
-                        Refund Amount: ${ret.refundAmount.toFixed(2)}
+                      <span className="font-serif font-semibold text-emerald-700 dark:text-emerald-400">
+                        Refund Credit: {formatPrice(ret.refundAmount)}
                       </span>
                     </div>
                   </div>
 
-                  <div className="text-xs text-gray-700">
+                  <div className="text-xs text-[#786b58] dark:text-[#9e978b]">
                     <p>
                       <strong>Reason:</strong> {ret.reason}
                     </p>
                     {ret.note && (
-                      <p className="mt-0.5 text-gray-600 italic">
+                      <p className="mt-1 italic">
                         &ldquo;{ret.note}&rdquo;
                       </p>
                     )}
@@ -264,46 +287,33 @@ export default function OrderDetailsPage({ params }: PageProps) {
 
                   {/* Visual Stepper */}
                   <div className="pt-2">
-                    <div className="grid grid-cols-5 gap-1 text-[11px] text-center font-semibold">
+                    <div className="grid grid-cols-5 gap-2 text-[10px] text-center font-medium">
                       {stages.map((stage, idx) => (
                         <div key={stage} className="flex flex-col items-center">
                           <div
-                            className={`h-2.5 w-full rounded-full mb-1 transition-colors ${
-                              idx <= currentStageIdx ? 'bg-green-600' : 'bg-gray-200'
+                            className={`h-2 w-full rounded-full mb-1.5 transition-colors ${
+                              idx <= currentStageIdx ? 'bg-[#c5a059]' : 'bg-[#e5decb] dark:bg-[#283042]'
                             }`}
                           />
                           <span
                             className={
-                              idx <= currentStageIdx ? 'text-green-800 font-bold' : 'text-gray-400'
+                              idx <= currentStageIdx ? 'text-[#9b8353] dark:text-[#d6be90] font-semibold' : 'text-[#a09585] dark:text-[#58647d]'
                             }
                           >
                             {stage === 'RETURN_REQUESTED'
-                              ? 'Requested'
+                              ? 'Initiated'
                               : stage === 'RETURN_APPROVED'
                               ? 'Approved'
                               : stage === 'RETURNED'
-                              ? 'Returned'
+                              ? 'Received'
                               : stage === 'REFUND_PENDING'
-                              ? 'Refund Pending'
-                              : 'Refunded'}
+                              ? 'Processing'
+                              : 'Settled'}
                           </span>
                         </div>
                       ))}
                     </div>
                   </div>
-
-                  {/* Demo advance return status */}
-                  {currentStageIdx < stages.length - 1 && (
-                    <div className="pt-2 flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => handleAdvanceReturn(ret)}
-                        className="text-xs font-semibold text-amazon-link hover:underline bg-white px-3 py-1.5 rounded border border-gray-300"
-                      >
-                        Advance status for demo testing →
-                      </button>
-                    </div>
-                  )}
                 </div>
               );
             })}
@@ -311,131 +321,125 @@ export default function OrderDetailsPage({ params }: PageProps) {
         )}
 
         {/* ── Order Summary Cards Grid ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 rounded-lg border border-gray-200 bg-white p-5 shadow-xs mb-8 text-xs">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 p-6 sm:p-8 shadow-[0_12px_40px_rgba(26,23,20,0.04)] dark:shadow-[0_16px_45px_rgba(0,0,0,0.6)] mb-10 text-xs">
           {/* Shipping Address */}
           <div>
-            <div className="flex items-center gap-1.5 font-bold text-gray-900 mb-2">
-              <MapPin size={14} className="text-gray-500" />
-              <span>Shipping Address</span>
+            <div className="flex items-center gap-2 font-serif font-semibold text-[#9b8353] dark:text-[#d6be90] mb-3">
+              <MapPin size={15} className="text-[#c5a059]" />
+              <span>Destination Client</span>
             </div>
-            <p className="font-semibold text-gray-900">{order.shippingAddress.fullName}</p>
-            <p className="text-gray-600">{order.shippingAddress.street}</p>
-            <p className="text-gray-600">
+            <p className="font-semibold text-[#141312] dark:text-[#f8f5ee]">{order.shippingAddress.fullName}</p>
+            <p className="text-[#615442] dark:text-[#b8af9f]">{order.shippingAddress.street}</p>
+            <p className="text-[#615442] dark:text-[#b8af9f]">
               {order.shippingAddress.city}, {order.shippingAddress.state}{' '}
               {order.shippingAddress.postalCode}
             </p>
-            <p className="text-gray-600">{order.shippingAddress.country}</p>
+            <p className="text-[#615442] dark:text-[#b8af9f]">{order.shippingAddress.country}</p>
             {order.shippingAddress.phone && (
-              <p className="text-gray-500 mt-1">Phone: {order.shippingAddress.phone}</p>
+              <p className="text-[#8e816e] dark:text-[#7e8aa2] mt-1.5">Secure Line: {order.shippingAddress.phone}</p>
             )}
           </div>
 
           {/* Payment Method */}
           <div>
-            <div className="flex items-center gap-1.5 font-bold text-gray-900 mb-2">
-              <CreditCard size={14} className="text-gray-500" />
-              <span>Payment Method</span>
+            <div className="flex items-center gap-2 font-serif font-semibold text-[#9b8353] dark:text-[#d6be90] mb-3">
+              <CreditCard size={15} className="text-[#c5a059]" />
+              <span>Settlement Protocol</span>
             </div>
-            <p className="font-semibold text-gray-900 capitalize">
+            <p className="font-semibold capitalize text-[#141312] dark:text-[#f8f5ee]">
               {order.paymentMethod.type}
             </p>
             {order.paymentMethod.type === 'card' && (
-              <p className="text-gray-600">
+              <p className="text-[#615442] dark:text-[#b8af9f]">
                 {order.paymentMethod.brand} ending in {order.paymentMethod.last4}
               </p>
             )}
             {order.paymentMethod.type === 'upi' && (
-              <p className="text-gray-600">UPI ID: {order.paymentMethod.upiId}</p>
+              <p className="text-[#615442] dark:text-[#b8af9f]">UPI ID: {order.paymentMethod.upiId}</p>
             )}
             {order.paymentMethod.type === 'cod' && (
-              <p className="text-gray-600">Cash on Delivery</p>
+              <p className="text-[#615442] dark:text-[#b8af9f]">Vault Concierge Settlement</p>
             )}
           </div>
 
           {/* Order Summary Pricing */}
           <div>
-            <div className="flex items-center gap-1.5 font-bold text-gray-900 mb-2">
-              <ShieldCheck size={14} className="text-gray-500" />
-              <span>Order Summary</span>
+            <div className="flex items-center gap-2 font-serif font-semibold text-[#9b8353] dark:text-[#d6be90] mb-3">
+              <Award size={15} className="text-[#c5a059]" />
+              <span>Valuation Summary</span>
             </div>
-            <div className="space-y-1 text-gray-600">
+            <div className="space-y-1.5 text-[#786b58] dark:text-[#9e978b]">
               <div className="flex justify-between">
-                <span>Items Subtotal:</span>
-                <span>${order.subtotal.toFixed(2)}</span>
+                <span>Pieces Subtotal:</span>
+                <span className="font-serif font-medium text-[#141312] dark:text-[#f8f5ee]">{formatPrice(order.subtotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span>Shipping:</span>
-                <span>${order.shippingCost.toFixed(2)}</span>
+                <span>Insured Courier:</span>
+                <span className="font-serif font-medium text-[#141312] dark:text-[#f8f5ee]">{formatPrice(order.shippingCost)}</span>
               </div>
-              {order.tax > 0 && (
-                <div className="flex justify-between">
-                  <span>Estimated Tax:</span>
-                  <span>${order.tax.toFixed(2)}</span>
-                </div>
-              )}
-              <div className="flex justify-between font-bold text-gray-900 border-t border-gray-100 pt-1 text-sm">
-                <span>Grand Total:</span>
-                <span className="text-[#b12704]">${order.total.toFixed(2)}</span>
+              <div className="flex justify-between font-serif font-bold text-sm text-[#141312] dark:text-[#f8f5ee] border-t border-[#f0eae0] dark:border-[#1e2433] pt-2">
+                <span>Grand Valuation:</span>
+                <span className="text-[#9b8353] dark:text-[#d6be90]">{formatPrice(order.total)}</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* ── Order Items ── */}
-        <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-xs mb-8">
-          <h2 className="text-base font-bold text-gray-900 mb-4 pb-2 border-b border-gray-200">
-            Items Ordered ({order.items.length})
+        <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 p-6 sm:p-8 shadow-[0_12px_40px_rgba(26,23,20,0.04)] dark:shadow-[0_16px_45px_rgba(0,0,0,0.6)] mb-10">
+          <h2 className="font-serif text-lg font-medium text-[#141312] dark:text-[#f8f5ee] mb-6 pb-3 border-b border-[#f0eae0] dark:border-[#1e2433]">
+            Allocated Masterpieces ({order.items.length})
           </h2>
 
-          <div className="divide-y divide-gray-100 space-y-4">
+          <div className="divide-y divide-[#f0eae0] dark:divide-[#1e2433] space-y-5">
             {order.items.map((item, idx) => (
               <div
                 key={idx}
-                className="pt-4 first:pt-0 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"
+                className="pt-5 first:pt-0 flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between"
               >
-                <div className="flex gap-4 items-center flex-1">
-                  <div className="relative h-20 w-20 rounded border bg-white p-1 flex-shrink-0">
+                <div className="flex gap-5 items-center flex-1">
+                  <div className="relative h-24 w-24 rounded-2xl border border-[#ebe2d1] dark:border-[#262c3d] bg-[#fbfaf8] dark:bg-[#161a25] p-2 shrink-0">
                     <Image
                       src={item.image}
                       alt={item.title}
                       fill
-                      sizes="80px"
+                      sizes="96px"
                       className="object-contain p-1"
                     />
                   </div>
 
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 max-w-lg">
+                    <h3 className="font-serif text-sm font-medium text-[#141312] dark:text-[#f8f5ee] line-clamp-2 max-w-lg">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      Quantity: <strong className="text-gray-800">{item.quantity}</strong> · ${item.price.toFixed(2)} each
+                    <p className="text-xs text-[#786b58] dark:text-[#9e978b] mt-1">
+                      Quantity: <strong className="text-[#141312] dark:text-[#f8f5ee]">{item.quantity}</strong> · <span className="font-serif font-semibold">{formatPrice(item.price)} each</span>
                     </p>
-                    <div className="mt-1 flex items-center gap-2 text-xs text-green-700">
-                      <Truck size={14} />
-                      <span>Estimated Delivery: {order.estimatedDelivery || 'Standard'}</span>
+                    <div className="mt-1.5 flex items-center gap-2 text-xs text-[#9b8353] dark:text-[#d6be90] font-medium">
+                      <Truck size={14} className="text-[#c5a059]" />
+                      <span>Insured Dispatch: {order.estimatedDelivery || 'In 4-5 Business Days'}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Line Item Actions */}
-                <div className="flex flex-col gap-2 w-full sm:w-48 text-xs">
+                <div className="flex flex-col gap-2.5 w-full sm:w-52 text-xs">
                   <Link
                     href={`/product/${item.productId}`}
-                    className="w-full rounded bg-amazon-yellow py-1.5 text-center font-semibold text-gray-900 hover:bg-amazon-yellow-hover border border-[#fcd200] flex items-center justify-center gap-1.5"
+                    className="w-full rounded-xl bg-gradient-to-r from-[#c5a059] to-[#b89548] text-[#12110f] py-2.5 text-center font-semibold uppercase tracking-wider text-[11px] shadow-sm hover:brightness-105 transition-all flex items-center justify-center gap-1.5"
                   >
                     <Star size={13} />
-                    <span>Write a product review</span>
+                    <span>Client Appraisal</span>
                   </Link>
 
                   {order.status !== 'cancelled' && order.status !== 'REFUNDED' && (
                     <button
                       type="button"
                       onClick={() => handleOpenReturnModal(item)}
-                      className="w-full rounded border border-gray-300 bg-white py-1.5 text-center font-medium text-gray-700 hover:bg-gray-50 flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="w-full rounded-xl border border-[#dfd6c5] dark:border-[#2f384d] bg-white dark:bg-[#161a25] py-2 text-center font-medium text-[#786b58] dark:text-[#c4b59d] hover:border-[#c5a059] flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                     >
-                      <RotateCcw size={13} />
-                      <span>Return or replace</span>
+                      <RotateCcw size={13} className="text-[#c5a059]" />
+                      <span>Salon Consultation</span>
                     </button>
                   )}
                 </div>
@@ -443,52 +447,6 @@ export default function OrderDetailsPage({ params }: PageProps) {
             ))}
           </div>
         </div>
-
-        {/* ── Recommendations: Based on your order ── */}
-        {recommendations.length > 0 && (
-          <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-xs">
-            <h2 className="text-base font-bold text-gray-900 mb-4">
-              Recommended based on this purchase
-            </h2>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {recommendations.map((p) => {
-                const img = p.images?.[0]?.url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300';
-                return (
-                  <Link
-                    key={p.id}
-                    href={`/product/${p.slug}`}
-                    className="group flex flex-col justify-between rounded-lg border border-gray-200 p-3 hover:border-gray-300 hover:shadow-xs transition-all bg-white"
-                  >
-                    <div>
-                      <div className="relative h-28 w-full rounded bg-white overflow-hidden mb-2">
-                        <Image
-                          src={img}
-                          alt={p.title}
-                          fill
-                          sizes="150px"
-                          className="object-contain p-1 group-hover:scale-105 transition-transform"
-                        />
-                      </div>
-                      <h3 className="text-xs font-medium text-amazon-link group-hover:underline line-clamp-2">
-                        {p.title}
-                      </h3>
-                      <div className="mt-1 flex items-center gap-1 text-xs text-amber-500">
-                        <Star size={12} className="fill-amber-400 text-amber-400" />
-                        <span className="text-gray-700 font-bold">{p.rating.toFixed(1)}</span>
-                        <span className="text-gray-400">({p.reviewCount})</span>
-                      </div>
-                    </div>
-
-                    <div className="mt-2 pt-1 border-t border-gray-100 text-sm font-bold text-gray-900">
-                      ${p.price.toFixed(2)}
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* ── Return Request Modal ── */}
@@ -496,62 +454,62 @@ export default function OrderDetailsPage({ params }: PageProps) {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-2xs p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 text-[#141312] dark:text-[#f8f5ee]"
         >
-          <div className="relative w-full max-w-lg rounded-xl border border-gray-300 bg-white p-6 shadow-2xl">
+          <div className="relative w-full max-w-lg rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white dark:bg-[#12151f] p-6 sm:p-8 shadow-2xl">
             <button
               type="button"
               onClick={() => setSelectedItemForReturn(null)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 cursor-pointer"
+              className="absolute top-5 right-5 text-[#9a8d7a] hover:text-[#141312] dark:hover:text-[#f8f5ee] cursor-pointer"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
 
-            <div className="flex items-center gap-2 mb-2 text-amazon-orange">
-              <RotateCcw size={20} />
-              <h3 className="text-base font-bold text-gray-900">
-                Choose a reason for return
+            <div className="flex items-center gap-2 mb-4">
+              <RotateCcw size={18} className="text-[#c5a059]" />
+              <h3 className="font-serif text-base font-medium">
+                Salon Consultation &amp; Return Request
               </h3>
             </div>
 
-            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 mb-4">
-              <div className="relative h-12 w-12 rounded border bg-white p-1 flex-shrink-0">
+            <div className="flex items-center gap-4 p-4 bg-[#fbfaf8] dark:bg-[#161a25] rounded-2xl border border-[#ebe2d1] dark:border-[#262c3d] mb-5">
+              <div className="relative h-14 w-14 rounded-xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white dark:bg-[#12151f] p-1 shrink-0">
                 <Image
                   src={selectedItemForReturn.image}
                   alt={selectedItemForReturn.title}
                   fill
-                  sizes="48px"
+                  sizes="56px"
                   className="object-contain"
                 />
               </div>
               <div className="text-xs">
-                <p className="font-semibold text-gray-900 line-clamp-1">
+                <p className="font-serif font-medium line-clamp-1">
                   {selectedItemForReturn.title}
                 </p>
-                <p className="text-gray-500">
-                  Refund amount:{' '}
-                  <strong className="text-green-700 font-bold">
-                    ${(selectedItemForReturn.price * selectedItemForReturn.quantity).toFixed(2)}
+                <p className="text-[#786b58] dark:text-[#9e978b] mt-0.5">
+                  Refund credit valuation:{' '}
+                  <strong className="font-serif text-[#9b8353] dark:text-[#d6be90]">
+                    {formatPrice(selectedItemForReturn.price * selectedItemForReturn.quantity)}
                   </strong>
                 </p>
               </div>
             </div>
 
             {returnError && (
-              <div className="mb-4 rounded bg-red-50 p-2.5 text-xs text-red-700 border border-red-200">
+              <div className="mb-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 p-3 text-xs text-rose-900 dark:text-rose-200 border border-rose-200 dark:border-rose-900/50">
                 {returnError}
               </div>
             )}
 
             <form onSubmit={handleConfirmReturn} className="space-y-4 text-xs">
-              <div>
-                <label className="block font-bold text-gray-800 mb-1">
-                  Why are you returning this?
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-[#786b58] dark:text-[#c4b59d]">
+                  Reason for Consultation / Return
                 </label>
                 <select
                   value={returnReason}
                   onChange={(e) => setReturnReason(e.target.value)}
-                  className="w-full rounded border border-gray-300 px-3 py-2 text-xs bg-white text-gray-900 focus:ring-1 focus:ring-amazon-orange focus:outline-none"
+                  className="w-full rounded-xl border border-[#dfd6c5] dark:border-[#2f384d] bg-white dark:bg-[#161a25] px-3.5 py-2.5 text-xs focus:outline-none focus:border-[#c5a059]"
                   required
                 >
                   {RETURN_REASONS.map((reason) => (
@@ -562,47 +520,34 @@ export default function OrderDetailsPage({ params }: PageProps) {
                 </select>
               </div>
 
-              <div>
-                <label className="block font-bold text-gray-800 mb-1">
-                  Comments / Note (Optional)
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-[#786b58] dark:text-[#c4b59d]">
+                  Bespoke Notes for Client Concierge (Optional)
                 </label>
                 <textarea
                   rows={3}
                   value={returnNote}
                   onChange={(e) => setReturnNote(e.target.value)}
-                  placeholder="Provide any details about the issue"
-                  className="w-full rounded border border-gray-300 px-3 py-2 text-xs focus:ring-1 focus:ring-amazon-orange focus:outline-none"
+                  placeholder="Provide any additional resizing or exchange preferences..."
+                  className="w-full rounded-xl border border-[#dfd6c5] dark:border-[#2f384d] bg-white dark:bg-[#161a25] px-3.5 py-2.5 text-xs focus:outline-none focus:border-[#c5a059]"
                 />
               </div>
 
-              <div className="rounded-md bg-blue-50 p-3 text-[11px] text-blue-800 border border-blue-200">
-                <p className="font-bold">Amazon Free Return Guarantee</p>
-                <p className="mt-0.5">
-                  A prepaid return label will be provided. The refund of{' '}
-                  <strong>
-                    ${(selectedItemForReturn.price * selectedItemForReturn.quantity).toFixed(2)}
-                  </strong>{' '}
-                  will be credited to your original payment method once received.
-                </p>
-              </div>
-
-              <div className="pt-2 flex items-center justify-end gap-2 border-t border-gray-100">
-                <Button
+              <div className="pt-3 flex items-center justify-end gap-3 border-t border-[#f0eae0] dark:border-[#1e2433]">
+                <button
                   type="button"
-                  variant="secondary"
                   onClick={() => setSelectedItemForReturn(null)}
-                  className="text-xs"
+                  className="rounded-xl border border-[#dfd6c5] dark:border-[#2f384d] px-5 py-2 text-xs font-semibold text-[#786b58] dark:text-[#c4b59d] cursor-pointer"
                 >
                   Cancel
-                </Button>
-                <Button
+                </button>
+                <button
                   type="submit"
-                  variant="buy-now"
                   disabled={submittingReturn}
-                  className="text-xs font-bold px-5"
+                  className="rounded-xl bg-gradient-to-r from-[#c5a059] to-[#b89548] px-6 py-2 text-xs uppercase tracking-wider font-semibold text-[#12110f] shadow-sm hover:brightness-105 cursor-pointer disabled:opacity-50"
                 >
-                  {submittingReturn ? 'Submitting...' : 'Confirm Return'}
-                </Button>
+                  {submittingReturn ? 'Submitting...' : 'Confirm Request'}
+                </button>
               </div>
             </form>
           </div>

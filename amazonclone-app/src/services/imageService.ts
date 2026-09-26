@@ -61,6 +61,30 @@ export async function uploadAvatar(
 }
 
 /**
+ * Upload a banner / promotional hero image to Cloudinary.
+ */
+export async function uploadBannerImage(
+  file: File,
+  onProgress?: (pct: number) => void,
+): Promise<ApiResponse<ImageUploadResult>> {
+  const { uploadToCloudinary } = await import('@/lib/cloudinary/upload');
+  try {
+    const result = await uploadToCloudinary(file, 'banners', onProgress);
+    return {
+      success: true,
+      data: {
+        publicId: result.publicId,
+        url: result.secureUrl,
+        width: result.width,
+        height: result.height,
+      },
+    };
+  } catch (error) {
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+/**
  * Get an optimised Cloudinary URL for a given publicId and preset.
  */
 export function getImageUrl(

@@ -1,7 +1,7 @@
 'use client';
 // ============================================================================
 // Seller Products Page — /seller/products
-// View, filter, publish/unpublish, edit, and delete seller's catalog items
+// Valenza Maison Partner Atelier Catalog & Masterpiece Management
 // ============================================================================
 import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
@@ -18,9 +18,10 @@ import {
   CheckCircle2,
   AlertCircle,
   ExternalLink,
+  Crown,
+  Gem,
 } from 'lucide-react';
 import { SellerLayout } from '@/components/seller/SellerLayout';
-import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 import {
   fetchSellerProducts,
@@ -74,7 +75,7 @@ export default function SellerProductsPage() {
   // Handle Delete
   const handleDeleteProduct = async (product: Product) => {
     if (!user) return;
-    if (!confirm(`Are you sure you want to delete "${product.title}"? This cannot be undone.`)) {
+    if (!confirm(`Are you sure you want to retire "${product.title}" from the catalog?`)) {
       return;
     }
 
@@ -100,239 +101,208 @@ export default function SellerProductsPage() {
       );
     }
 
-    if (statusFilter !== 'all') {
-      if (statusFilter === 'low_stock') {
-        list = list.filter((p) => p.stock > 0 && p.stock <= 5);
-      } else {
-        list = list.filter((p) => p.status === statusFilter);
-      }
-    }
-
-    return list;
+    if (statusFilter === 'all') return list;
+    if (statusFilter === 'low_stock') return list.filter((p) => p.stock > 0 && p.stock <= 5);
+    return list.filter((p) => p.status === statusFilter);
   }, [products, searchQuery, statusFilter]);
 
   return (
     <SellerLayout>
-      <div className="space-y-6">
-        {/* Toast alert */}
-        {noticeMessage && (
-          <div className="fixed top-20 right-4 z-50 flex items-center gap-2 rounded-lg bg-green-700 px-4 py-3 text-sm font-semibold text-white shadow-xl animate-bounce">
-            <CheckCircle2 size={18} strokeWidth={3} />
-            <span>{noticeMessage}</span>
-          </div>
-        )}
-
-        {/* ── Page Header & Add CTA ── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-4">
+      <div className="space-y-6 text-[#141312] dark:text-[#f8f5ee]">
+        
+        {/* ── Top Header Banner ── */}
+        <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/90 dark:bg-[#121620]/90 backdrop-blur-xl p-6 sm:p-8 shadow-[0_10px_35px_rgba(26,23,20,0.03)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.4)] flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Manage Products</h1>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Review and manage your store&apos;s product listings ({products.length} total)
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f6f1e6] dark:bg-[#1c2333] border border-[#d6be90]/40 dark:border-[#c5a059]/30 text-[10px] font-serif font-bold uppercase tracking-[0.24em] text-[#8a6827] dark:text-[#dfba73] mb-2.5 shadow-2xs">
+              <Crown size={11} className="text-[#c5a059]" />
+              <span>Catalog &amp; Masterpieces</span>
+            </div>
+            <h1 className="font-serif text-2xl sm:text-3xl font-light tracking-tight text-[#141312] dark:text-[#f8f5ee]">
+              Manage Atelier Catalog
+            </h1>
+            <p className="mt-1 text-xs sm:text-sm text-[#786b58] dark:text-[#9e978b] leading-relaxed">
+              Curate, edit pricing, update specifications, and control marketplace visibility for your pieces.
             </p>
           </div>
 
           <Link href="/seller/products/new">
-            <Button variant="buy-now" className="text-xs font-bold px-4 py-2 flex items-center gap-1.5 shadow-xs">
-              <PlusCircle size={15} />
-              <span>Add New Product</span>
-            </Button>
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-serif tracking-widest uppercase font-bold text-[#121110] bg-gradient-to-r from-[#c5a059] via-[#dfba73] to-[#9b7532] hover:brightness-105 active:scale-98 border border-[#c5a059]/50 shadow-sm transition-all cursor-pointer shrink-0"
+            >
+              <PlusCircle size={14} strokeWidth={2.2} />
+              <span>Add New Piece</span>
+            </button>
           </Link>
         </div>
 
-        {/* ── Filters & Search Strip ── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-gray-200 shadow-xs text-xs">
-          {/* Search input */}
-          <div className="relative flex-1 max-w-sm">
+        {/* ── Notice Message ── */}
+        {noticeMessage && (
+          <div className="rounded-2xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-[#102415] p-4 flex items-center gap-3 text-emerald-900 dark:text-emerald-200 text-xs shadow-md animate-fade-in">
+            <CheckCircle2 size={16} className="shrink-0 text-emerald-600 dark:text-emerald-400" />
+            <span className="font-serif font-medium">{noticeMessage}</span>
+          </div>
+        )}
+
+        {/* ── Filter Bar ── */}
+        <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/90 dark:bg-[#121620]/90 p-4 sm:p-5 shadow-xs space-y-4">
+          <div className="relative">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by title, SKU, or brand..."
-              className="w-full rounded-md border border-gray-300 pl-8 pr-3 py-1.5 text-xs text-gray-900 focus:ring-1 focus:ring-amazon-orange focus:outline-none"
+              placeholder="Search by title, SKU, brand, or model..."
+              className="w-full rounded-2xl border border-[#dfd6c5] dark:border-[#2f384d] bg-[#fdfcf9] dark:bg-[#161a25] pl-9 pr-4 py-2.5 text-xs text-[#141312] dark:text-[#f8f5ee] placeholder:text-[#9e978b] focus:border-[#c5a059] dark:focus:border-[#dfba73] focus:outline-none focus:ring-2 focus:ring-[#c5a059]/20 transition-all"
             />
-            <Search size={14} className="absolute left-2.5 top-2 text-gray-400" />
+            <Search size={14} className="absolute left-3 top-3 text-[#9e978b]" />
           </div>
 
-          {/* Status Filter */}
-          <div className="flex items-center gap-2">
-            <span className="text-gray-500">Status:</span>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-xs text-gray-800 focus:ring-1 focus:ring-amazon-orange focus:outline-none cursor-pointer"
-            >
-              <option value="all">All Listings</option>
-              <option value="active">Active Only</option>
-              <option value="draft">Drafts Only</option>
-              <option value="low_stock">Low Stock (≤ 5)</option>
-              <option value="out_of_stock">Out of Stock</option>
-            </select>
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {(
+              [
+                { id: 'all', label: `All Pieces (${products.length})` },
+                { id: 'active', label: 'Active in Salons' },
+                { id: 'draft', label: 'Drafts & Pending' },
+                { id: 'low_stock', label: 'Low Stock (< 5)' },
+                { id: 'out_of_stock', label: 'Sold Out' },
+              ] as const
+            ).map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setStatusFilter(tab.id as typeof statusFilter)}
+                className={`px-4 py-2 rounded-xl text-xs font-serif tracking-wider uppercase whitespace-nowrap transition-all cursor-pointer ${
+                  statusFilter === tab.id
+                    ? 'bg-gradient-to-r from-[#171513] to-[#25201a] dark:from-[#1b2230] dark:to-[#121620] text-[#dfba73] border border-[#c5a059]/50 shadow-xs font-bold'
+                    : 'bg-[#f8f4ec] dark:bg-[#161b26] text-[#6d6356] dark:text-[#a0a6b5] hover:text-[#141312] dark:hover:text-[#f8f5ee] border border-transparent hover:border-[#dfd6c5] dark:hover:border-[#2f384d]'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* ── Products Table ── */}
+        {/* ── Products Grid / Table ── */}
         {loading ? (
-          <div className="rounded-xl border border-gray-200 bg-white p-12 text-center text-xs text-gray-500 animate-pulse">
-            Loading products catalog...
+          <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white dark:bg-[#121620] p-12 text-center text-xs text-[#786b58] font-serif animate-pulse">
+            Loading catalog pieces...
           </div>
         ) : filteredProducts.length === 0 ? (
-          <div className="rounded-xl border border-gray-200 bg-white p-12 text-center shadow-xs">
-            <Package size={40} className="text-gray-400 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-gray-900 mb-1">
-              No products found
-            </h3>
-            <p className="text-xs text-gray-500 max-w-sm mx-auto mb-6">
-              {searchQuery || statusFilter !== 'all'
-                ? 'Try adjusting your search or filter settings.'
-                : "You haven't listed any products yet. Get started by creating your first listing!"}
+          <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white dark:bg-[#121620] p-12 text-center shadow-xs text-xs text-[#786b58] dark:text-[#8e98ac]">
+            <Package size={36} className="text-[#c5a059]/40 mx-auto mb-3" />
+            <p className="font-serif font-bold text-base text-[#141312] dark:text-[#f8f5ee]">
+              No Products Found
             </p>
-            <Link href="/seller/products/new">
-              <Button variant="buy-now" className="text-xs font-bold px-6 py-2">
-                Create First Product
-              </Button>
-            </Link>
+            <p className="mt-1 text-xs text-[#786b58] dark:text-[#8e98ac]">
+              No pieces match your selected filter criteria.
+            </p>
           </div>
         ) : (
-          <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-xs">
+          <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white dark:bg-[#121620] overflow-hidden shadow-[0_6px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 text-xs">
-                <thead className="bg-gray-50 text-gray-600 font-semibold uppercase tracking-wider text-[11px]">
-                  <tr>
-                    <th className="px-4 py-3 text-left">Product</th>
-                    <th className="px-4 py-3 text-left">SKU</th>
-                    <th className="px-4 py-3 text-left">Category</th>
-                    <th className="px-4 py-3 text-right">Price</th>
-                    <th className="px-4 py-3 text-center">Stock</th>
-                    <th className="px-4 py-3 text-center">Status</th>
-                    <th className="px-4 py-3 text-right">Actions</th>
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="bg-gradient-to-r from-[#faf7f2] to-[#f4eee4] dark:from-[#151924] dark:to-[#0f1219] border-b border-[#ebe2d1] dark:border-[#232938] text-[10px] font-serif font-bold uppercase tracking-[0.16em] text-[#8a7b68] dark:text-[#8e98ac]">
+                    <th className="py-3.5 px-4 font-semibold">Masterpiece</th>
+                    <th className="py-3.5 px-4 font-semibold">Category / Salon</th>
+                    <th className="py-3.5 px-4 font-semibold">Valuation</th>
+                    <th className="py-3.5 px-4 font-semibold">Vault Stock</th>
+                    <th className="py-3.5 px-4 font-semibold">Status</th>
+                    <th className="py-3.5 px-4 font-semibold text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 bg-white">
+                <tbody className="divide-y divide-[#f5efe5] dark:divide-[#1a202c]">
                   {filteredProducts.map((p) => {
-                    const img =
-                      p.images?.[0]?.url ||
-                      'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100';
-                    const isLowStock = p.stock > 0 && p.stock <= 5;
-                    const isOut = p.stock <= 0 || p.status === 'out_of_stock';
-
+                    const isDraft = p.status === 'draft';
+                    const isOutOfStock = p.stock <= 0;
                     return (
-                      <tr key={p.id} className="hover:bg-gray-50/60 transition-colors">
-                        {/* Product Title & Thumbnail */}
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-3">
-                            <div className="relative h-12 w-12 rounded border bg-white p-0.5 flex-shrink-0">
+                      <tr key={p.id} className="hover:bg-[#faf7f2]/60 dark:hover:bg-[#161a25] transition-colors">
+                        <td className="py-4 px-4">
+                          <div className="flex items-center gap-3.5">
+                            <div className="h-12 w-12 rounded-xl border border-[#ede4d4] dark:border-[#232938] bg-[#fbf9f6] dark:bg-[#171c26] flex-shrink-0 relative overflow-hidden shadow-2xs">
                               <Image
-                                src={img}
+                                src={p.images?.[0]?.url || '/images/placeholder-product.png'}
                                 alt={p.title}
                                 fill
                                 sizes="48px"
-                                className="object-contain"
+                                className="object-cover"
                               />
                             </div>
-                            <div className="min-w-0 max-w-xs sm:max-w-sm">
-                              <p className="font-semibold text-gray-900 line-clamp-1">
+                            <div className="min-w-0">
+                              <Link
+                                href={`/product/${p.slug}`}
+                                className="font-serif font-medium text-xs text-[#141312] dark:text-[#f8f5ee] hover:text-[#8a6827] dark:hover:text-[#dfba73] transition-colors line-clamp-1"
+                              >
                                 {p.title}
-                              </p>
-                              <div className="flex items-center gap-2 mt-0.5">
-                                <span className="text-[11px] text-gray-400">
-                                  {p.brand || 'No Brand'}
-                                </span>
-                                <Link
-                                  href={`/product/${p.slug}`}
-                                  target="_blank"
-                                  className="text-[11px] text-amazon-link hover:underline inline-flex items-center gap-0.5"
-                                  title="View on customer site"
-                                >
-                                  <span>View</span>
-                                  <ExternalLink size={10} />
-                                </Link>
+                              </Link>
+                              <div className="text-[10px] text-[#8a7b68] dark:text-[#8e98ac] font-mono mt-0.5">
+                                SKU: {p.sku || 'N/A'} {p.brand && `• ${p.brand}`}
                               </div>
                             </div>
                           </div>
                         </td>
 
-                        {/* SKU */}
-                        <td className="px-4 py-3 font-mono text-[11px] text-gray-600">
-                          {p.sku || '—'}
-                        </td>
-
-                        {/* Category */}
-                        <td className="px-4 py-3 text-gray-600 capitalize">
+                        <td className="py-4 px-4 font-serif text-[11px] text-[#6d6356] dark:text-[#a0a6b5] capitalize">
                           {p.categoryName || p.category}
                         </td>
 
-                        {/* Price */}
-                        <td className="px-4 py-3 text-right">
-                          <span className="font-bold text-gray-900">
-                            {formatPrice(p.price)}
-                          </span>
-                          {p.compareAtPrice && p.compareAtPrice > p.price && (
-                            <span className="block text-[10px] text-gray-400 line-through">
-                              {formatPrice(p.compareAtPrice)}
-                            </span>
+                        <td className="py-4 px-4 font-serif font-bold text-xs text-[#141312] dark:text-[#f8f5ee]">
+                          {formatPrice(p.price)}
+                        </td>
+
+                        <td className="py-4 px-4 font-sans font-medium">
+                          {p.stock <= 0 ? (
+                            <span className="text-red-600 dark:text-red-400 font-bold">0 (Depleted)</span>
+                          ) : p.stock <= 5 ? (
+                            <span className="text-amber-600 dark:text-amber-400 font-bold">{p.stock} (Low)</span>
+                          ) : (
+                            <span className="text-emerald-700 dark:text-emerald-400 font-semibold">{p.stock} Units</span>
                           )}
                         </td>
 
-                        {/* Stock */}
-                        <td className="px-4 py-3 text-center">
+                        <td className="py-4 px-4">
                           <span
-                            className={`inline-block px-2 py-0.5 rounded-full font-bold text-[11px] ${
-                              isOut
-                                ? 'bg-red-100 text-red-700'
-                                : isLowStock
-                                ? 'bg-amber-100 text-amber-800'
-                                : 'bg-green-100 text-green-800'
-                            }`}
-                          >
-                            {p.stock}
-                          </span>
-                        </td>
-
-                        {/* Status */}
-                        <td className="px-4 py-3 text-center">
-                          <span
-                            className={`inline-block px-2.5 py-0.5 rounded-full font-bold text-[10px] uppercase ${
+                            className={`rounded-full px-2.5 py-0.5 text-[9.5px] font-serif font-bold uppercase tracking-wider ${
                               p.status === 'active'
-                                ? 'bg-green-100 text-green-800'
+                                ? 'bg-emerald-50 dark:bg-[#132816] text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                                 : p.status === 'draft'
-                                ? 'bg-gray-100 text-gray-600'
-                                : 'bg-red-100 text-red-700'
+                                ? 'bg-amber-50 dark:bg-[#261d10] text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                                : 'bg-red-50 dark:bg-[#281315] text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800'
                             }`}
                           >
-                            {p.status.replace(/_/g, ' ')}
+                            {p.status}
                           </span>
                         </td>
 
-                        {/* Actions */}
-                        <td className="px-4 py-3 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            {/* Toggle Publish / Draft */}
+                        <td className="py-4 px-4 text-right">
+                          <div className="inline-flex items-center gap-2">
                             <button
                               type="button"
                               onClick={() => handleToggleStatus(p)}
-                              className="p-1.5 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-900 cursor-pointer"
-                              title={p.status === 'active' ? 'Set to Draft' : 'Publish Product'}
+                              title={p.status === 'active' ? 'Unpublish to Draft' : 'Publish Live'}
+                              className="p-1.5 rounded-lg border border-[#dfd6c5] dark:border-[#2f384d] hover:bg-[#f5ede0] dark:hover:bg-[#1c2333] text-[#786b58] dark:text-[#a0a6b5] hover:text-[#8a6827] dark:hover:text-[#dfba73] transition-all cursor-pointer"
                             >
-                              {p.status === 'active' ? <EyeOff size={15} /> : <Eye size={15} />}
+                              {p.status === 'active' ? <EyeOff size={13} /> : <Eye size={13} />}
                             </button>
 
-                            {/* Edit */}
-                            <Link
-                              href={`/seller/products/${p.id}/edit`}
-                              className="p-1.5 rounded hover:bg-gray-100 text-gray-500 hover:text-amazon-orange cursor-pointer"
-                              title="Edit product"
-                            >
-                              <Edit2 size={15} />
+                            <Link href={`/seller/products/${p.id}/edit`}>
+                              <button
+                                type="button"
+                                title="Edit Masterpiece"
+                                className="p-1.5 rounded-lg border border-[#dfd6c5] dark:border-[#2f384d] hover:bg-[#f5ede0] dark:hover:bg-[#1c2333] text-[#786b58] dark:text-[#a0a6b5] hover:text-[#8a6827] dark:hover:text-[#dfba73] transition-all cursor-pointer"
+                              >
+                                <Edit2 size={13} />
+                              </button>
                             </Link>
 
-                            {/* Delete */}
                             <button
                               type="button"
                               onClick={() => handleDeleteProduct(p)}
-                              className="p-1.5 rounded hover:bg-red-50 text-gray-400 hover:text-red-600 cursor-pointer"
-                              title="Delete product"
+                              title="Delete Piece"
+                              className="p-1.5 rounded-lg border border-red-200 dark:border-red-900/40 hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 dark:text-red-400 transition-all cursor-pointer"
                             >
-                              <Trash2 size={15} />
+                              <Trash2 size={13} />
                             </button>
                           </div>
                         </td>

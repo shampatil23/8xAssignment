@@ -3,6 +3,7 @@
 // Admin Promotions — Promotional Coupons, Discount Rates & Validity Windows
 // ============================================================================
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   Tag,
   Plus,
@@ -16,6 +17,7 @@ import {
   Calendar,
   DollarSign,
   Percent,
+  Sparkles,
 } from 'lucide-react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { ConfirmationModal } from '@/components/admin/ConfirmationModal';
@@ -220,6 +222,21 @@ export default function AdminPromotionsPage() {
               <span>New Promotion</span>
             </Button>
           </div>
+        </div>
+
+        {/* ── Sub-navigation Tabs ── */}
+        <div className="flex items-center gap-2 border-b border-gray-200">
+          <span className="px-4 py-2 border-b-2 border-amber-500 font-bold text-sm text-gray-900 flex items-center gap-1.5">
+            <Tag size={15} className="text-amber-500" />
+            Promo Coupons & Discounts
+          </span>
+          <Link
+            href="/admin/banners"
+            className="px-4 py-2 border-b-2 border-transparent hover:border-gray-300 font-medium text-sm text-gray-500 hover:text-gray-900 flex items-center gap-1.5 transition-colors"
+          >
+            <Sparkles size={15} className="text-amber-500" />
+            Hero Slideshow Banners & Offers
+          </Link>
         </div>
 
         {/* Notifications */}

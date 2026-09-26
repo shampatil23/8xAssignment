@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Cinzel, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
+import { AiAssistantWidget } from '@/components/ai/AiAssistantWidget';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -9,25 +10,33 @@ const inter = Inter({
   display: 'swap',
 });
 
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  variable: '--font-cinzel',
+  display: 'swap',
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-jakarta',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   title: {
-    default: 'Amazon Clone (Portfolio Demo) — Educational Full-Stack Project',
-    template: '%s | Amazon Clone Demo',
+    default: 'Valenza — Haute Horlogerie, Fine Jewelry & Bespoke Living',
+    template: '%s | Valenza Maison de Luxe',
   },
   description:
-    'An educational portfolio demonstration of a multi-vendor e-commerce platform. For learning and evaluation purposes only. Not affiliated with Amazon.com, Inc.',
-  keywords: ['portfolio', 'demo', 'educational project', 'ecommerce clone', 'nextjs'],
-  authors: [{ name: 'Developer Portfolio' }],
-  robots: {
-    index: false,
-    follow: false,
-  },
+    'Discover timeless elegance, curated luxury goods, Swiss timepieces, fine jewels, and bespoke artisan creations on Valenza.',
+  keywords: ['Valenza', 'luxury marketplace', 'haute horlogerie', 'fine jewelry', 'bespoke fashion', 'private reserve'],
+  authors: [{ name: 'Valenza Maison de Luxe' }],
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#131921',
+  themeColor: '#0a0d14',
 };
 
 export default function RootLayout({
@@ -36,15 +45,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className={`${inter.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">
-        {/* Global Educational & Portfolio Disclaimer Banner */}
-        <div className="bg-[#232f3e] text-white text-[11px] px-3 py-1.5 text-center font-medium border-b border-gray-700 flex items-center justify-center gap-2 select-none">
-          <span>
-            🎓 <strong>Educational Portfolio Project</strong> — Demonstration &amp; evaluation only. Not affiliated with Amazon.com, Inc. No real credit card or sensitive credentials are collected.
-          </span>
-        </div>
-        <Providers>{children}</Providers>
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${inter.variable} ${cinzel.variable} ${jakarta.variable} h-full antialiased`}
+    >
+      <body className="flex min-h-full flex-col bg-[#faf9f6] text-[#141312]">
+        <Providers>
+          {children}
+          <AiAssistantWidget />
+        </Providers>
       </body>
     </html>
   );

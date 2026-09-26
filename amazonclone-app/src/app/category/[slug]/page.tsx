@@ -1,10 +1,11 @@
 'use client';
 // ============================================================================
 // Category Products Page — /category/[slug]
+// Valenza Maison Haute Horlogerie, Joaillerie & Living Salons
 // ============================================================================
 import React, { useEffect, useState, use } from 'react';
 import Link from 'next/link';
-import { ChevronRight, Filter, SlidersHorizontal } from 'lucide-react';
+import { ChevronRight, Gem, ChevronDown } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { ProductCard } from '@/components/product/ProductCard';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -89,94 +90,120 @@ export default function CategoryPage({ params }: PageProps) {
 
   return (
     <MainLayout>
-      <div className="mx-auto max-w-screen-2xl px-4 py-6">
+      <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 py-6 sm:py-8 text-[#141312] dark:text-[#f8f5ee]">
         {/* ── Breadcrumb ── */}
-        <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs text-gray-500">
-          <Link href="/" className="hover:text-amazon-link hover:underline">
-            Home
+        <div className="text-[11px] uppercase tracking-[0.16em] font-medium text-[#786b58] dark:text-[#9e978b] mb-4 flex items-center gap-2">
+          <Link href="/" className="hover:text-[#c5a059] dark:hover:text-[#d6be90] transition-colors">
+            Maison
           </Link>
-          <ChevronRight size={12} />
-          <span className="font-semibold text-gray-800">
+          <span className="text-[#dfd6c5] dark:text-[#2c3242]">◆</span>
+          <span className="text-[#141312] dark:text-[#f8f5ee] font-semibold">Salons</span>
+          <span className="text-[#dfd6c5] dark:text-[#2c3242]">◆</span>
+          <span className="text-[#8a6827] dark:text-[#dfba73]">
             {category?.name || slug}
           </span>
-        </nav>
+        </div>
 
         {/* ── Category Header Banner ── */}
-        <div className="mb-6 rounded-lg bg-white border border-gray-200 p-6 shadow-sm">
+        <div className="mb-8 rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 backdrop-blur-xl p-6 sm:p-8 shadow-[0_10px_35px_rgba(26,23,20,0.03)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.5)]">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+              <span className="text-[10px] uppercase font-semibold tracking-[0.25em] text-[#9b8353] dark:text-[#d6be90] block mb-1.5 flex items-center gap-1.5">
+                <Gem size={11} className="text-[#c5a059]" />
+                Maison Salon Exhibition
+              </span>
+              <h1 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-light tracking-tight text-[#141312] dark:text-[#f8f5ee]">
                 {category?.name || slug}
               </h1>
               {category?.description && (
-                <p className="mt-1.5 text-sm text-gray-600 max-w-2xl">
+                <p className="mt-1.5 text-xs sm:text-sm text-[#786b58] dark:text-[#9e978b] max-w-2xl leading-relaxed">
                   {category.description}
                 </p>
               )}
             </div>
-            <div className="text-xs text-gray-500 font-medium whitespace-nowrap">
+            <div className="text-xs font-semibold uppercase tracking-wider text-[#8a7b68] dark:text-[#8e98ac] shrink-0">
               {loading
-                ? 'Loading results...'
-                : `${displayedProducts.length} ${displayedProducts.length === 1 ? 'result' : 'results'}`}
+                ? 'Allocating catalog...'
+                : `${displayedProducts.length} ${displayedProducts.length === 1 ? 'Masterpiece' : 'Masterpieces'}`}
             </div>
           </div>
 
           {/* ── Quick Filter Bar ── */}
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
-            <div className="flex items-center gap-2">
-              <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-medium text-gray-700 select-none">
+          <div className="mt-6 pt-5 flex flex-wrap items-center justify-between gap-4 border-t border-[#f0eae0] dark:border-[#1e2433]">
+            <div className="flex items-center gap-3">
+              <label className="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold uppercase tracking-wider text-[#6e6353] dark:text-[#a0a6b5] select-none hover:text-[#141312] dark:hover:text-[#f8f5ee] transition-colors">
                 <input
                   type="checkbox"
                   checked={inStockOnly}
                   onChange={(e) => setInStockOnly(e.target.checked)}
-                  className="rounded border-gray-300 text-amazon-orange focus:ring-amazon-orange h-4 w-4"
+                  className="rounded border-[#dfd6c5] dark:border-[#383e50] text-[#c5a059] focus:ring-[#c5a059] h-3.5 w-3.5 cursor-pointer accent-[#c5a059]"
                 />
-                In Stock Only
+                <span>Private Vault In Stock</span>
               </label>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">Sort by:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                className="rounded border border-gray-300 bg-white px-2.5 py-1 text-xs text-gray-800 focus:outline-none focus:ring-2 focus:ring-amazon-orange cursor-pointer"
-              >
-                <option value="featured">Featured</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="rating">Avg. Customer Review</option>
-              </select>
+              <span className="text-xs uppercase tracking-wider font-semibold text-[#8a7b68] dark:text-[#8e98ac] hidden sm:inline">
+                Sort:
+              </span>
+              <div className="relative">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                  className="appearance-none rounded-xl border border-[#ebe2d1] dark:border-[#2f384d] bg-[#fbfaf8] dark:bg-[#161a25] pl-3.5 pr-8 py-2 text-xs font-semibold text-[#141312] dark:text-[#f8f5ee] focus:outline-none focus:border-[#c5a059] dark:focus:border-[#dfba73] cursor-pointer shadow-xs transition-all"
+                >
+                  <option value="featured">Maison Featured</option>
+                  <option value="price-asc">Valuation: Low to High</option>
+                  <option value="price-desc">Valuation: High to Low</option>
+                  <option value="rating">Client Appraisals</option>
+                </select>
+                <ChevronDown
+                  size={13}
+                  className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8a7b68] dark:text-[#8e98ac]"
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* ── Products Grid ── */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
               <ProductCardSkeleton key={i} />
             ))}
           </div>
         ) : error ? (
           <EmptyState
-            title="Unable to load products"
+            title="Unable to load salon products"
             description={error}
             actionLabel="Try Again"
             onAction={() => window.location.reload()}
           />
         ) : displayedProducts.length === 0 ? (
-          <EmptyState
-            title="No products found in this category"
-            description="We couldn't find any products matching your selected criteria."
-            actionLabel="View All Products"
-            onAction={() => {
-              setInStockOnly(false);
-              setSortBy('featured');
-            }}
-          />
+          <div className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 p-12 text-center shadow-sm">
+            <span className="text-[10px] uppercase font-semibold tracking-[0.25em] text-[#9b8353] dark:text-[#d6be90] block mb-1">
+              Salon Reserve
+            </span>
+            <h2 className="font-serif text-xl sm:text-2xl font-light text-[#141312] dark:text-[#f8f5ee] mb-2">
+              No Pieces Currently Available
+            </h2>
+            <p className="text-xs sm:text-sm text-[#786b58] dark:text-[#9e978b] max-w-md mx-auto mb-6">
+              We couldn&apos;t find any active allocations matching your selected filter criteria.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setInStockOnly(false);
+                setSortBy('featured');
+              }}
+              className="px-6 py-3 rounded-xl font-sans text-xs uppercase tracking-[0.16em] font-semibold text-[#12110f] bg-gradient-to-r from-[#c5a059] via-[#d6be90] to-[#b89548] hover:brightness-105 shadow-md cursor-pointer transition-all"
+            >
+              Reset Filters
+            </button>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {displayedProducts.map((product, idx) => (
               <ProductCard
                 key={product.id}
@@ -190,3 +217,4 @@ export default function CategoryPage({ params }: PageProps) {
     </MainLayout>
   );
 }
+

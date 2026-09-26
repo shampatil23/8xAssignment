@@ -1,53 +1,55 @@
 // ============================================================================
-// (auth) group layout — minimal shell for sign-in / sign-up / forgot-password
-// Includes educational disclaimer to satisfy Google Safe Browsing standards
+// (auth) group layout — Valenza Maison de Luxe Authentication Shell
 // ============================================================================
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: { default: 'Sign In — Amazon Clone Demo', template: '%s | Amazon Clone Demo' },
+  title: { default: 'Client Sign In — Valenza Maison Privée', template: '%s | Valenza Maison' },
+  description: 'Access your private Valenza client salon and high-luxury curated collections.',
   robots: { index: false, follow: false },
 };
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      {/* Educational Notice Bar */}
-      <div className="bg-amber-50 text-amber-900 border-b border-amber-200 py-1.5 px-4 text-center text-xs font-medium">
-        ⚠️ <strong>Developer Portfolio Demo:</strong> This is an educational project. <strong>Do not enter real Amazon credentials.</strong>
-      </div>
+    <div className="flex min-h-screen flex-col justify-between bg-[#faf9f6] dark:bg-[#0b0c10] text-[#141312] dark:text-[#f8f5ee] relative overflow-hidden selection:bg-[#c5a059]/20 selection:text-[#141312] transition-colors duration-300">
+      {/* Background ambient luxury lighting */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[550px] bg-gradient-to-b from-[#f3ead7]/60 via-[#edd9b7]/20 to-transparent dark:from-[#151c2e]/40 dark:via-[#0e1424]/20 dark:to-transparent blur-3xl pointer-events-none -z-10" />
+      <div className="absolute -bottom-24 right-0 w-96 h-96 bg-[#d6be90]/10 dark:bg-[#c5a059]/5 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-1/3 -left-32 w-80 h-80 bg-[#c5a059]/10 rounded-full blur-3xl pointer-events-none -z-10" />
 
-      {/* Amazon-style logo header */}
-      <header className="flex justify-center py-6">
-        <Link href="/" id="auth-logo" aria-label="Amazon Clone home">
-          <span className="font-extrabold text-amazon-dark text-3xl tracking-tight leading-none">
-            amazon<span className="text-amazon-orange">.</span>
-            <span className="text-sm align-super font-bold text-gray-500 ml-0.5">clone demo</span>
-          </span>
-        </Link>
-      </header>
-
-      {/* Page content */}
-      <main className="flex flex-1 flex-col items-center px-4 pb-12">
+      {/* Main Page Container (Horizontal Centered Viewport) */}
+      <main className="flex flex-1 items-center justify-center px-4 sm:px-6 lg:px-8 py-8 sm:py-12 z-10">
         {children}
       </main>
 
-      {/* Educational Footer */}
-      <footer className="border-t py-6 text-center text-xs text-gray-500 space-y-2">
-        <div className="flex justify-center gap-4 text-[11px]">
-          <Link href="/" className="text-amazon-link hover:underline">
-            Home
-          </Link>
-          <span className="text-gray-300">|</span>
-          <span className="text-gray-500">Non-Commercial Educational Project</span>
-          <span className="text-gray-300">|</span>
-          <span className="text-gray-500">All trademarks belong to their respective owners</span>
+      {/* Refined Luxury Footer */}
+      <footer className="border-t border-[#ebe2d1] dark:border-[#1e2330] py-6 text-center text-xs text-[#786b58] dark:text-[#a09a8e] bg-[#f5f1e8]/50 dark:bg-[#0e1118]/50 backdrop-blur-sm z-10">
+        <div className="max-w-5xl mx-auto px-4 space-y-3">
+          <div className="flex flex-wrap items-center justify-center gap-6 text-[11px] uppercase tracking-widest font-medium text-[#655947] dark:text-[#b8af9f]">
+            <Link href="/" className="hover:text-[#c5a059] dark:hover:text-[#e8d5b5] transition-colors">
+              Maison Home
+            </Link>
+            <span className="text-[#dfd6c5] dark:text-[#2c3242]">◆</span>
+            <Link href="/cart" className="hover:text-[#c5a059] dark:hover:text-[#e8d5b5] transition-colors">
+              Shopping Bag
+            </Link>
+            <span className="text-[#dfd6c5] dark:text-[#2c3242]">◆</span>
+            <Link href="/customer-service" className="hover:text-[#c5a059] dark:hover:text-[#e8d5b5] transition-colors">
+              Client Concierge
+            </Link>
+            <span className="text-[#dfd6c5] dark:text-[#2c3242]">◆</span>
+            <span className="hover:text-[#c5a059] cursor-pointer transition-colors">
+              Confidentiality Charter
+            </span>
+          </div>
+
+          <p className="text-[11px] text-[#9a8d79] dark:text-[#6e778b] tracking-wider">
+            © {new Date().getFullYear()} Valenza Haute Maison. Handcrafted Masterpieces & Haute Horlogerie.
+          </p>
         </div>
-        <p className="text-[10px] text-gray-400">
-          © {new Date().getFullYear()} Amazon Clone Portfolio Project. Built for learning and demonstration purposes only.
-        </p>
       </footer>
     </div>
   );
 }
+

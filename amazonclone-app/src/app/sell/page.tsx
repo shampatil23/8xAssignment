@@ -393,11 +393,12 @@ export default function SellPage() {
                         onChange={(e) => setExistingCategory(e.target.value)}
                         className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 bg-white focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden"
                       >
-                        <option value="electronics">Electronics & Gadgets</option>
-                        <option value="fashion">Fashion & Apparel</option>
-                        <option value="home-kitchen">Home & Kitchen</option>
-                        <option value="books">Books & Media</option>
-                        <option value="beauty">Beauty & Personal Care</option>
+                        <option value="electronics">Haute Horlogerie & Timepieces</option>
+                        <option value="fashion">Haute Couture & Sartorial Wear</option>
+                        <option value="beauty">High Joaillerie & Rare Parfumerie</option>
+                        <option value="home-kitchen">Maison & Sanctuary Living</option>
+                        <option value="computers">Sculptural Tech & Atelier Sound</option>
+                        <option value="books">Rare Editions & Fine Volumes</option>
                       </select>
                     </div>
 
@@ -553,11 +554,12 @@ export default function SellPage() {
                           onChange={(e) => setRegCategory(e.target.value)}
                           className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white focus:border-[#e77600] focus:ring-1 focus:ring-[#e77600] focus:outline-hidden"
                         >
-                          <option value="electronics">Electronics & Accessories</option>
-                          <option value="fashion">Clothing & Shoes</option>
-                          <option value="home-kitchen">Home & Kitchen</option>
-                          <option value="books">Books</option>
-                          <option value="beauty">Beauty & Personal Care</option>
+                          <option value="electronics">Haute Horlogerie & Timepieces</option>
+                          <option value="fashion">Haute Couture & Sartorial Wear</option>
+                          <option value="beauty">High Joaillerie & Rare Parfumerie</option>
+                          <option value="home-kitchen">Maison & Sanctuary Living</option>
+                          <option value="computers">Sculptural Tech & Atelier Sound</option>
+                          <option value="books">Rare Editions & Fine Volumes</option>
                         </select>
                       </div>
 

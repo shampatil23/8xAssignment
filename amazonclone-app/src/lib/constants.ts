@@ -2,33 +2,33 @@
 // Application-wide constants
 // ============================================================================
 
-export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? 'Amazon Clone';
+export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? 'Valenza';
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
 // Navigation categories (nav bar)
 export const NAV_LINKS = [
-  { label: 'Wishlist', href: '/wishlist' },
-  { label: "Today's Deals", href: '/deals' },
-  { label: 'Prime Video', href: '/prime-video' },
-  { label: 'Coupons', href: '/coupons' },
-  { label: 'Customer Service', href: '/customer-service' },
-  { label: 'Registry', href: '/registry' },
-  { label: 'Gift Cards', href: '/gift-cards' },
-  { label: 'Sell', href: '/sell' },
+  { label: 'Watches & Horlogerie', href: '/category/electronics' },
+  { label: 'Fine Jewelry', href: '/category/beauty' },
+  { label: 'Haute Couture', href: '/category/fashion' },
+  { label: 'Maison Living', href: '/category/home-garden' },
+  { label: 'Private Reserve', href: '/deals' },
+  { label: 'Audio & Tech', href: '/category/computers' },
+  { label: 'Bespoke Concierge', href: '/customer-service' },
+  { label: 'Atelier Registry', href: '/registry' },
 ] as const;
 
-// Product categories for search dropdown
+// Product categories for search dropdown and mobile salon menu (clear & luxurious)
 export const SEARCH_CATEGORIES = [
-  { value: 'all', label: 'All' },
-  { value: 'electronics', label: 'Electronics' },
-  { value: 'computers', label: 'Computers' },
-  { value: 'fashion', label: 'Fashion' },
-  { value: 'home-garden', label: 'Home & Garden' },
-  { value: 'sports', label: 'Sports & Outdoors' },
-  { value: 'books', label: 'Books' },
-  { value: 'toys', label: 'Toys & Games' },
-  { value: 'beauty', label: 'Beauty' },
-  { value: 'grocery', label: 'Grocery' },
+  { value: 'all', label: 'All Categories & Salons' },
+  { value: 'electronics', label: 'Luxury Watches & Timepieces' },
+  { value: 'fashion', label: 'Fashion & Haute Couture' },
+  { value: 'beauty', label: 'Jewelry & Fine Fragrances' },
+  { value: 'home-garden', label: 'Home & Sanctuary Living' },
+  { value: 'computers', label: 'Electronics & Premium Audio' },
+  { value: 'sports', label: 'Sports & Grand Tourisme' },
+  { value: 'books', label: 'Books & Rare Editions' },
+  { value: 'toys', label: 'Collectibles, Toys & Games' },
+  { value: 'grocery', label: 'Gourmet Food & Fine Wine' },
 ] as const;
 
 // Footer links

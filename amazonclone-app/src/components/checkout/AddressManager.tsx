@@ -1,11 +1,10 @@
 'use client';
 // ============================================================================
-// AddressManager — Amazon-style Delivery Address Picker & Form
+// AddressManager — Valenza Maison Destination Residence Manager
 // Allows selecting, adding, editing, and deleting customer delivery addresses
 // ============================================================================
 import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, CheckCircle2, MapPin, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { Plus, Edit2, Trash2, CheckCircle2, MapPin, AlertCircle, Gem, Check } from 'lucide-react';
 import type { Address } from '@/types';
 import { validateAddress } from '@/services/addressService';
 
@@ -113,7 +112,7 @@ export function AddressManager({
       {/* ── List of Saved Addresses ── */}
       {addresses.length > 0 && !isAddingNew && !editingAddressId && (
         <div className="space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             {addresses.map((addr) => {
               const isSelected = addr.id === selectedAddressId;
 
@@ -121,50 +120,54 @@ export function AddressManager({
                 <div
                   key={addr.id}
                   onClick={() => onSelectAddress(addr)}
-                  className={`relative flex flex-col justify-between rounded-lg border p-4 cursor-pointer transition-all ${
+                  className={`relative flex flex-col justify-between rounded-2xl border p-4.5 cursor-pointer transition-all duration-200 ${
                     isSelected
-                      ? 'border-amazon-orange bg-amber-50/30 ring-2 ring-amazon-orange shadow-xs'
-                      : 'border-gray-300 bg-white hover:border-gray-400'
+                      ? 'border-[#c5a059] bg-[#fcfaf6] dark:bg-[#1a2130] ring-2 ring-[#c5a059]/30 shadow-[0_4px_20px_rgba(197,160,89,0.12)]'
+                      : 'border-[#ebe2d1] dark:border-[#262c3d] bg-white dark:bg-[#161a25] hover:border-[#c5a059]/50'
                   }`}
                 >
                   <div>
-                    <div className="flex items-center justify-between gap-2 mb-1.5">
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2.5">
                         <input
                           type="radio"
                           name="selected_address"
                           checked={isSelected}
                           onChange={() => onSelectAddress(addr)}
-                          className="h-4 w-4 text-amazon-orange focus:ring-amazon-orange border-gray-300 cursor-pointer"
+                          className="h-4 w-4 text-[#c5a059] focus:ring-[#c5a059] border-[#dfd6c5] cursor-pointer accent-[#c5a059]"
                         />
-                        <span className="text-sm font-bold text-gray-900">
+                        <span className="font-serif text-sm font-semibold text-[#141312] dark:text-[#f8f5ee]">
                           {addr.fullName}
                         </span>
                       </div>
                       {addr.isDefault && (
-                        <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-bold text-gray-700 uppercase">
-                          Default
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#f4ece0] dark:bg-[#2a261c] px-2.5 py-0.5 text-[10px] font-semibold text-[#9b8353] dark:text-[#d6be90] uppercase tracking-wider border border-[#e5d6be] dark:border-[#3e3422]">
+                          <Gem size={10} className="text-[#c5a059]" />
+                          Primary Residence
                         </span>
                       )}
                     </div>
 
-                    <div className="text-xs text-gray-700 pl-6 space-y-0.5 leading-relaxed">
-                      <p>{addr.street}</p>
+                    <div className="text-xs text-[#6e6353] dark:text-[#9e978b] pl-6.5 space-y-0.5 leading-relaxed font-sans">
+                      <p className="font-medium text-[#141312] dark:text-[#e8e4dc]">{addr.street}</p>
                       <p>
                         {addr.city}, {addr.state} {addr.postalCode}
                       </p>
                       <p>{addr.country}</p>
-                      <p className="text-gray-500 mt-1">Phone: {addr.phone}</p>
+                      <p className="text-[#9b8353] dark:text-[#c5a059] text-[11px] mt-1.5 font-mono">
+                        Tel: {addr.phone}
+                      </p>
                     </div>
                   </div>
 
-                  <div className="mt-3 pt-2.5 border-t border-gray-100 pl-6 flex items-center justify-between text-xs">
+                  <div className="mt-3.5 pt-3 border-t border-[#f0eae0] dark:border-[#242b3d] pl-6.5 flex items-center justify-between text-xs">
                     {isSelected ? (
-                      <span className="font-semibold text-amazon-orange text-xs">
-                        Delivering to this address
+                      <span className="font-sans text-[11px] font-semibold text-[#9b8353] dark:text-[#d6be90] flex items-center gap-1">
+                        <Check size={12} className="text-[#c5a059]" />
+                        Selected for Dispatch
                       </span>
                     ) : (
-                      <span className="text-gray-500 text-xs">
+                      <span className="text-[#9e978b] text-[11px]">
                         Click to select
                       </span>
                     )}
@@ -176,7 +179,7 @@ export function AddressManager({
                           e.stopPropagation();
                           handleStartEdit(addr);
                         }}
-                        className="text-amazon-link hover:underline flex items-center gap-1 cursor-pointer"
+                        className="text-[#9b8353] dark:text-[#d6be90] hover:underline flex items-center gap-1 cursor-pointer text-xs transition-colors"
                       >
                         <Edit2 size={12} />
                         <span>Edit</span>
@@ -185,14 +188,14 @@ export function AddressManager({
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (confirm(`Remove address for ${addr.fullName}?`)) {
+                          if (confirm(`Remove destination residence for ${addr.fullName}?`)) {
                             onDeleteAddress(addr.id);
                           }
                         }}
-                        className="text-gray-500 hover:text-red-600 flex items-center gap-1 cursor-pointer"
+                        className="text-[#a49987] hover:text-red-500 flex items-center gap-1 cursor-pointer text-xs transition-colors"
                       >
                         <Trash2 size={12} />
-                        <span>Delete</span>
+                        <span>Remove</span>
                       </button>
                     </div>
                   </div>
@@ -207,10 +210,12 @@ export function AddressManager({
               resetForm();
               setIsAddingNew(true);
             }}
-            className="flex items-center gap-1.5 text-xs font-semibold text-amazon-link hover:underline pt-2 cursor-pointer"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-[#9b8353] dark:text-[#d6be90] hover:text-[#c5a059] pt-2 cursor-pointer transition-colors"
           >
-            <Plus size={14} />
-            <span>Add a new delivery address</span>
+            <div className="w-5 h-5 rounded-full border border-[#c5a059]/40 flex items-center justify-center bg-[#faf6ee] dark:bg-[#1f2738]">
+              <Plus size={12} className="text-[#c5a059]" />
+            </div>
+            <span>Register a new destination residence</span>
           </button>
         </div>
       )}
@@ -219,17 +224,18 @@ export function AddressManager({
       {(isAddingNew || editingAddressId) && (
         <form
           onSubmit={handleSubmitForm}
-          className="rounded-lg border border-gray-300 bg-white p-5 shadow-xs"
+          className="rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white dark:bg-[#161a25] p-6 shadow-[0_8px_30px_rgba(26,23,20,0.04)]"
         >
-          <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-4">
-            <h3 className="text-base font-bold text-gray-900">
-              {editingAddressId ? 'Edit delivery address' : 'Add a new address'}
+          <div className="flex items-center justify-between border-b border-[#f0eae0] dark:border-[#242b3d] pb-3.5 mb-5">
+            <h3 className="font-serif text-base font-medium text-[#141312] dark:text-[#f8f5ee] flex items-center gap-2">
+              <MapPin size={16} className="text-[#c5a059]" />
+              <span>{editingAddressId ? 'Edit Destination Residence' : 'Register New Destination Residence'}</span>
             </h3>
             {addresses.length > 0 && (
               <button
                 type="button"
                 onClick={resetForm}
-                className="text-xs text-gray-500 hover:underline"
+                className="text-xs text-[#8a7f6e] dark:text-[#9e978b] hover:text-[#141312] dark:hover:text-[#f8f5ee] transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -239,35 +245,38 @@ export function AddressManager({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
             {/* Country / Region */}
             <div className="sm:col-span-2">
-              <label className="block font-semibold text-gray-800 mb-1">
-                Country / Region
+              <label className="block font-medium text-[#4a4235] dark:text-[#d0c9bd] mb-1.5">
+                Country / Sovereign Territory
               </label>
               <select
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
-                className="w-full rounded border border-gray-300 px-3 py-2 text-xs bg-white text-gray-900 focus:outline-none focus:ring-1 focus:ring-amazon-orange"
+                className="w-full rounded-xl border border-[#ebe2d1] dark:border-[#2f384d] px-3.5 py-2.5 text-xs bg-[#faf8f5] dark:bg-[#12151f] text-[#141312] dark:text-[#f8f5ee] focus:outline-none focus:ring-1 focus:ring-[#c5a059] focus:border-[#c5a059]"
               >
                 <option value="India">India</option>
                 <option value="United States">United States</option>
                 <option value="United Kingdom">United Kingdom</option>
-                <option value="Canada">Canada</option>
+                <option value="France">France</option>
+                <option value="Switzerland">Switzerland</option>
+                <option value="United Arab Emirates">United Arab Emirates</option>
+                <option value="Singapore">Singapore</option>
               </select>
             </div>
 
             {/* Full Name */}
             <div className="sm:col-span-2">
-              <label className="block font-semibold text-gray-800 mb-1">
-                Full name (First and Last name)
+              <label className="block font-medium text-[#4a4235] dark:text-[#d0c9bd] mb-1.5">
+                Client Full Name (Recipient)
               </label>
               <input
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="e.g. Sham Patil"
-                className={`w-full rounded border px-3 py-2 text-xs focus:outline-none focus:ring-1 ${
+                className={`w-full rounded-xl border px-3.5 py-2.5 text-xs bg-[#faf8f5] dark:bg-[#12151f] text-[#141312] dark:text-[#f8f5ee] focus:outline-none focus:ring-1 ${
                   errors.fullName
                     ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-amazon-orange'
+                    : 'border-[#ebe2d1] dark:border-[#2f384d] focus:ring-[#c5a059] focus:border-[#c5a059]'
                 }`}
               />
               {errors.fullName && (
@@ -277,18 +286,18 @@ export function AddressManager({
 
             {/* Street Address */}
             <div className="sm:col-span-2">
-              <label className="block font-semibold text-gray-800 mb-1">
-                Street address / Flat / Building / Apartment
+              <label className="block font-medium text-[#4a4235] dark:text-[#d0c9bd] mb-1.5">
+                Residence Address / Villa / Estate / Suite
               </label>
               <input
                 type="text"
                 value={street}
                 onChange={(e) => setStreet(e.target.value)}
-                placeholder="Flat No, House No, Street name, Locality"
-                className={`w-full rounded border px-3 py-2 text-xs focus:outline-none focus:ring-1 ${
+                placeholder="Estate / Suite number, Street name, Locality"
+                className={`w-full rounded-xl border px-3.5 py-2.5 text-xs bg-[#faf8f5] dark:bg-[#12151f] text-[#141312] dark:text-[#f8f5ee] focus:outline-none focus:ring-1 ${
                   errors.street
                     ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-amazon-orange'
+                    : 'border-[#ebe2d1] dark:border-[#2f384d] focus:ring-[#c5a059] focus:border-[#c5a059]'
                 }`}
               />
               {errors.street && (
@@ -298,18 +307,18 @@ export function AddressManager({
 
             {/* City */}
             <div>
-              <label className="block font-semibold text-gray-800 mb-1">
-                City / Town
+              <label className="block font-medium text-[#4a4235] dark:text-[#d0c9bd] mb-1.5">
+                City / Metropolitan Area
               </label>
               <input
                 type="text"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                placeholder="e.g. Mumbai, New Delhi"
-                className={`w-full rounded border px-3 py-2 text-xs focus:outline-none focus:ring-1 ${
+                placeholder="e.g. Mumbai, New Delhi, Pune"
+                className={`w-full rounded-xl border px-3.5 py-2.5 text-xs bg-[#faf8f5] dark:bg-[#12151f] text-[#141312] dark:text-[#f8f5ee] focus:outline-none focus:ring-1 ${
                   errors.city
                     ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-amazon-orange'
+                    : 'border-[#ebe2d1] dark:border-[#2f384d] focus:ring-[#c5a059] focus:border-[#c5a059]'
                 }`}
               />
               {errors.city && (
@@ -319,18 +328,18 @@ export function AddressManager({
 
             {/* State */}
             <div>
-              <label className="block font-semibold text-gray-800 mb-1">
+              <label className="block font-medium text-[#4a4235] dark:text-[#d0c9bd] mb-1.5">
                 State / Province
               </label>
               <input
                 type="text"
                 value={state}
                 onChange={(e) => setState(e.target.value)}
-                placeholder="e.g. Maharashtra, California"
-                className={`w-full rounded border px-3 py-2 text-xs focus:outline-none focus:ring-1 ${
+                placeholder="e.g. Maharashtra, Karnataka"
+                className={`w-full rounded-xl border px-3.5 py-2.5 text-xs bg-[#faf8f5] dark:bg-[#12151f] text-[#141312] dark:text-[#f8f5ee] focus:outline-none focus:ring-1 ${
                   errors.state
                     ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-amazon-orange'
+                    : 'border-[#ebe2d1] dark:border-[#2f384d] focus:ring-[#c5a059] focus:border-[#c5a059]'
                 }`}
               />
               {errors.state && (
@@ -340,19 +349,19 @@ export function AddressManager({
 
             {/* Postal Code */}
             <div>
-              <label className="block font-semibold text-gray-800 mb-1">
-                Postal / ZIP code
+              <label className="block font-medium text-[#4a4235] dark:text-[#d0c9bd] mb-1.5">
+                Postal / PIN Code
               </label>
               <input
                 type="text"
                 value={postalCode}
                 onChange={(e) => setPostalCode(e.target.value)}
-                placeholder="e.g. 400001 or 90210"
+                placeholder="e.g. 411041 or 110001"
                 maxLength={10}
-                className={`w-full rounded border px-3 py-2 text-xs focus:outline-none focus:ring-1 ${
+                className={`w-full rounded-xl border px-3.5 py-2.5 text-xs bg-[#faf8f5] dark:bg-[#12151f] text-[#141312] dark:text-[#f8f5ee] focus:outline-none focus:ring-1 ${
                   errors.postalCode
                     ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-amazon-orange'
+                    : 'border-[#ebe2d1] dark:border-[#2f384d] focus:ring-[#c5a059] focus:border-[#c5a059]'
                 }`}
               />
               {errors.postalCode && (
@@ -362,18 +371,18 @@ export function AddressManager({
 
             {/* Phone */}
             <div>
-              <label className="block font-semibold text-gray-800 mb-1">
-                Phone number
+              <label className="block font-medium text-[#4a4235] dark:text-[#d0c9bd] mb-1.5">
+                Confidential Contact Phone
               </label>
               <input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="e.g. 9876543210"
-                className={`w-full rounded border px-3 py-2 text-xs focus:outline-none focus:ring-1 ${
+                className={`w-full rounded-xl border px-3.5 py-2.5 text-xs bg-[#faf8f5] dark:bg-[#12151f] text-[#141312] dark:text-[#f8f5ee] focus:outline-none focus:ring-1 ${
                   errors.phone
                     ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-amazon-orange'
+                    : 'border-[#ebe2d1] dark:border-[#2f384d] focus:ring-[#c5a059] focus:border-[#c5a059]'
                 }`}
               />
               {errors.phone && (
@@ -383,36 +392,35 @@ export function AddressManager({
 
             {/* Default address checkbox */}
             <div className="sm:col-span-2 pt-1">
-              <label className="flex items-center gap-2 text-xs text-gray-700 cursor-pointer select-none">
+              <label className="flex items-center gap-2.5 text-xs text-[#4a4235] dark:text-[#d0c9bd] cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={isDefault}
                   onChange={(e) => setIsDefault(e.target.checked)}
-                  className="rounded border-gray-300 text-amazon-orange focus:ring-amazon-orange cursor-pointer"
+                  className="rounded border-[#dfd6c5] text-[#c5a059] focus:ring-[#c5a059] cursor-pointer accent-[#c5a059]"
                 />
-                <span>Make this my default address</span>
+                <span>Set as primary default destination residence</span>
               </label>
             </div>
           </div>
 
-          <div className="mt-5 pt-4 border-t border-gray-200 flex items-center gap-3">
-            <Button
+          <div className="mt-6 pt-4 border-t border-[#f0eae0] dark:border-[#242b3d] flex items-center gap-3">
+            <button
               type="submit"
-              variant="buy-now"
               disabled={isSubmitting}
-              className="px-6 py-2 text-xs font-bold"
+              className="px-6 py-3 rounded-xl font-sans text-xs uppercase tracking-[0.15em] font-semibold text-[#12110f] bg-gradient-to-r from-[#c5a059] via-[#d6be90] to-[#b89548] hover:brightness-105 shadow-sm transition-all cursor-pointer disabled:opacity-50"
             >
               {isSubmitting
-                ? 'Saving...'
+                ? 'Saving Residence...'
                 : editingAddressId
                 ? 'Save Changes'
-                : 'Use this address'}
-            </Button>
+                : 'Confirm & Use Residence'}
+            </button>
             {addresses.length > 0 && (
               <button
                 type="button"
                 onClick={resetForm}
-                className="text-xs text-gray-600 hover:underline"
+                className="text-xs text-[#8a7f6e] dark:text-[#9e978b] hover:underline cursor-pointer"
               >
                 Cancel
               </button>

@@ -14,19 +14,19 @@ export function NavBar() {
   return (
     <>
       <nav
-        className="bg-amazon-dark-light flex items-center gap-1 px-3 py-1.5 text-white text-sm overflow-x-auto scrollbar-hide"
+        className="bg-[#0c0e14] border-b border-[#c5a059]/20 flex items-center gap-1.5 px-4 py-1.5 text-gray-200 text-xs md:text-[13px] font-medium tracking-wider overflow-x-auto scrollbar-hide select-none"
         aria-label="Main navigation"
       >
         {/* Hamburger + All */}
         <button
           id="all-departments-btn"
           onClick={() => setMenuOpen(true)}
-          className="flex items-center gap-1 px-2 py-1 rounded font-semibold hover:ring-1 hover:ring-white transition-all whitespace-nowrap"
+          className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#181a24] border border-[#c5a059]/30 text-[#dfba73] hover:text-white hover:bg-[#202330] hover:border-[#dfba73] transition-all whitespace-nowrap font-semibold cursor-pointer"
           aria-label="Open all departments menu"
           aria-expanded={menuOpen}
         >
-          <Menu size={16} />
-          <span>All</span>
+          <Menu size={15} className="text-[#dfba73]" />
+          <span>Ateliers &amp; Salons</span>
         </button>
 
         {/* Nav links */}
@@ -34,7 +34,7 @@ export function NavBar() {
           <Link
             key={link.href}
             href={link.href}
-            className="px-2 py-1 rounded hover:ring-1 hover:ring-white transition-all whitespace-nowrap"
+            className="px-3 py-1 rounded-full text-gray-300 hover:text-[#dfba73] hover:bg-white/5 transition-all whitespace-nowrap tracking-wide"
           >
             {link.label}
           </Link>

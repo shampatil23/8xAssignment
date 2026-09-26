@@ -1,6 +1,7 @@
 'use client';
 // ============================================================================
-// ProductRating — Star rating display with numerical score and review count
+// ProductRating — Valenza Maison Star Rating Display
+// Refined gold stars with serif rating scores and elegant client review count
 // ============================================================================
 import React from 'react';
 import { Star, StarHalf } from 'lucide-react';
@@ -27,9 +28,9 @@ export function ProductRating({
   const emptyStars = Math.max(0, 5 - fullStars - (hasHalfStar ? 1 : 0));
 
   const starSize = {
-    sm: 13,
-    md: 16,
-    lg: 20,
+    sm: 12,
+    md: 15,
+    lg: 18,
   }[size];
 
   const textClasses = {
@@ -39,10 +40,10 @@ export function ProductRating({
   }[size];
 
   return (
-    <div className={`inline-flex items-center gap-1.5 ${className}`}>
+    <div className={`inline-flex items-center gap-2 ${className}`}>
       {/* Stars row */}
       <div
-        className="flex items-center text-amber-500"
+        className="flex items-center text-[#c5a059]"
         aria-label={`${clampedRating} out of 5 stars`}
       >
         {/* Full stars */}
@@ -50,7 +51,7 @@ export function ProductRating({
           <Star
             key={`full-${i}`}
             size={starSize}
-            className="fill-amber-400 text-amber-500"
+            className="fill-[#c5a059] text-[#c5a059]"
           />
         ))}
 
@@ -58,7 +59,7 @@ export function ProductRating({
         {hasHalfStar && (
           <StarHalf
             size={starSize}
-            className="fill-amber-400 text-amber-500"
+            className="fill-[#c5a059] text-[#c5a059]"
           />
         )}
 
@@ -67,18 +68,20 @@ export function ProductRating({
           <Star
             key={`empty-${i}`}
             size={starSize}
-            className="text-gray-300 fill-gray-100"
+            className="text-[#dfd6c5] dark:text-[#32394d] fill-[#ede6d8] dark:fill-[#1e2433]"
           />
         ))}
       </div>
 
       {/* Numerical score and review count */}
       {showCount && (
-        <div className={`flex items-center gap-1 text-amazon-link hover:underline hover:text-amazon-link-hover cursor-pointer ${textClasses}`}>
-          <span className="font-semibold text-gray-800">{clampedRating.toFixed(1)}</span>
+        <div className={`flex items-center gap-1.5 ${textClasses}`}>
+          <span className="font-serif font-medium text-[#141312] dark:text-[#f8f5ee]">
+            {clampedRating.toFixed(1)}
+          </span>
           {typeof reviewCount === 'number' && (
-            <span className="text-gray-500">
-              ({reviewCount.toLocaleString()})
+            <span className="text-xs text-[#8e816e] dark:text-[#8894ab] hover:text-[#c5a059] transition-colors cursor-pointer">
+              ({reviewCount.toLocaleString()} Client Appraisals)
             </span>
           )}
         </div>

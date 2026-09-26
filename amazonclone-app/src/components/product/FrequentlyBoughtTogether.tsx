@@ -1,13 +1,13 @@
 'use client';
 // ============================================================================
-// FrequentlyBoughtTogether — Amazon-style bundle add-to-cart component
+// FrequentlyBoughtTogether — Valenza Maison Curated Complements & Atelier Suite
 // ============================================================================
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Plus, Check, ShoppingCart } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { Plus, Check, ShoppingBag, Sparkles } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/hooks/useAuth';
+import { useLocation } from '@/context/LocationContext';
 import type { Product } from '@/types';
 
 interface BundleItem {
@@ -25,61 +25,61 @@ interface FrequentlyBoughtTogetherProps {
   onRequireAuth?: () => void;
 }
 
-// Sensible accessories based on current product category
+// Luxury complementary accessories
 function getComplementaryItems(product: Product): BundleItem[] {
-  if (product.category === 'electronics' || product.category === 'computers') {
+  if (product.category === 'horlogerie' || product.category === 'electronics') {
     return [
       {
-        id: 'acc-anker-cable-6ft',
-        title: 'Anker Premium Braided USB-C to USB-C Fast Charging Cable (6ft, 100W)',
-        price: 16.99,
-        image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&auto=format&fit=crop&q=80',
+        id: 'acc-leather-watch-roll',
+        title: 'Handcrafted Tuscan Calfskin Watch & Collector Travel Roll',
+        price: 280,
+        image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&auto=format&fit=crop&q=80',
         category: 'accessories',
       },
       {
-        id: 'acc-protective-sleeve',
-        title: 'Amazon Basics Shockproof Electronics Protection Travel Case (Water-Resistant)',
-        price: 24.50,
-        image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=400&auto=format&fit=crop&q=80',
+        id: 'acc-swiss-polishing-cloth',
+        title: 'Swiss Horology Microfiber Polishing Glove & Care Set',
+        price: 95,
+        image: 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=400&auto=format&fit=crop&q=80',
         category: 'accessories',
       },
     ];
   }
 
-  if (product.category === 'fashion') {
+  if (product.category === 'leather' || product.category === 'fashion') {
     return [
       {
-        id: 'acc-leather-care-kit',
-        title: 'Premium All-Weather Leather & Fabric Protector Spray (12 oz)',
-        price: 14.99,
+        id: 'acc-saphir-leather-balm',
+        title: "Saphir Médaille d'Or Artisan Leather Preservation Crème",
+        price: 85,
         image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=400&auto=format&fit=crop&q=80',
-        category: 'fashion',
+        category: 'leather',
       },
       {
-        id: 'acc-cotton-socks-3pk',
-        title: 'Breathable Moisture-Wicking Cushioned Crew Socks (3 Pairs)',
-        price: 12.99,
+        id: 'acc-silk-twill-scarf',
+        title: 'Pure Mulberry Silk Twill Protective Atelier Dust Wrap',
+        price: 160,
         image: 'https://images.unsplash.com/photo-1582966772680-860e372bb558?w=400&auto=format&fit=crop&q=80',
         category: 'fashion',
       },
     ];
   }
 
-  // Generic fallback for home/books/other
+  // Joaillerie / Vault Default
   return [
     {
-      id: 'acc-microfiber-cloths',
-      title: 'AmazonCommercial Multi-Surface Microfiber Cleaning Cloths (12-Pack)',
-      price: 11.99,
-      image: 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=400&auto=format&fit=crop&q=80',
-      category: 'home',
+      id: 'acc-gemological-loupe',
+      title: 'Precision 10x Aplanatic Triplet Gemological Loupe & Case',
+      price: 175,
+      image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&auto=format&fit=crop&q=80',
+      category: 'jewelry',
     },
     {
-      id: 'acc-universal-adapter',
-      title: 'Universal Compact Travel Power Adapter Surge Protector',
-      price: 19.99,
-      image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&auto=format&fit=crop&q=80',
-      category: 'electronics',
+      id: 'acc-velvet-presentation-tray',
+      title: 'Midnight Obsidian Velvet Valet Display & Inspection Tray',
+      price: 120,
+      image: 'https://images.unsplash.com/photo-1600003014755-ba31aa59c4b6?w=400&auto=format&fit=crop&q=80',
+      category: 'jewelry',
     },
   ];
 }
@@ -92,6 +92,7 @@ export function FrequentlyBoughtTogether({
 }: FrequentlyBoughtTogetherProps) {
   const { addItem } = useCart();
   const { user } = useAuth();
+  const { country, convertPrice } = useLocation();
   const [addedSuccess, setAddedSuccess] = useState(false);
 
   const accessories = getComplementaryItems(currentProduct);
@@ -100,7 +101,7 @@ export function FrequentlyBoughtTogether({
     id: currentProduct.id,
     title: currentProduct.title,
     price: currentPrice,
-    image: currentProduct.images?.[0]?.url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400',
+    image: currentProduct.images?.[0]?.url || 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=400',
     category: currentProduct.category,
   };
 
@@ -114,7 +115,6 @@ export function FrequentlyBoughtTogether({
   ]);
 
   const toggleItem = (id: string) => {
-    // Keep at least one item selected
     if (selectedIds.includes(id)) {
       if (selectedIds.length > 1) {
         setSelectedIds(selectedIds.filter((item) => item !== id));
@@ -128,6 +128,8 @@ export function FrequentlyBoughtTogether({
     .filter((item) => selectedIds.includes(item.id))
     .reduce((sum, item) => sum + item.price, 0);
 
+  const localBundlePrice = convertPrice(totalBundlePrice);
+
   const handleAddBundle = () => {
     if (!user) {
       if (onRequireAuth) {
@@ -138,7 +140,6 @@ export function FrequentlyBoughtTogether({
       return;
     }
 
-    // Add each selected item to cart
     if (selectedIds.includes(mainItem.id)) {
       addItem(currentProduct, 1);
     }
@@ -153,19 +154,19 @@ export function FrequentlyBoughtTogether({
             slug: acc.id,
             description: acc.title,
             category: acc.category,
-            brand: 'Amazon Basics',
+            brand: 'Valenza Atelier Accessories',
             price: acc.price,
             stock: 50,
             images: [{ url: acc.image, alt: acc.title, isPrimary: true }],
             status: 'active',
-            rating: 4.6,
-            reviewCount: 420,
+            rating: 4.9,
+            reviewCount: 88,
             isPrimeEligible: true,
             tags: ['accessories', acc.category],
             deliveryInfo: {
               isFreeDelivery: true,
               estimatedDays: 2,
-              fastestDeliveryDate: 'Tomorrow, 8 PM',
+              fastestDeliveryDate: 'Tomorrow, by 2 PM',
               standardDeliveryDate: 'in 2 days',
               shippingFee: 0,
             },
@@ -182,29 +183,35 @@ export function FrequentlyBoughtTogether({
   };
 
   return (
-    <section aria-labelledby="fbt-heading" className={`rounded-lg border border-gray-200 bg-white p-5 shadow-sm ${className}`}>
-      <h2 id="fbt-heading" className="text-base font-bold text-gray-900 mb-4">
-        Frequently bought together
-      </h2>
+    <section 
+      aria-labelledby="fbt-heading" 
+      className={`rounded-3xl border border-[#ebe2d1] dark:border-[#262c3d] bg-white/95 dark:bg-[#12151f]/95 backdrop-blur-xl p-6 sm:p-8 shadow-[0_12px_40px_rgba(26,23,20,0.03)] dark:shadow-[0_16px_45px_rgba(0,0,0,0.6)] ${className}`}
+    >
+      <div className="flex items-center gap-2 mb-6 pb-3 border-b border-[#f2ede4] dark:border-[#1e2433]">
+        <Sparkles className="w-4 h-4 text-[#c5a059]" />
+        <h2 id="fbt-heading" className="font-serif text-lg sm:text-xl font-light tracking-tight text-[#141312] dark:text-[#f8f5ee]">
+          Curated Complements &amp; Atelier Suite
+        </h2>
+      </div>
 
-      <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6 justify-between">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8 justify-between">
         {/* Product Images Strip with Plus signs */}
-        <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+        <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
           {allItems.map((item, index) => {
             const isSelected = selectedIds.includes(item.id);
             return (
               <React.Fragment key={item.id}>
                 {index > 0 && (
-                  <span className="text-gray-400 font-bold text-lg select-none">
+                  <span className="text-[#c5a059] font-serif text-xl select-none">
                     +
                   </span>
                 )}
                 <div
                   onClick={() => toggleItem(item.id)}
-                  className={`relative h-20 w-20 sm:h-24 sm:w-24 rounded border p-1 bg-white cursor-pointer transition-all ${
+                  className={`relative h-20 w-20 sm:h-24 sm:w-24 rounded-2xl border p-2 bg-[#fbfaf8] dark:bg-[#161a25] cursor-pointer transition-all ${
                     isSelected
-                      ? 'border-amazon-orange shadow-xs'
-                      : 'border-gray-200 opacity-40 grayscale'
+                      ? 'border-[#c5a059] ring-2 ring-[#c5a059]/30 shadow-sm'
+                      : 'border-[#ebe2d1] dark:border-[#222838] opacity-40 grayscale'
                   }`}
                 >
                   <Image
@@ -215,7 +222,7 @@ export function FrequentlyBoughtTogether({
                     className="object-contain p-1"
                   />
                   {isSelected && (
-                    <div className="absolute -top-1.5 -right-1.5 bg-amazon-orange text-white rounded-full p-0.5 shadow-xs">
+                    <div className="absolute -top-1.5 -right-1.5 bg-[#c5a059] text-[#12110f] rounded-full p-0.5 shadow-sm">
                       <Check size={12} strokeWidth={3} />
                     </div>
                   )}
@@ -226,55 +233,55 @@ export function FrequentlyBoughtTogether({
         </div>
 
         {/* Bundle Price & Add to Cart button */}
-        <div className="flex flex-col gap-2 min-w-[240px]">
-          <div className="text-sm text-gray-700">
-            Total price:{' '}
-            <span className="text-xl font-bold text-[#b12704]">
-              ${totalBundlePrice.toFixed(2)}
+        <div className="flex flex-col gap-3 min-w-[260px]">
+          <div className="text-xs text-[#786b58] dark:text-[#9e978b]">
+            Suite Valuation:{' '}
+            <span className="font-serif text-xl sm:text-2xl font-medium text-[#141312] dark:text-[#f8f5ee] ml-1">
+              {country.symbol}{Math.floor(localBundlePrice).toLocaleString(country.locale)}
             </span>
           </div>
 
-          <Button
+          <button
             type="button"
-            variant="cart"
             onClick={handleAddBundle}
-            className="w-full sm:w-auto"
+            className="group w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-sans text-xs uppercase tracking-[0.16em] font-semibold text-[#12110f] bg-gradient-to-r from-[#c5a059] via-[#d6be90] to-[#b89548] hover:brightness-105 active:scale-[0.99] transition-all shadow-[0_4px_16px_rgba(197,160,89,0.25)] cursor-pointer"
           >
             {addedSuccess ? (
-              <span className="flex items-center gap-1.5 text-green-800">
-                <Check size={16} strokeWidth={3} /> Added to Cart!
+              <span className="flex items-center gap-1.5 text-[#12110f]">
+                <Check size={15} strokeWidth={3} /> Added to Bag!
               </span>
             ) : (
               <span className="flex items-center gap-1.5">
-                <ShoppingCart size={16} /> Add all {selectedIds.length} to Cart
+                <ShoppingBag size={15} /> Add Bundle to Bag ({selectedIds.length})
               </span>
             )}
-          </Button>
+          </button>
         </div>
       </div>
 
       {/* Checkbox list with titles and prices */}
-      <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-2">
+      <div className="mt-6 pt-5 border-t border-[#f2ede4] dark:border-[#1e2433] flex flex-col gap-3">
         {allItems.map((item, index) => {
           const isSelected = selectedIds.includes(item.id);
+          const itemLocalPrice = convertPrice(item.price);
           return (
             <label
               key={item.id}
-              className="flex items-start gap-2.5 text-xs text-gray-700 cursor-pointer select-none hover:text-gray-900"
+              className="flex items-start gap-3 text-xs text-[#615442] dark:text-[#b8af9f] cursor-pointer select-none hover:text-[#141312] dark:hover:text-[#f8f5ee] transition-colors"
             >
               <input
                 type="checkbox"
                 checked={isSelected}
                 onChange={() => toggleItem(item.id)}
-                className="mt-0.5 rounded border-gray-300 text-amazon-orange focus:ring-amazon-orange cursor-pointer"
+                className="mt-0.5 rounded border-[#c5a059] text-[#c5a059] focus:ring-[#c5a059] cursor-pointer accent-[#c5a059]"
               />
               <span>
-                <strong className="text-gray-900">
-                  {index === 0 ? 'This item: ' : ''}
+                <strong className="text-[#141312] dark:text-[#f8f5ee] font-medium">
+                  {index === 0 ? 'Featured Piece: ' : ''}
                 </strong>
                 {item.title} —{' '}
-                <span className="font-bold text-[#b12704]">
-                  ${item.price.toFixed(2)}
+                <span className="font-serif font-semibold text-[#9b8353] dark:text-[#d6be90]">
+                  {country.symbol}{Math.floor(itemLocalPrice).toLocaleString(country.locale)}
                 </span>
               </span>
             </label>

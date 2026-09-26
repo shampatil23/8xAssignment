@@ -61,6 +61,10 @@ export interface CartContextValue extends CartState {
   savedItems: CartItem[];
   itemCount: number;
   subtotal: number;
+  appliedPromoCode: string | null;
+  appliedDiscountPercent: number;
+  applyPromoCode: (code: string) => boolean;
+  removePromoCode: () => void;
   addItem: (
     product: Product,
     variantOrQty?: ProductVariant | null | number,
@@ -84,6 +88,49 @@ function getStorageKey(uid?: string | null) {
 export function CartProvider({ children }: { children: ReactNode }) {
   const { user, loading: authLoading } = useAuth();
   const [state, dispatch] = useReducer(cartReducer, initialState);
+
+  const [appliedPromoCode, setAppliedPromoCode] = React.useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('valenza_active_promo_code') || null;
+    }
+    return null;
+  });
+
+  const [appliedDiscountPercent, setAppliedDiscountPercent] = React.useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const code = localStorage.getItem('valenza_active_promo_code');
+      return code ? 20 : 0;
+    }
+    return 0;
+  });
+
+  const applyPromoCode = useCallback((code: string) => {
+    if (!code || !code.trim()) return false;
+    const cleanCode = code.trim().toUpperCase();
+    setAppliedPromoCode(cleanCode);
+    setAppliedDiscountPercent(20);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('valenza_active_promo_code', cleanCode);
+        localStorage.setItem(
+          'amazon_clone_applied_promo',
+          JSON.stringify({ code: cleanCode, discountPercent: 20, timestamp: Date.now() }),
+        );
+      } catch {}
+    }
+    return true;
+  }, []);
+
+  const removePromoCode = useCallback(() => {
+    setAppliedPromoCode(null);
+    setAppliedDiscountPercent(0);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('valenza_active_promo_code');
+        localStorage.removeItem('amazon_clone_applied_promo');
+      } catch {}
+    }
+  }, []);
 
   // Sync cart helper: updates state, localStorage, and Firebase RTDB
   const syncCart = useCallback(
@@ -430,6 +477,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         savedItems,
         itemCount,
         subtotal,
+        appliedPromoCode,
+        appliedDiscountPercent,
+        applyPromoCode,
+        removePromoCode,
         addItem,
         updateQuantity,
         removeItem,

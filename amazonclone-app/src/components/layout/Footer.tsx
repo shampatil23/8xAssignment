@@ -38,31 +38,35 @@ export function Footer() {
       </div>
 
       {/* Divider */}
-      <hr className="border-gray-700" />
+      <hr className="border-gray-800" />
 
       {/* Bottom bar */}
       <div className="flex flex-col items-center gap-2 py-6 text-center text-xs text-gray-400">
-        {/* Logo */}
-        <span className="font-extrabold text-white text-base tracking-tight">
-          amazon<span className="text-amazon-orange">.</span>
-          <span className="text-xs align-super">clone</span>
-        </span>
+        {/* Valenza Luxury Logo */}
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-full border border-amber-400/50 bg-amber-500/10 flex items-center justify-center">
+            <span className="font-serif font-black text-amber-300 text-xs">V</span>
+          </div>
+          <span className="font-serif tracking-[0.25em] uppercase font-bold text-white text-sm bg-gradient-to-r from-amber-100 via-amber-200 to-yellow-400 bg-clip-text text-transparent">
+            VALENZA
+          </span>
+        </div>
 
         {/* Legal links */}
-        <nav aria-label="Footer legal" className="flex flex-wrap justify-center gap-3">
-          {['Conditions of Use', 'Privacy Notice', 'Interest-Based Ads'].map((label) => (
+        <nav aria-label="Footer legal" className="flex flex-wrap justify-center gap-4 text-gray-400 mt-1">
+          {['Private Client Terms', 'Haute Horlogerie Guarantee', 'Bespoke Privacy Policy', 'White-Glove Delivery'].map((label) => (
             <Link
               key={label}
               href="#"
-              className="hover:text-white transition-colors"
+              className="hover:text-amber-300 transition-colors text-[11px]"
             >
               {label}
             </Link>
           ))}
         </nav>
 
-        <p>
-          © 1996–{year}, {APP_NAME}, Inc. or its affiliates
+        <p className="text-[11px] text-gray-500 mt-1">
+          © {year} {APP_NAME} Maison de Luxe. All rights reserved. Authentic luxury certified.
         </p>
       </div>
     </footer>

@@ -29,6 +29,7 @@ import type {
   ProductQuestion,
   QuestionAnswer,
   Promotion,
+  HeroBanner,
   PlatformSettings,
   SellerApplication,
   Notification,
@@ -148,6 +149,18 @@ export function profileToAppUser(profile: UserProfile): AppUser {
 // Category RTDB operations (/categories/{id})
 // ============================================================================
 
+const LUXURY_CATEGORY_NAMES: Record<string, string> = {
+  electronics: 'Luxury Watches & Timepieces',
+  fashion: 'Fashion & Haute Couture',
+  beauty: 'Jewelry & Fine Fragrances',
+  'home-garden': 'Home & Sanctuary Living',
+  computers: 'Electronics & Premium Audio',
+  sports: 'Sports & Grand Tourisme',
+  books: 'Books & Rare Editions',
+  toys: 'Collectibles, Toys & Games',
+  grocery: 'Gourmet Food & Fine Wine',
+};
+
 export async function getAllCategories(): Promise<Category[]> {
   const db = getRTDB();
   try {
@@ -158,7 +171,20 @@ export async function getAllCategories(): Promise<Category[]> {
       return SEED_CATEGORIES;
     }
     const val = snap.val() as Record<string, Category>;
-    return Object.values(val);
+    const list = Object.values(val);
+
+    // If database still has legacy names, update RTDB in background with luxury definitions
+    const hasLegacy = list.some((c) => c.name.includes('Beauty & Personal Care') || c.name.includes('Computers & Accessories'));
+    if (hasLegacy) {
+      for (const cat of SEED_CATEGORIES) {
+        set(ref(db, `categories/${cat.id}`), cat).catch(() => {});
+      }
+    }
+
+    return list.map((c) => ({
+      ...c,
+      name: LUXURY_CATEGORY_NAMES[c.slug] || c.name,
+    }));
   } catch (err) {
     console.warn('[RTDB] getAllCategories failed, using fallback:', err);
     return SEED_CATEGORIES;
@@ -945,6 +971,213 @@ export async function savePromotionInDB(promo: Promotion): Promise<void> {
 export async function deletePromotionInDB(promoId: string): Promise<void> {
   const db = getRTDB();
   await remove(ref(db, `promotions/${promoId}`));
+}
+
+// ── Hero Banners & Promotional Slides ──────────────────────────────────────
+export const DEFAULT_HERO_BANNERS: HeroBanner[] = [
+  {
+    id: 'banner-horlogerie-1',
+    badge: 'HAUTE HORLOGERIE • SALON 2026',
+    title: 'Masterpieces of Perpetual Motion',
+    subtitle: 'THE APEX OF SWISS CRAFTSMANSHIP',
+    description:
+      'Immerse yourself in precision mechanical art. Hand-finished skeleton tourbillons, perpetual calendars, and grand complications crafted by master horologists.',
+    image: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=2400&auto=format&fit=crop',
+    primaryHref: '/category/electronics',
+    primaryCta: 'Explore Timepieces',
+    secondaryHref: '/deals',
+    secondaryCta: 'Private Viewing',
+    highlightTag: 'Limited to 25 Pieces Worldwide',
+    discountText: 'Special Exhibition Pricing',
+    offerCode: 'HORLOGERIE26',
+    order: 1,
+    isActive: true,
+    createdAt: '2026-01-01T00:00:00.000Z',
+  },
+  {
+    id: 'banner-high-jewelry-2',
+    badge: 'MAISON JOAILLERIE • RARE GEMSTONES',
+    title: 'Brilliance Beyond Any Measure',
+    subtitle: 'FLAWLESS D-GRADE & COLOMBIAN EMERALDS',
+    description:
+      'Exquisite statement solitaires, untreated royal blue sapphires, and bespoke high-jewelry suites sculpted in 18k Fairmined rose gold and platinum.',
+    image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2400&auto=format&fit=crop',
+    primaryHref: '/category/beauty',
+    primaryCta: 'View The High Jewels',
+    secondaryHref: '/about',
+    secondaryCta: 'Gemological Dossier',
+    highlightTag: 'Certified GIA & Gubelin',
+    discountText: 'Complimentary Diamond Dossier',
+    offerCode: 'BRILLIANCE26',
+    order: 2,
+    isActive: true,
+    createdAt: '2026-01-02T00:00:00.000Z',
+  },
+  {
+    id: 'banner-haute-couture-3',
+    badge: 'ATELIER PRIVÉ • RUNWAY EDIT',
+    title: 'Sartorial Art & Modern Grandeur',
+    subtitle: 'THE FALL / WINTER 2026 COLLECTION',
+    description:
+      'Sculptural trench coats, double-faced cashmere capes, and bespoke Italian silk tailoring curated from the world’s most prestigious heritage fashion houses.',
+    image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2400&auto=format&fit=crop',
+    primaryHref: '/category/fashion',
+    primaryCta: 'Shop The Runway',
+    secondaryHref: '/deals',
+    secondaryCta: 'Request Private Stylist',
+    highlightTag: 'Bespoke Atelier Commission',
+    discountText: '20% Private Preview Privilege',
+    offerCode: 'ATELIER20',
+    order: 3,
+    isActive: true,
+    createdAt: '2026-01-03T00:00:00.000Z',
+  },
+  {
+    id: 'banner-private-reserve-4',
+    badge: 'PRIVATE RESERVE • MAISON ART',
+    title: 'Sanctuaries of Unrivaled Living',
+    subtitle: 'CURATED ARCHITECTURAL LIVING',
+    description:
+      'Artisan Murano crystal, sculptural bronze lighting, and private reserve fragrances distilled from rare centifolia roses in Grasse.',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2400&auto=format&fit=crop',
+    primaryHref: '/category/home-garden',
+    primaryCta: 'Enter Private Reserve',
+    secondaryHref: '/customer-service',
+    secondaryCta: 'Curator Consultation',
+    highlightTag: 'Exclusive Valenza Edition',
+    discountText: 'Complimentary White Glove Delivery',
+    offerCode: 'RESERVEVIP',
+    order: 4,
+    isActive: true,
+    createdAt: '2026-01-04T00:00:00.000Z',
+  },
+  {
+    id: 'banner-grand-motoring-5',
+    badge: 'GRAND TOURISME • MOTORING ATELIER',
+    title: 'Aerodynamic Prowess & Pure Art',
+    subtitle: 'COACHBUILT PERFORMANCE ICONS',
+    description:
+      'Bespoke commissions, carbon fiber aerodynamic components, and ultra-rare heritage motoring collectibles curated for the world’s most discerning collectors.',
+    image: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=2400&auto=format&fit=crop',
+    primaryHref: '/category/sports',
+    primaryCta: 'Explore Motoring',
+    secondaryHref: '/registry',
+    secondaryCta: 'Private Inquiries',
+    highlightTag: 'Numbered Series Delivery',
+    discountText: 'Curator Track Allocation',
+    offerCode: 'GRANDTOUR26',
+    order: 5,
+    isActive: true,
+    createdAt: '2026-01-05T00:00:00.000Z',
+  },
+];
+
+const LOCAL_STORAGE_BANNERS_KEY = 'valenza_hero_banners_cache';
+
+export async function getHeroBannersFromDB(): Promise<HeroBanner[]> {
+  const db = getRTDB();
+  try {
+    const snap = await get(ref(db, 'hero_banners'));
+    if (snap.exists()) {
+      const val = snap.val() as Record<string, HeroBanner>;
+      const list = Object.values(val);
+      
+      // Auto-heal legacy makeup image on watch banner
+      for (const b of list) {
+        if (b.id === 'banner-haute-horlogerie-1' && (b.image.includes('522335789203') || b.image.includes('makeup'))) {
+          b.image = 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=2400&auto=format&fit=crop';
+          set(ref(db, `hero_banners/${b.id}`), b).catch(() => {});
+        }
+      }
+
+      list.sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(LOCAL_STORAGE_BANNERS_KEY, JSON.stringify(list));
+        } catch {}
+      }
+      return list;
+    }
+
+    // Seed defaults if empty in DB
+    const list = [...DEFAULT_HERO_BANNERS];
+    for (const b of list) {
+      await set(ref(db, `hero_banners/${b.id}`), b);
+    }
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(LOCAL_STORAGE_BANNERS_KEY, JSON.stringify(list));
+      } catch {}
+    }
+    return list;
+  } catch (err) {
+    console.warn('[database.getHeroBannersFromDB] failed, reading from local fallback:', err);
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem(LOCAL_STORAGE_BANNERS_KEY);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch {}
+    }
+    return DEFAULT_HERO_BANNERS;
+  }
+}
+
+export async function saveHeroBannerInDB(banner: HeroBanner): Promise<void> {
+  const db = getRTDB();
+  try {
+    await set(ref(db, `hero_banners/${banner.id}`), banner);
+  } catch (err) {
+    console.warn('[database.saveHeroBannerInDB] remote failed, syncing local cache:', err);
+  }
+  if (typeof window !== 'undefined') {
+    try {
+      const cached = localStorage.getItem(LOCAL_STORAGE_BANNERS_KEY);
+      const list: HeroBanner[] = cached ? JSON.parse(cached) : [...DEFAULT_HERO_BANNERS];
+      const idx = list.findIndex((b) => b.id === banner.id);
+      if (idx >= 0) {
+        list[idx] = banner;
+      } else {
+        list.push(banner);
+      }
+      list.sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+      localStorage.setItem(LOCAL_STORAGE_BANNERS_KEY, JSON.stringify(list));
+    } catch {}
+  }
+}
+
+export async function deleteHeroBannerInDB(bannerId: string): Promise<void> {
+  const db = getRTDB();
+  try {
+    await remove(ref(db, `hero_banners/${bannerId}`));
+  } catch (err) {
+    console.warn('[database.deleteHeroBannerInDB] remote failed:', err);
+  }
+  if (typeof window !== 'undefined') {
+    try {
+      const cached = localStorage.getItem(LOCAL_STORAGE_BANNERS_KEY);
+      if (cached) {
+        const list: HeroBanner[] = JSON.parse(cached);
+        const filtered = list.filter((b) => b.id !== bannerId);
+        localStorage.setItem(LOCAL_STORAGE_BANNERS_KEY, JSON.stringify(filtered));
+      }
+    } catch {}
+  }
+}
+
+export async function reorderHeroBannersInDB(bannerIds: string[]): Promise<void> {
+  const db = getRTDB();
+  const updates: Record<string, any> = {};
+  bannerIds.forEach((id, idx) => {
+    updates[`hero_banners/${id}/order`] = idx + 1;
+  });
+  try {
+    await update(ref(db), updates);
+  } catch (err) {
+    console.warn('[database.reorderHeroBannersInDB] failed:', err);
+  }
 }
 
 const DEFAULT_SETTINGS: PlatformSettings = {
