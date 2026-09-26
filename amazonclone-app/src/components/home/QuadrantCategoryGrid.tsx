@@ -51,7 +51,7 @@ const SALON_SECTIONS: SalonSectionConfig[] = [
       {
         id: 'fb-watch-1',
         name: 'Tourbillon Edition',
-        image: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=600&auto=format&fit=crop&q=85',
+        image: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=600&auto=format&fit=crop&q=85',
         href: '/category/electronics',
       },
       {

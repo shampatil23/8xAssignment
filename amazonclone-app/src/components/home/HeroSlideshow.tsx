@@ -249,20 +249,25 @@ export function HeroSlideshow() {
               <ArrowRight size={15} className="text-[#121110] group-hover:translate-x-1 transition-transform" />
             </button>
 
-            {/* Secondary Luxury Glass Button */}
-            {currentSlide.secondaryHref && currentSlide.secondaryCta && (
-              <button
-                type="button"
-                id="hero-secondary-cta-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleBannerClick(currentSlide.secondaryHref, currentSlide.offerCode, e);
-                }}
-                className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full backdrop-blur-xl bg-white/70 hover:bg-white dark:bg-white/10 dark:hover:bg-white/20 border border-[#c5a059]/70 hover:border-[#dfba73] text-[#141312] dark:text-white hover:text-[#8a6827] dark:hover:text-[#dfba73] font-serif font-semibold text-xs sm:text-[13px] tracking-[0.22em] uppercase shadow-[0_4px_20px_rgba(197,160,89,0.12)] hover:shadow-[0_8px_30px_rgba(197,160,89,0.3)] hover:scale-[1.03] active:scale-95 transition-all duration-300 cursor-pointer"
-              >
-                <span className="font-serif tracking-[0.22em] font-semibold">{currentSlide.secondaryCta}</span>
-              </button>
-            )}
+            {/* Secondary Luxury Glass Button (View Offers) */}
+            <button
+              type="button"
+              id="hero-secondary-cta-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleBannerClick(currentSlide.secondaryHref || '/deals', currentSlide.offerCode, e);
+              }}
+              className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full backdrop-blur-xl bg-white/70 hover:bg-white dark:bg-white/10 dark:hover:bg-white/20 border border-[#c5a059]/70 hover:border-[#dfba73] text-[#141312] dark:text-white hover:text-[#8a6827] dark:hover:text-[#dfba73] font-serif font-semibold text-xs sm:text-[13px] tracking-[0.22em] uppercase shadow-[0_4px_20px_rgba(197,160,89,0.12)] hover:shadow-[0_8px_30px_rgba(197,160,89,0.3)] hover:scale-[1.03] active:scale-95 transition-all duration-300 cursor-pointer"
+            >
+              <span className="font-serif tracking-[0.22em] font-semibold">
+                {currentSlide.secondaryCta &&
+                !currentSlide.secondaryCta.toLowerCase().includes('private') &&
+                !currentSlide.secondaryCta.toLowerCase().includes('viewing') &&
+                !currentSlide.secondaryCta.toLowerCase().includes('access')
+                  ? currentSlide.secondaryCta
+                  : 'View Offers'}
+              </span>
+            </button>
           </div>
         </div>
 

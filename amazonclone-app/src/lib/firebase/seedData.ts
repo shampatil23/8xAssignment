@@ -305,7 +305,7 @@ export const SEED_PRODUCTS: Product[] = [
     },
     images: [
       {
-        url: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=800&auto=format&fit=crop&q=85',
+        url: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=800&auto=format&fit=crop&q=85',
         alt: 'Patek Philippe Grandmaster Chime Timepiece',
         isPrimary: true,
       },

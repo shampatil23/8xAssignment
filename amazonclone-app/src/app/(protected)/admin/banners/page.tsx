@@ -139,7 +139,7 @@ export default function AdminBannersPage() {
     setPrimaryHref('/category/fashion');
     setPrimaryCta('Explore Collection');
     setSecondaryHref('/deals');
-    setSecondaryCta('Private Access');
+    setSecondaryCta('View Offers');
     setHighlightTag('Limited Commission');
     setDiscountText('Special 20% Privilege');
     setOfferCode('MAISON20');
@@ -977,7 +977,7 @@ export default function AdminBannersPage() {
                       type="text"
                       value={secondaryCta}
                       onChange={(e) => setSecondaryCta(e.target.value)}
-                      placeholder="e.g. Private Viewing"
+                      placeholder="e.g. View Offers"
                       className="w-full px-3 py-2 text-xs rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     />
                   </div>
