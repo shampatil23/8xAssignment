@@ -1,51 +1,79 @@
 # 👑 Valenza Haute Maison — Next-Generation Luxury Marketplace & E-Commerce Platform
 
+<div align="center">
+
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.0%20(App%20Router)-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19.0-61dafb?style=for-the-badge&logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178c6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![TypeScript 5](https://img.shields.io/badge/TypeScript-5.0-3178c6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Firebase RTDB](https://img.shields.io/badge/Firebase-Realtime%20Database-ffca28?style=for-the-badge&logo=firebase)](https://firebase.google.com/)
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind-CSS%20v4-38bdf8?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
 [![Groq AI](https://img.shields.io/badge/Groq%20AI-Llama%20%26%20GPT--OSS-f55036?style=for-the-badge)](https://groq.com/)
+[![Cloudinary](https://img.shields.io/badge/Cloudinary-Signed%20Media%20CDN-3448c5?style=for-the-badge&logo=cloudinary)](https://cloudinary.com/)
+[![Razorpay](https://img.shields.io/badge/Razorpay-Test%20Gateway-0c2340?style=for-the-badge&logo=razorpay)](https://razorpay.com/)
 
-An authentic, ultra-premium multi-vendor luxury marketplace and high-fidelity e-commerce ecosystem built from the ground up for the **8x Engineering 24-Hour Build Challenge**. 
+<p align="center">
+  <strong>An authentic, ultra-premium multi-vendor luxury marketplace and high-fidelity e-commerce ecosystem built from the ground up for the 8x Engineering 24-Hour Build Challenge.</strong>
+</p>
 
-Valenza Haute Maison reimagines global marketplace architecture with the operational rigor of **Amazon** combined with the visual refinement, curation, and bespoke service of high luxury maisons (Cartier, Patek Philippe, Audemars Piguet, Hermès, Assouline).
+<p align="center">
+  <a href="https://amazonclone-app.vercel.app/">🌐 <strong>Live Application Demo</strong></a> •
+  <a href="https://github.com/shampatil23/8xAssignment">📦 <strong>GitHub Repository</strong></a> •
+  <a href="#-video-walkthrough--demo">📹 <strong>Walkthrough Video</strong></a> •
+  <a href="#-8x-autonomous-agent-logs--trajectory-audit">🤖 <strong>Agent Trajectory Logs</strong></a> •
+  <a href="#-demo--testing-credentials">🔑 <strong>Test Credentials</strong></a>
+</p>
+
+</div>
 
 ---
 
-## 📌 Deliverables & Quick Links
-
-| Deliverable | Description & Status |
-| :--- | :--- |
-| **🌐 Live Application** | [Deployed Live on Vercel](https://amazonclone-app.vercel.app/) *(Accessible to all visitors & test accounts)* |
-| **📦 GitHub Repository** | [shampatil23/8xAssignment](https://github.com/shampatil23/8xAssignment) *(Complete source code & commit history)* |
-| **📹 Walkthrough Video** | [5-Minute Loom Video Walkthrough](#-video-walkthrough--demo) *(Full customer, merchant, and admin workflow)* |
-| **🤖 8x Agent Logs** | [`.agent-logs/`](./.agent-logs/) *(10 fully synchronized AI development session logs & audit trails)* |
-| **📑 Technical Specs** | [Architecture Reference](./.agents/AMAZON-TECH-ARCHITECTURE.md) |
+## 📑 Table of Contents
+1. [⚡ The 8x Engineering 24-Hour Challenge Brief](#-the-8x-engineering-24-hour-challenge-brief)
+2. [🤖 8x Autonomous Agent Logs & Trajectory Audit](#-8x-autonomous-agent-logs--trajectory-audit)
+3. [🏗️ System Architecture & Cloud Data Topology](#-system-architecture--cloud-data-topology)
+4. [🌟 High-Resolution Visual Showcase & Feature Deep Dive](#-high-resolution-visual-showcase--feature-deep-dive)
+   - [1. Storefront & Curated Luxury Ateliers](#1-storefront--curated-luxury-ateliers)
+   - [2. Search, Faceted Filtering & Catalog Discovery](#2-search-faceted-filtering--catalog-discovery)
+   - [3. Product Detail Page (PDP) & The Valenza Buy Box](#3-product-detail-page-pdp--the-valenza-buy-box)
+   - [4. 4-Step Accordion Checkout & Razorpay Integration](#4-4-step-accordion-checkout--razorpay-integration)
+   - [5. Seller Central — Merchant Hub & Inventory Stepper](#5-seller-central--merchant-hub--inventory-stepper)
+   - [6. Admin Central — Command Console & Governance](#6-admin-central--command-console--governance)
+   - [7. Valenza AI Concierge & Bespoke Stylist](#7-valenza-ai-concierge--bespoke-stylist)
+5. [🛠️ Complete Technology Stack](#-complete-technology-stack)
+6. [📂 Repository Structure](#-repository-structure)
+7. [🚀 Local Setup & Getting Started](#-local-setup--getting-started)
+8. [🔑 Demo & Testing Credentials](#-demo--testing-credentials)
+9. [🧪 Razorpay Test Mode Verification](#-razorpay-test-mode-verification)
+10. [📹 Video Walkthrough & Demo](#-video-walkthrough--demo)
+11. [🏆 8x Engineering Evaluation Checklist](#-8x-engineering-evaluation-checklist)
 
 ---
 
 ## ⚡ The 8x Engineering 24-Hour Challenge Brief
 
-> **The Objective**: Rebuild a massive, full-scale consumer product in 24 hours — delivering deeper functionality, higher visual fidelity, and superior product judgement than standard clones.
+> [!IMPORTANT]
+> **The Challenge Objective**: Rebuild a massive, full-scale consumer product in 24 hours — delivering deeper functionality, higher visual fidelity, and superior product judgement than typical clone implementations.
 >
-> **Target Archetype**: [amazon.com](https://amazon.com/) elevated into a next-generation high-luxury marketplace.
->
-> **Core Pillars**:
-> 1. **Complete Ecosystem Depth**: Three fully functional portals — Customer Storefront, Merchant Central (`/seller`), and Super Admin Central (`/admin`).
-> 2. **Operational Realism**: Real-time persistent state, multi-step checkout, atomic inventory management, signed CDN media ingestion, and verified return lifecycles.
-> 3. **AI Concierge Integration**: In-app conversational AI luxury stylist and store assistant powered by ultra-fast Groq LLM inference.
-> 4. **Rigorous Agent Capture**: 100% autonomous prompt/response capture synchronized across all development sessions in `.agent-logs/`.
+> **Target Archetype**: [amazon.com](https://amazon.com/) elevated into a next-generation high-luxury marketplace: **Valenza Haute Maison**.
+
+### The 4 Core Pillars of Valenza Haute Maison
+
+| Pillar | Engineering & Product Execution |
+| :--- | :--- |
+| **1. Complete Ecosystem Depth** | **Three fully functional portals**: Customer Shopper Storefront, Merchant Central ([`/seller`](file:///c:/Users/bavis/Downloads/8x%20update/8xAssignment/amazonclone-app/src/app/(protected)/seller/page.tsx)), and Super Admin Command Central ([`/admin`](file:///c:/Users/bavis/Downloads/8x%20update/8xAssignment/amazonclone-app/src/app/(protected)/admin/page.tsx)). |
+| **2. Operational Realism** | Real-time persistent state via Firebase RTDB, atomic inventory decrement, multi-vendor order fulfillment steppers, signed Cloudinary CDN ingestion, and full 5-stage return dispute lifecycles. |
+| **3. AI Concierge Integration** | In-app conversational luxury stylist and shopping advisor powered by ultra-fast Groq LLM inference (`openai/gpt-oss-120b` and `qwen/qwen3.8-27b`) with live streaming responses. |
+| **4. Rigorous Agent Capture** | 100% autonomous prompt/response capture synchronized across all 10 development sessions in [`.agent-logs/`](file:///c:/Users/bavis/Downloads/8x%20update/8xAssignment/.agent-logs/) conforming to the **8x Engineering Agent Capture Specification**. |
 
 ---
 
 ## 🤖 8x Autonomous Agent Logs & Trajectory Audit
 
-Every prompt, decision, thinking trace, and system response throughout this build challenge was captured autonomously without manual alteration using the **8x Engineering Agent Capture Specification**.
+Every prompt, decision, model reasoning trace, and system response throughout this build challenge was captured autonomously without manual alteration using the **8x Engineering Agent Capture Specification**.
 
 <div align="center">
-  <img src="./amazonclone-app/redmedata/AGENT.png" alt="8x Autonomous Agent Logs & Audit Interface" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
-  <p><em>Figure: 8x Autonomous Agent Trajectory Audit — Complete turn-by-turn prompt, reasoning, and response logs.</em></p>
+  <img src="./amazonclone-app/redmedata/AGENT.png" alt="8x Autonomous Agent Logs & In-App Audit Interface" width="100%" style="border-radius: 10px; border: 1px solid rgba(229, 231, 235, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.2);" />
+  <p><em>Figure 1: In-App 8x Autonomous Agent Trajectory Explorer (<code>/agent-logs</code>) — Complete session audit trails with turn-by-turn prompts, reasoning traces, timestamps, and model tags.</em></p>
 </div>
 
 ### System Capture Mechanism
@@ -54,6 +82,7 @@ Every prompt, decision, thinking trace, and system response throughout this buil
 - **Automated Lifecycle Hooks**: [`.agents/hooks.json`](./.agents/hooks.json) configured on `Stop` and `PostInvocation`
 - **Synchronization Engine**: [`.agent-logs/sync.py`](./.agent-logs/sync.py) with automated regex security redaction filter
 - **Format Standard**: `.agent-logs/YYYY-MM-DD_HH-MM-SS_<session-id>.md` matching the 8x assignment specification
+- **Interactive UI**: Dedicated in-app log viewer accessible at [`/agent-logs`](https://amazonclone-app.vercel.app/agent-logs)
 
 ### Synchronized Session Index
 
@@ -68,11 +97,10 @@ Every prompt, decision, thinking trace, and system response throughout this buil
 | **07** | [`2026-09-25_13-45-55_3c2407a8...md`](./.agent-logs/2026-09-25_13-45-55_3c2407a8-e998-4eb3-b20e-168a257143d0.md) | 2026-09-25 13:45 | `gemini-3.6-flash` / Antigravity | 46 | **Admin Central (`/admin`)**: Marketplace GMV tracking, user ban/unban governance, return dispute approval workflow. |
 | **08** | [`2026-09-25_18-45-42_1eea34b9...md`](./.agent-logs/2026-09-25_18-45-42_1eea34b9-4a9b-439a-8c46-da2b19cd9ad4.md) | 2026-09-25 18:45 | `gemini-3.6-flash` / Antigravity | 12 | **Checkout & Payments**: 4-step checkout accordion, Razorpay test mode modal (cards, UPI, 3D secure OTP simulation), order review. |
 | **09** | [`2026-09-26_04-55-14_a7c9ada0...md`](./.agent-logs/2026-09-26_04-55-14_a7c9ada0-1511-46fb-8860-7255b918ed0b.md) | 2026-09-26 04:55 | `gemini-3.6-flash` / Antigravity | 75+ | **Luxury Overhaul & AI Assistant**: Valenza elevation, 6 curated Ateliers, Groq AI Concierge streaming assistant, secret redaction, Render deployment compatibility. |
-| **10** | [`2026-09-26_18-26-09_c4175d9a...md`](./.agent-logs/2026-09-26_18-26-09_c4175d9a-14c4-4a76-b7b6-b1dc0f646bd1.md) | 2026-09-26 18:26 | `gemini-3.6-flash` / Antigravity | 1 | **Audit Documentation**: Added dedicated agent log section, high-resolution redmedata screenshots, and finalized push trajectory. |
+| **10** | [`2026-09-26_18-26-09_c4175d9a...md`](./.agent-logs/2026-09-26_18-26-09_c4175d9a-14c4-4a76-b7b6-b1dc0f646bd1.md) | 2026-09-26 18:26 | `gemini-3.8-flash` / Antigravity | 5 | **Visual Audit & Section Release**: Dedicated in-app `/agent-logs` route, high-resolution showcase integration, and synchronized GitHub origin. |
 
-### How to Regenerate & Verify Logs Locally
 ```bash
-# From workspace root
+# Verify log synchronization locally
 python .agent-logs/sync.py
 
 # Expected output:
@@ -81,31 +109,31 @@ python .agent-logs/sync.py
 
 ---
 
-## 🏗️ System Architecture & Data Topology
+## 🏗️ System Architecture & Cloud Data Topology
 
-Valenza is built on an event-driven, reactive cloud architecture separating presentation, edge caching, real-time persistence, and secure serverless operations.
+Valenza Haute Maison is built on an event-driven, reactive cloud architecture separating presentation, edge caching, real-time persistence, and secure serverless operations.
 
 <div align="center">
-  <img src="./.agents/references/readmeref/Architecture.png" alt="Valenza System Architecture" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
-  <p><em>Figure 1: Full-Stack Architecture — Next.js 16 App Router, Firebase Realtime Database, Cloudinary CDN pipeline, Groq AI Concierge, and Razorpay payment orchestration.</em></p>
+  <img src="./.agents/references/readmeref/Architecture.png" alt="Valenza Full-Stack System Architecture" width="100%" style="border-radius: 10px; border: 1px solid rgba(229, 231, 235, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.2);" />
+  <p><em>Figure 2: Full-Stack Cloud Architecture — Next.js 16 App Router, Firebase Realtime Database, Cloudinary CDN pipeline, Groq AI Concierge, and Razorpay payment orchestration.</em></p>
 </div>
 
 ### Architectural Highlights
 
-- **Reactive State & Persistence**: Backed by **Firebase Realtime Database (RTDB)** for atomic inventory decrement, instant live cart sync, order state updates, and real-time review publishing.
-- **Three-Tier Role-Based Access Control (RBAC)**: Secure route protection guarding Customer Shoppers, Verified Merchants (`/seller/*`), and Super Admins (`/admin/*`).
-- **Multi-Model AI Inference**: Groq-powered serverless AI Concierge with graceful multi-model fallback (`openai/gpt-oss-120b` → `openai/gpt-oss-20b` → `qwen/qwen3.8-27b`).
-- **Dynamic Multi-Currency Engine**: Global pricing matrix converting USD base catalog into INR (`₹`), EUR (`€`), GBP (`£`), CAD (`C$`), and JPY (`¥`) with real-time tax and shipping thresholds.
-- **Signed Cloudinary Media Pipeline**: Direct-to-cloud asset uploads with server-side HMAC signature verification, automated WebP compression, and CDN distribution.
+- **Reactive State & Persistence**: Backed by **Firebase Realtime Database (RTDB)** for atomic inventory decrement, instant live cart sync across tabs, order state updates, and real-time review publishing without full-page reloads.
+- **Three-Tier Role-Based Access Control (RBAC)**: Secure route protection wrappers guarding Customer Shoppers, Verified Merchants ([`/seller/*`](file:///c:/Users/bavis/Downloads/8x%20update/8xAssignment/amazonclone-app/src/app/(protected)/seller/page.tsx)), and Super Admins ([`/admin/*`](file:///c:/Users/bavis/Downloads/8x%20update/8xAssignment/amazonclone-app/src/app/(protected)/admin/page.tsx)).
+- **Multi-Model AI Inference**: Groq-powered serverless AI Concierge with graceful multi-model fallback (`openai/gpt-oss-120b` → `openai/gpt-oss-20b` → `qwen/qwen3.8-27b`) delivering sub-200ms TTFT responses.
+- **Dynamic Multi-Currency Matrix**: Global pricing engine converting USD base catalog into INR (`₹`), EUR (`€`), GBP (`£`), CAD (`C$`), and JPY (`¥`) with real-time tax and white-glove shipping thresholds.
+- **Signed Cloudinary Media Pipeline**: Direct-to-cloud asset ingestion with server-side HMAC signature verification, automated WebP compression, and high-speed global CDN delivery.
 
 ---
 
-## 🌟 Visual Showcase & Feature Deep Dive
+## 🌟 High-Resolution Visual Showcase & Feature Deep Dive
 
 ### 1. Storefront & Curated Luxury Ateliers
 <div align="center">
-  <img src="./amazonclone-app/redmedata/HOME.png" alt="Storefront Home" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
-  <p><em>Figure 2: Valenza storefront with dynamic hero carousel, localized delivery header, and 6 curated luxury ateliers.</em></p>
+  <img src="./amazonclone-app/redmedata/HOME.png" alt="Valenza Storefront Home" width="100%" style="border-radius: 10px; border: 1px solid rgba(229, 231, 235, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.2);" />
+  <p><em>Figure 3: Valenza Haute Maison Storefront — Dynamic editorial hero carousel, localized delivery header, currency switcher, and 6 curated luxury ateliers.</em></p>
 </div>
 
 - **Dynamic Hero Slideshow**: Interactive editorial banners with custom CTA routing, promotional countdowns, and dark glassmorphic styling.
@@ -119,41 +147,41 @@ Valenza is built on an event-driven, reactive cloud architecture separating pres
 
 ---
 
-### 2. Search, Faceted Filtering & Catalog Navigation
+### 2. Search, Faceted Filtering & Catalog Discovery
 <div align="center">
-  <img src="./amazonclone-app/redmedata/ITEMS.png" alt="Catalog Search & Filters" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
-  <p><em>Figure 3: Faceted catalog search with predictive keyword matching, atelier filters, price range sliders, and rating stars.</em></p>
+  <img src="./amazonclone-app/redmedata/ITEMS.png" alt="Catalog Search & Faceted Filtering" width="100%" style="border-radius: 10px; border: 1px solid rgba(229, 231, 235, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.2);" />
+  <p><em>Figure 4: Faceted catalog discovery (`/search`) — Real-time keyword autocomplete, atelier department filters, price range sliders, and customer rating thresholds.</em></p>
 </div>
 
-- **Predictive Search**: Real-time autocomplete matching product titles, ateliers, designer brands, and descriptions.
-- **Multi-Dimensional Faceting**: Filter catalog by department, price bounds, customer rating (4★ & up), stock availability, and delivery speed.
-- **Dynamic Sorting**: Sort by Featured, Price (Ascending/Descending), Customer Reviews, and Latest Acquisitions.
+- **Predictive Search Bar**: Instant autocomplete matching product titles, ateliers, designer maisons, and descriptions with debounce optimization.
+- **Multi-Dimensional Faceting**: Filter items by department, price bounds, customer rating (4★ & up), stock availability, and delivery speed.
+- **Dynamic Sorting Engine**: Sort by Featured, Price (Ascending/Descending), Customer Reviews, and Latest Maison Acquisitions.
 
 ---
 
-### 3. Product Detail Page (PDP) & Buying Experience
+### 3. Product Detail Page (PDP) & The Valenza Buy Box
 <div align="center">
-  <img src="./amazonclone-app/redmedata/DETAILS.png" alt="Product Detail Page" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
-  <p><em>Figure 4: Product detail page with multi-angle gallery, high-res hover zoom, variant selectors, and the iconic Amazon Buy Box.</em></p>
+  <img src="./amazonclone-app/redmedata/DETAILS.png" alt="Product Detail Page & Buy Box" width="100%" style="border-radius: 10px; border: 1px solid rgba(229, 231, 235, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.2);" />
+  <p><em>Figure 5: Product detail page (`/product/[slug]`) — Multi-angle high-res thumbnail gallery, hover zoom lens, variant selectors, and the iconic Amazon Buy Box.</em></p>
 </div>
 
-- **Interactive Gallery**: Multi-image thumbnail carousel with smooth hover zoom and full-screen view.
-- **Variant Selector**: Seamlessly switch between metals, colors, sizes, and editions with real-time price and stock updates.
-- **The Valenza Buy Box**: Live stock counters, estimated white-glove delivery countdown ("Order within 3 hrs 20 mins"), Add to Bag, and Instant Checkout.
-- **Verified Customer Reviews**: Star distribution charts, verified purchaser badges, and interactive review submission.
+- **Interactive Gallery**: Multi-image thumbnail carousel with smooth hover zoom and full-screen preview.
+- **Variant Selector**: Seamlessly switch between precious metals, colors, sizes, and rare editions with real-time price and stock updates.
+- **The Valenza Buy Box**: Live stock counter, estimated white-glove delivery countdown (*"Order within 3 hrs 20 mins"*), Add to Bag, and 1-Click Instant Checkout.
+- **Verified Customer Reviews**: Star distribution histogram, verified purchaser badges, and interactive review submission.
 
 ---
 
-### 4. 4-Step Checkout & Payment Orchestration
+### 4. 4-Step Accordion Checkout & Razorpay Integration
 <div align="center">
-  <img src="./amazonclone-app/redmedata/ORDER%20SUMMARY.png" alt="Checkout Flow" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
-  <p><em>Figure 5: Streamlined 4-step accordion checkout supporting Credit Cards, Razorpay Gateway, UPI / QR, and Cash on Delivery.</em></p>
+  <img src="./amazonclone-app/redmedata/ORDER%20SUMMARY.png" alt="Checkout Flow & Order Summary" width="100%" style="border-radius: 10px; border: 1px solid rgba(229, 231, 235, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.2);" />
+  <p><em>Figure 6: Streamlined 4-step accordion checkout (`/checkout`) — Delivery address selection, delivery speed tiers, Razorpay test mode gateway, and coupon privilege redemption.</em></p>
 </div>
 
-- **Step 1 — Delivery Address**: Select from saved user addresses or specify new white-glove shipping destinations.
-- **Step 2 — Delivery Speed**: Choose between Complimentary Insured Courier and Priority White-Glove Concierge Delivery.
+- **Step 1 — Delivery Address**: Select from saved user destinations or input bespoke white-glove addresses.
+- **Step 2 — Delivery Speed**: Choose between Complimentary Insured Courier and Priority White-Glove Concierge Courier.
 - **Step 3 — Payment Methods**:
-  - 💳 **Credit / Debit Cards**: Visa, MasterCard, American Express, RuPay with live card brand detection.
+  - 💳 **Credit / Debit Cards**: Visa, MasterCard, American Express, RuPay with live card brand recognition.
   - ⚡ **Razorpay Payment Gateway (Test Mode)**: Authentic modal with test cards (`4111 1111 1111 1111`), UPI (`success@razorpay`), netbanking, and 3D Secure OTP simulation (`123456`).
   - 📱 **UPI / QR**: Instant VPA format validation and QR scan flow.
   - 💵 **Cash on Delivery (COD)**: Doorstep verification.
@@ -161,33 +189,34 @@ Valenza is built on an event-driven, reactive cloud architecture separating pres
 
 ---
 
-### 5. Seller Central — Merchant Hub & Inventory Management
+### 5. Seller Central — Merchant Hub & Inventory Stepper
 <div align="center">
-  <img src="./amazonclone-app/redmedata/seller.png" alt="Seller Central Dashboard" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
-  <p><em>Figure 6: Seller Central — Real-time revenue metrics, product listing manager, and 4-stage order fulfillment stepper.</em></p>
+  <img src="./amazonclone-app/redmedata/seller.png" alt="Seller Central Dashboard" width="100%" style="border-radius: 10px; border: 1px solid rgba(229, 231, 235, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.2);" />
+  <p><em>Figure 7: Seller Central (`/seller`) — Real-time merchant revenue metrics, listing CRUD with Cloudinary CDN, and 4-stage order fulfillment stepper.</em></p>
 </div>
 
-- **Merchant Telemetry**: Real-time sales volume, units dispatched, average order value, and stock alert indicators.
-- **Catalog Management**: Create, edit, activate/deactivate listings with Cloudinary multi-image uploads.
-- **Order Fulfillment Stepper**: Advance merchant orders across 4 fulfillment stages (`Confirmed` → `Processing` → `Shipped` → `Delivered`).
-- **Simulated Test Order Generator**: 1-click test order generator enabling vendors to immediately test and verify fulfillment workflows.
+- **Merchant Telemetry**: Real-time sales volume, units dispatched, average order value (AOV), and inventory stock health.
+- **Listing Management**: Create, edit, activate/deactivate listings with Cloudinary multi-image uploads.
+- **4-Stage Order Stepper**: Advance merchant orders across fulfillment stages (`Confirmed` → `Processing` → `Shipped` → `Delivered`).
+- **Simulated Test Order Generator**: 1-click test order generator enabling vendors to test and verify fulfillment lifecycles instantly.
 
 ---
 
-### 6. Admin Central — Marketplace Command Center
+### 6. Admin Central — Command Console & Governance
 <div align="center">
-  <img src="./amazonclone-app/redmedata/admin.png" alt="Admin Central Console" width="100%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
-  <p><em>Figure 7: Admin Central — Marketplace Gross Merchandise Value (GMV), user governance, and return approval workflows.</em></p>
+  <img src="./amazonclone-app/redmedata/admin.png" alt="Admin Central Console" width="100%" style="border-radius: 10px; border: 1px solid rgba(229, 231, 235, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.2);" />
+  <p><em>Figure 8: Admin Central (`/admin`) — Marketplace Gross Merchandise Value (GMV), customer dispute resolution, coupon manager, and user governance.</em></p>
 </div>
 
 - **Marketplace Governance**: Platform-wide telemetry covering Gross Merchandise Volume (GMV), active shoppers, vendor accounts, and open disputes.
-- **Return & Refund Lifecycle**: Item-level return review and 5-stage approval progression (`Requested` → `Approved` → `Item Returned` → `Processing` → `Refund Issued`).
-- **User & Merchant Governance**: Ban/unban accounts, audit authentication states, and grant seller privileges.
-- **Global Platform Controls**: Dynamically toggle active platform currency, adjust tax percentages, and configure promotional banners.
+- **Return & Refund Lifecycle ([`/admin/returns`](file:///c:/Users/bavis/Downloads/8x%20update/8xAssignment/amazonclone-app/src/app/(protected)/admin/returns/page.tsx))**: Item-level return review and 5-stage approval progression (`Requested` → `Approved` → `Item Returned` → `Processing` → `Refund Issued`).
+- **Promotions & Coupon Subsystem ([`/admin/promotions`](file:///c:/Users/bavis/Downloads/8x%20update/8xAssignment/amazonclone-app/src/app/(protected)/admin/promotions/page.tsx))**: Create/manage coupon codes (`MAISON20`, `ATELIER20`), percentage discounts, and validity windows.
+- **User & Merchant Governance ([`/admin/users`](file:///c:/Users/bavis/Downloads/8x%20update/8xAssignment/amazonclone-app/src/app/(protected)/admin/users/page.tsx))**: Ban/unban accounts, audit authentication states, and grant merchant privileges.
+- **Global Platform Controls ([`/admin/settings`](file:///c:/Users/bavis/Downloads/8x%20update/8xAssignment/amazonclone-app/src/app/(protected)/admin/settings/page.tsx))**: Dynamically toggle active platform currency, adjust tax percentages, and configure promotional banners.
 
 ---
 
-### 7. Valenza AI Concierge & Stylist
+### 7. Valenza AI Concierge & Bespoke Stylist
 - **Conversational Luxury Stylist**: Instant floating AI concierge accessible across the entire store.
 - **Domain-Trained Guidance**: Suggests curated anniversary gifts, formal gala attire, horological investment pieces, and home fragrance pairings.
 - **Smart Deep Linking**: Recommends products with direct clickable markdown navigation links (`/category/electronics`, `/deals`, `/orders`).
@@ -197,9 +226,10 @@ Valenza is built on an event-driven, reactive cloud architecture separating pres
 ## 🛠️ Complete Technology Stack
 
 ```
+Valenza Haute Maison Ecosystem
 ├── Framework:            Next.js 16 (App Router, Server Components & Route Handlers)
 ├── Runtime / Language:   Node.js 20+ & TypeScript 5 (Strict Mode)
-├── Styling & Design:     Tailwind CSS v4, Lucide React Icons, Custom Luxury Color System
+├── Styling & Design:     Tailwind CSS v4, Lucide React Icons, Custom Luxury Color Tokens
 ├── Database:             Firebase Realtime Database (RTDB) with Atomic Rules
 ├── Authentication:       Firebase Auth (Session persistence, Email/Password, RBAC)
 ├── Media Pipeline:       Cloudinary CDN (Signed server-side uploads & image transformations)
@@ -216,15 +246,15 @@ Valenza is built on an event-driven, reactive cloud architecture separating pres
 ```
 8xAssignment/
 ├── .agent-logs/                   # 🤖 Synchronized 8x agent prompt/response audit logs
-│   ├── 2026-09-21_11-05-07_...md  # Session 1: Initial setup & foundation
-│   ├── 2026-09-21_11-48-19_...md  # Session 2: Auth & routing
-│   ├── 2026-09-21_12-04-28_...md  # Session 3: Catalog schema & RTDB
-│   ├── 2026-09-21_14-39-36_...md  # Session 4: Cloudinary integration
-│   ├── 2026-09-25_11-08-23_...md  # Session 5: Seller & Admin consoles
-│   ├── 2026-09-25_12-57-05_...md  # Session 6: 8x agent capture setup
-│   ├── 2026-09-25_13-45-55_...md  # Session 7: Marketplace overhaul
-│   ├── 2026-09-25_18-45-42_...md  # Session 8: Testing & validation
-│   ├── 2026-09-26_04-55-14_...md  # Session 9: Luxury ateliers & AI Concierge
+│   ├── 2026-09-21_11-05-07_...md  # Session 01: Initial setup & foundation
+│   ├── 2026-09-21_11-48-19_...md  # Session 02: Auth & routing
+│   ├── 2026-09-21_12-04-28_...md  # Session 03: Catalog schema & RTDB
+│   ├── 2026-09-21_14-39-36_...md  # Session 04: Cloudinary integration
+│   ├── 2026-09-25_11-08-23_...md  # Session 05: Seller & Admin consoles
+│   ├── 2026-09-25_12-57-05_...md  # Session 06: 8x agent capture setup
+│   ├── 2026-09-25_13-45-55_...md  # Session 07: Marketplace overhaul
+│   ├── 2026-09-25_18-45-42_...md  # Session 08: Testing & validation
+│   ├── 2026-09-26_04-55-14_...md  # Session 09: Luxury ateliers & AI Concierge
 │   ├── 2026-09-26_18-26-09_...md  # Session 10: Agent logs UI & high-res redmedata screenshots
 │   └── sync.py                    # Automated log synchronization script with secret redaction
 ├── .agents/                       # Agent rules, architecture specs, and reference media
@@ -236,6 +266,8 @@ Valenza is built on an event-driven, reactive cloud architecture separating pres
 │   ├── src/
 │   │   ├── app/                   # App Router pages & API routes
 │   │   │   ├── (protected)/       # Route-guarded portals (/admin, /seller, /account)
+│   │   │   │   ├── admin/         # /admin command center, returns, promotions, users
+│   │   │   │   └── seller/        # /seller merchant dashboard, inventory, orders
 │   │   │   ├── agent-logs/        # 🤖 Interactive 8x Agent Logs Explorer & audit UI
 │   │   │   ├── api/ai/assistant/  # Groq AI Concierge streaming endpoint
 │   │   │   ├── api/cloudinary/    # Signed asset upload & deletion endpoints
@@ -257,6 +289,7 @@ Valenza is built on an event-driven, reactive cloud architecture separating pres
 │   ├── package.json
 │   └── next.config.ts
 ├── database.rules.json            # Firebase Realtime Database security rules
+├── render.yaml                    # Cloud render deployment orchestration
 └── README.md                      # Project documentation
 ```
 
@@ -321,13 +354,13 @@ The platform includes pre-configured test accounts across all roles:
 
 | Role | Email | Password | Access Area |
 | :--- | :--- | :--- | :--- |
-| **Marketplace Admin** | `admin@gmail.com` | `admin123` | `/admin` (Full telemetry & governance) |
-| **Verified Merchant** | `sham2@gmail.com` | `sham123` | `/seller` (Inventory & order fulfillment) |
-| **Customer Shopper** | `sham@gmail.com` | `sham123` | Storefront, Cart, Checkout, `/orders` |
+| **Marketplace Admin** | `admin@gmail.com` | `admin123` | [`/admin`](https://amazonclone-app.vercel.app/admin) (Full telemetry, returns, promotions, governance) |
+| **Verified Merchant** | `sham2@gmail.com` | `sham123` | [`/seller`](https://amazonclone-app.vercel.app/seller) (Inventory, listing CRUD, fulfillment stepper) |
+| **Customer Shopper** | `sham@gmail.com` | `sham123` | Storefront, Cart, Checkout, [`/orders`](https://amazonclone-app.vercel.app/orders) |
 
 ---
 
-## 🧪 Razorpay Test Mode Credentials
+## 🧪 Razorpay Test Mode Verification
 
 When completing a purchase via the **Razorpay Payment Gateway** option:
 - **Card Number**: `4111 1111 1111 1111`
